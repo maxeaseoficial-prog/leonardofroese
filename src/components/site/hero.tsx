@@ -31,7 +31,7 @@ export function Hero() {
     >
       {/* Cinematic Overlays */}
       <div 
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 -z-10"
         style={{
           background: `linear-gradient(
             90deg,
@@ -43,8 +43,9 @@ export function Hero() {
         }}
       />
       {/* Subtle vignette and bottom darkening */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,8,8,0.4)_100%)]" />
-      <div className="absolute inset-0 z-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,8,8,0.4)_100%)]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-transparent to-transparent" />
+
 
 
       <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center px-6 pb-24 pt-36 lg:px-10">
