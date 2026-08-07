@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   ArrowUpRight,
   BarChart3,
