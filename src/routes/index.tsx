@@ -1,24 +1,56 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AmbientBackground, ScrollProgress } from "@/components/site/primitives";
+import { Hero } from "@/components/site/hero";
+import { Footer, Nav } from "@/components/site/chrome";
+import {
+  About,
+  FinalCta,
+  ImpactBand,
+  Methodology,
+  Pillars,
+  Problems,
+  Results,
+  Testimonials,
+} from "@/components/site/sections";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const title = "Leonardo Froese | Caliber Gestão Empresarial";
+const description =
+  "Consultoria de gestão para empresários: financeiro, processos, comercial e escala. Há 16 anos estruturando empresas lucrativas que não dependem do dono.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main id="top" className="relative overflow-x-clip bg-background">
+      <ScrollProgress />
+      <Nav />
+      <Hero />
+      <div className="relative">
+        <AmbientBackground />
+        <div className="relative">
+          <Problems />
+          <Methodology />
+          <Pillars />
+          <Results />
+          <About />
+          <Testimonials />
+          <ImpactBand />
+          <FinalCta />
+          <Footer />
+        </div>
+      </div>
+    </main>
   );
 }
