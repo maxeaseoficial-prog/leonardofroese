@@ -24,14 +24,14 @@ export function Hero() {
         <div className="absolute inset-0">
           <img
             src={heroBg.url}
-            alt=""
-            className="h-full w-full object-cover object-center opacity-70 grayscale-[0.2]"
+            alt="Leonardo Froese"
+            className="h-full w-full object-cover object-center opacity-70"
           />
-          {/* Degrade sobre a imagem */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/40 to-background" />
+          {/* Camada de degradê sobreposta para legibilidade */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background" />
         </div>
-        {/* overlay cinematográfico + blur nas bordas */}
-        <div className="absolute inset-0 bg-background/40" />
+        {/* Overlay cinematográfico centralizado */}
+        <div className="absolute inset-0 bg-background/20" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,oklch(0.145_0_0/0.95)_100%)]" />
         <div className="absolute inset-0 backdrop-blur-[3px] [mask-image:radial-gradient(ellipse_at_center,transparent_45%,black_95%)]" />
       </motion.div>
