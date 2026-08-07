@@ -23,7 +23,7 @@ export function Hero() {
       ref={ref} 
       className="relative min-h-[100svh] overflow-hidden"
       style={{
-        backgroundImage: `url(${heroBg.url})`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${heroBg.url})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
