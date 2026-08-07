@@ -59,7 +59,7 @@ export function Footer() {
     <footer className="border-t border-border px-6 py-16 lg:px-10">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-base font-extrabold tracking-tight">CALIBER</p>
+          <p className="text-base font-extrabold tracking-tight">CÁLIBER</p>
           <p className="mt-2 text-xs font-light text-subtle">
             Gestão Empresarial: Leonardo Froese
           </p>
@@ -97,7 +97,7 @@ export function Footer() {
         </div>
       </div>
       <p className="mx-auto mt-12 w-full max-w-7xl text-[11px] font-light text-subtle">
-        © {new Date().getFullYear()} Caliber Gestão Empresarial. Todos os direitos
+        © {new Date().getFullYear()} Cáliber Gestão Empresarial. Todos os direitos
         reservados.
       </p>
     </footer>

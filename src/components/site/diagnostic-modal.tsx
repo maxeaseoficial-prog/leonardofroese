@@ -146,7 +146,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
                       <div className="space-y-8">
                         <h3 className="text-xl font-semibold text-white">Vamos começar pela sua empresa.</h3>
                         <div className="grid gap-6 sm:grid-cols-2">
-                          <Input label="Nome da empresa" value={data.empresa.nome} onChange={v => setData({...data, empresa: {...data.empresa, nome: v}})} placeholder="Ex: Caliber Gestão" />
+                          <Input label="Nome da empresa" value={data.empresa.nome} onChange={v => setData({...data, empresa: {...data.empresa, nome: v}})} placeholder="Ex: Cáliber Gestão" />
                           <Input label="Segmento" value={data.empresa.segmento} onChange={v => setData({...data, empresa: {...data.empresa, segmento: v}})} placeholder="Ex: Serviços, Varejo..." />
                           <Input label="Cidade / Estado" value={data.empresa.cidade} onChange={v => setData({...data, empresa: {...data.empresa, cidade: v}})} placeholder="Ex: São Paulo, SP" />
                           <Input label="Tempo de empresa" value={data.empresa.tempoEmpresa} onChange={v => setData({...data, empresa: {...data.empresa, tempoEmpresa: v}})} placeholder="Ex: 5 anos" />
@@ -259,7 +259,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
                             {data.contato.autorizo && <CheckCircle2 className="size-3.5 text-black" />}
                           </div>
                           <span className="text-xs font-light text-muted-foreground leading-relaxed">
-                            Autorizo o contato da equipe Caliber para falar sobre este diagnóstico estratégico.
+                            Autorizo o contato da equipe Cáliber para falar sobre este diagnóstico estratégico.
                           </span>
                         </label>
                       </div>

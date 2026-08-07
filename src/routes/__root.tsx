@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Leonardo Froese | Caliber Gestão Empresarial" },
+      { title: "Leonardo Froese | Cáliber Gestão Empresarial" },
       {
         name: "description",
         content:
           "Consultoria de gestão para empresários: financeiro, processos, comercial e escala.",
       },
-      { name: "author", content: "Caliber Gestão Empresarial" },
+      { name: "author", content: "Cáliber Gestão Empresarial" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
