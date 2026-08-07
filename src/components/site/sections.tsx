@@ -9,6 +9,7 @@ import {
   Crown,
   Gauge,
   Handshake,
+  Landmark,
   LineChart,
   Play,
   Quote,
@@ -212,67 +213,124 @@ export function Pillars() {
   );
 }
 
-/* ---------------- Sessão 5 — Resultados ---------------- */
+/* ---------------- Sessão 5 — Resultados (Transformações) ---------------- */
 
-const results = [
-  { icon: Gauge, value: 16, prefix: "+", suffix: "", label: "anos de mercado", static: "" },
+const transformations = [
   {
-    icon: Target,
-    value: 400,
-    prefix: "+",
-    suffix: "",
-    label: "empresas estruturadas",
-    static: "",
+    id: "01",
+    icon: Workflow,
+    title: "Empresa Organizada",
+    text: "Processos claros, responsabilidades definidas e uma operação que funciona de forma previsível.",
   },
   {
+    id: "02",
+    icon: Landmark,
+    title: "Financeiro sob Controle",
+    text: "Indicadores confiáveis, fluxo de caixa estruturado e decisões baseadas em dados.",
+  },
+  {
+    id: "03",
     icon: TrendingUp,
-    value: 100,
-    prefix: "+R$ ",
-    suffix: " mi",
-    label: "em lucro gerado",
-    static: "",
+    title: "Comercial Previsível",
+    text: "Processo comercial estruturado para gerar crescimento consistente e aumento da lucratividade.",
   },
   {
-    icon: Repeat,
-    value: 0,
-    prefix: "",
-    suffix: "",
-    label: "empresas de diversos segmentos",
-    static: "Multi",
+    id: "04",
+    icon: User,
+    title: "Dono com Liberdade",
+    text: "Uma empresa preparada para crescer sem depender do empresário em todas as decisões.",
   },
+];
+
+const indicators = [
+  { value: 16, suffix: "+", label: "Anos estruturando empresas" },
+  { value: 450, suffix: "+", label: "Empresas transformadas" },
+  { value: 100, prefix: "R$", suffix: " milhões+", label: "Em lucro gerado" },
+  { value: 12000, suffix: "+", label: "Pessoas treinadas" },
 ];
 
 export function Results() {
   return (
-    <Section id="resultados" className="bg-surface/40">
-      <SectionLabel>Resultados</SectionLabel>
-      <Reveal delay={0.1}>
-        <h2 className="text-balance-tight mt-6 text-3xl font-bold leading-[1.1] sm:text-5xl">
-          Resultados construídos na prática.
-        </h2>
-      </Reveal>
+    <Section id="resultados" className="overflow-hidden">
+      <div className="flex flex-col items-center text-center">
+        <SectionLabel>Resultados</SectionLabel>
+        <Reveal delay={0.1}>
+          <h2 className="text-balance-tight mt-6 text-4xl font-bold leading-[1.05] sm:text-6xl">
+            Transformações construídas na prática.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-muted-foreground sm:text-xl">
+            Mais do que aumentar faturamento, o objetivo é construir empresas que crescem com gestão, processos e previsibilidade.
+          </p>
+        </Reveal>
+      </div>
 
-      <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {results.map((r, i) => (
-          <Reveal key={r.label} delay={i * 0.08}>
-            <div className="card-premium h-full p-8">
-              <r.icon className="size-5 text-primary" strokeWidth={1.6} />
-              <p className="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">
-                {r.static ? (
-                  <span className="text-primary">{r.static}</span>
-                ) : (
-                  <CountUp
-                    to={r.value}
-                    prefix={r.prefix}
-                    suffix={r.suffix}
-                    className="text-primary"
-                  />
-                )}
+      {/* Primeira parte: Blocos Premium */}
+      <div className="mt-24 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {transformations.map((t, i) => (
+          <Reveal key={t.id} delay={0.1 + i * 0.1}>
+            <TiltCard className="group flex h-full flex-col p-10 glass border-white/5 bg-gradient-to-b from-surface/50 to-background/50">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-primary/40">
+                  {t.id}
+                </span>
+                <t.icon className="size-5 text-primary" strokeWidth={1.5} />
+              </div>
+              <h3 className="mt-12 text-xl font-semibold tracking-tight">{t.title}</h3>
+              <p className="mt-4 text-sm font-light leading-relaxed text-muted-foreground">
+                {t.text}
               </p>
-              <p className="mt-2 text-sm font-light text-muted-foreground">{r.label}</p>
-            </div>
+              
+              {/* Detalhe dourado discreto no hover */}
+              <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full" />
+            </TiltCard>
           </Reveal>
         ))}
+      </div>
+
+      {/* Segunda parte: Faixa Premium com Indicadores */}
+      <div className="relative mt-32">
+        {/* Linha horizontal dourada */}
+        <div className="absolute -top-12 left-0 right-0 h-px">
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, ease: "circOut" }}
+            className="h-full w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent" 
+          />
+        </div>
+
+        <div className="grid gap-12 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          {indicators.map((ind, i) => (
+            <Reveal key={ind.label} delay={0.4 + i * 0.1}>
+              <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+                <p className="text-4xl font-bold tracking-tighter text-primary sm:text-5xl">
+                  <CountUp 
+                    to={ind.value} 
+                    prefix={ind.prefix || ""} 
+                    suffix={ind.suffix}
+                    duration={2.5}
+                  />
+                </p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-subtle">
+                  {ind.label}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="absolute -bottom-12 left-0 right-0 h-px">
+          <motion.div 
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
+            className="h-full w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent" 
+          />
+        </div>
       </div>
     </Section>
   );
