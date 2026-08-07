@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from "motion/react";
+import founderImg from "@/assets/leonardo-founder.png.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -291,16 +292,14 @@ export function About() {
           {/* PLACEHOLDER — foto do Leonardo */}
           <motion.div
             style={{ y }}
-            data-image-placeholder="leonardo"
-            className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-surface-2 to-surface"
+            className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-surface"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_20%,oklch(0.83_0.121_82.5/0.10),transparent_70%)]" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-subtle">
-              <User className="size-8" strokeWidth={1.2} />
-              <span className="text-[11px] uppercase tracking-[0.24em]">
-                Espaço para foto
-              </span>
-            </div>
+            <img
+              src={founderImg.url}
+              alt="Leonardo Froese"
+              className="h-full w-full object-cover grayscale-[0.2] transition-all duration-700 hover:grayscale-0"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
           </motion.div>
         </Reveal>
 
