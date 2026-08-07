@@ -134,7 +134,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
               </div>
 
               {/* Form Content */}
-              <div className="min-h-[450px]">
+              <div className="min-h-[350px]">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step}
