@@ -31,9 +31,8 @@ export function Nav() {
     >
       <nav className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#top" className="flex items-baseline gap-2">
-          <span className="text-base font-extrabold tracking-tight">CALIBER</span>
-          <span className="text-[10px] uppercase tracking-[0.24em] text-subtle">
-            Gestão Empresarial
+          <span className="text-base font-extrabold tracking-tight uppercase">
+            Leonardo Froese
           </span>
         </a>
         <div className="hidden items-center gap-9 lg:flex">
