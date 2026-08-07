@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import { CountUp, MagneticButton, Reveal } from "./primitives";
-import heroBg from "@/assets/hero-bg.png.asset.json";
+import heroBg from "@/assets/hero-bg-v2.png.asset.json";
 
 const stats = [
   { label: "de mercado", value: 16, prefix: "+", suffix: " anos" },
@@ -13,27 +13,38 @@ const stats = [
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
+  const scaleBg = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
   const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
     <section ref={ref} className="relative min-h-[100svh] overflow-hidden">
       {/* Imagem de fundo com degrade cinematográfico */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 -z-10" aria-hidden>
+      <motion.div style={{ y: yBg, scale: scaleBg }} className="absolute inset-0 -z-10 h-screen w-full" aria-hidden>
         <div className="absolute inset-0">
           <img
             src={heroBg.url}
             alt="Leonardo Froese"
-            className="h-full w-full object-cover object-center opacity-70"
+            className="h-full w-full object-cover object-center opacity-85 brightness-[0.85] contrast-[1.05]"
           />
-          {/* Camada de degradê sobreposta para legibilidade */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background" />
+          {/* Custom Cinematic Overlay based on user request */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(
+                90deg,
+                rgba(8,8,8,0.82) 0%,
+                rgba(8,8,8,0.60) 35%,
+                rgba(8,8,8,0.35) 65%,
+                rgba(8,8,8,0.20) 100%
+              )`
+            }}
+          />
+          {/* Subtle vignette and bottom darkening */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,8,8,0.4)_100%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>
-        {/* Overlay cinematográfico centralizado */}
-        <div className="absolute inset-0 bg-background/20" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,oklch(0.145_0_0/0.95)_100%)]" />
-        <div className="absolute inset-0 backdrop-blur-[3px] [mask-image:radial-gradient(ellipse_at_center,transparent_45%,black_95%)]" />
       </motion.div>
 
       <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center px-6 pb-24 pt-36 lg:px-10">
