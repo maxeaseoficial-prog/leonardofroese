@@ -84,12 +84,12 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-md overflow-y-auto pt-6 pb-6 px-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-md overflow-y-auto py-8 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-          className="relative w-full max-w-3xl bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-6 lg:p-10 shadow-2xl"
+          className="relative w-full max-w-4xl bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-6 lg:p-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
         >
           <button 
             onClick={onClose} 
