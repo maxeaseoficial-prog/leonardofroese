@@ -23,7 +23,7 @@ export function Hero() {
       ref={ref} 
       className="relative min-h-[100svh] overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${heroBg.url})`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url(${heroBg.url})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -83,18 +83,6 @@ export function Hero() {
             </div>
           </Reveal>
 
-          <div className="mt-16 grid gap-4 sm:grid-cols-3">
-            {stats.map((s, i) => (
-              <Reveal key={s.label} delay={0.55 + i * 0.12}>
-                <div className="card-premium h-full px-6 py-6">
-                  <p className="text-2xl font-bold tracking-tight text-primary sm:text-[1.7rem]">
-                    <CountUp to={s.value} prefix={s.prefix} suffix={s.suffix} />
-                  </p>
-                  <p className="mt-1.5 text-sm font-light text-subtle">{s.label}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </motion.div>
       </div>
 
