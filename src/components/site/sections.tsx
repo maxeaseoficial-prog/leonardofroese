@@ -130,17 +130,17 @@ export function Methodology() {
 
         <ol className="grid gap-10 pl-10 lg:grid-cols-7 lg:gap-6 lg:pl-0">
           {steps.map((s, i) => (
-            <li key={s.title} className="relative">
+            <li key={s.title} className="group/step relative">
               <motion.span
                 initial={{ scale: 0.5, opacity: 0.2 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="absolute -left-10 top-1 block size-[19px] rounded-full border border-primary/60 bg-background shadow-[0_0_22px_-4px_oklch(0.83_0.121_82.5/0.7)] lg:relative lg:left-0 lg:top-0"
+                className="absolute -left-10 top-1 block size-[19px] rounded-full border border-primary/60 bg-background shadow-[0_0_22px_-4px_oklch(0.83_0.121_82.5/0.7)] transition-transform duration-500 group-hover/step:scale-125 group-hover/step:border-primary lg:relative lg:left-0 lg:top-0"
               >
-                <span className="absolute inset-[5px] rounded-full bg-primary" />
+                <span className="absolute inset-[5px] rounded-full bg-primary transition-transform duration-500 group-hover/step:scale-110" />
               </motion.span>
-              <Reveal delay={i * 0.05} className="lg:mt-6">
+              <Reveal delay={i * 0.05} className="transition-transform duration-500 group-hover/step:translate-x-1 lg:mt-6 lg:group-hover/step:translate-x-0 lg:group-hover/step:translate-y-[-4px]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-subtle">
                   {String(i + 1).padStart(2, "0")}
                 </p>
