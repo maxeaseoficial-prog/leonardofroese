@@ -186,26 +186,37 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
                     )}
 
                     {step === 3 && (
-                      <div className="space-y-10">
-                        <h3 className="text-xl font-semibold text-white">Quanto a empresa depende de você hoje?</h3>
-                        <div className="space-y-8">
+                      <div className="space-y-12">
+                        <div>
+                          <h3 className="text-2xl font-semibold text-white">Gestão da Empresa</h3>
+                          <p className="mt-3 text-sm font-light text-muted-foreground leading-relaxed max-w-2xl">
+                            Avalie cada afirmação movendo o controle para representar a realidade atual da sua empresa. 
+                            Não existem respostas certas ou erradas. Quanto mais preciso você responder, mais útil será o diagnóstico.
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-16">
                           <ScaleQuestion 
                             label="As principais decisões ainda dependem do dono?" 
+                            description="Avalie o quanto sua empresa continua dependendo da sua presença para funcionar."
                             value={data.gestao.dependenciaDono} 
                             onChange={v => setData({...data, gestao: {...data.gestao, dependenciaDono: v}})} 
                           />
                           <ScaleQuestion 
                             label="A empresa possui indicadores de gestão acompanhados?" 
+                            description="Analise se as decisões são tomadas com base em dados ou no 'feeling'."
                             value={data.gestao.indicadores} 
                             onChange={v => setData({...data, gestao: {...data.gestao, indicadores: v}})} 
                           />
                           <ScaleQuestion 
                             label="O financeiro possui projeções confiáveis?" 
+                            description="Verifique se você tem clareza sobre o fluxo de caixa futuro e margens."
                             value={data.gestao.financeiro} 
                             onChange={v => setData({...data, gestao: {...data.gestao, financeiro: v}})} 
                           />
                           <ScaleQuestion 
                             label="Os líderes sabem claramente o que entregar?" 
+                            description="Avalie se o time tem autonomia e clareza sobre suas responsabilidades."
                             value={data.gestao.lideranca} 
                             onChange={v => setData({...data, gestao: {...data.gestao, lideranca: v}})} 
                           />
@@ -381,25 +392,107 @@ function OptionCard({ children, active, onClick }: { children: string, active: b
   );
 }
 
-function ScaleQuestion({ label, value, onChange }: { label: string, value: number, onChange: (v: number) => void }) {
-  const levels = ["Crítico", "Baixo", "Médio", "Alto", "Excelente"];
+function ScaleQuestion({ label, description, value, onChange }: { label: string, description: string, value: number, onChange: (v: number) => void }) {
+  const levels = ["Muito Baixo", "Baixo", "Moderado", "Alto", "Muito Alto"];
+  const subLabels = ["Nunca", "Pouco", "Médio", "Muito", "Totalmente"];
+  
+  // Cores baseadas no nível
+  const getLevelColor = (v: number) => {
+    switch(v) {
+      case 1: return "text-zinc-500";
+      case 2: return "text-primary/60";
+      case 3: return "text-primary/80";
+      case 4: return "text-primary";
+      case 5: return "text-primary brightness-125";
+      default: return "text-zinc-500";
+    }
+  };
+
+  const getBarColor = (v: number) => {
+    switch(v) {
+      case 1: return "bg-zinc-600";
+      case 2: return "bg-primary/40";
+      case 3: return "bg-primary/70";
+      case 4: return "bg-primary";
+      case 5: return "bg-primary brightness-125";
+      default: return "bg-zinc-600";
+    }
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-end">
-        <label className="text-sm font-medium text-white/90 max-w-sm">{label}</label>
-        <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{levels[value - 1]}</span>
+    <div className="space-y-6">
+      <div className="space-y-1.5">
+        <label className="text-lg font-medium text-white tracking-tight">{label}</label>
+        <p className="text-sm font-light text-muted-foreground/60">{description}</p>
       </div>
-      <div className="flex gap-2">
-        {[1, 2, 3, 4, 5].map(v => (
-          <button
-            key={v}
-            onClick={() => onChange(v)}
-            className={cn(
-              "flex-1 h-3 rounded-full transition-all duration-500",
-              v <= value ? "bg-primary shadow-[0_0_10px_oklch(0.83_0.121_82.5/0.3)]" : "bg-white/5 hover:bg-white/10"
-            )}
+      
+      <div className="relative pt-4 pb-12">
+        {/* Track de fundo */}
+        <div className="absolute top-[22px] left-0 right-0 h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <motion.div 
+            className={cn("h-full origin-left transition-colors duration-500", getBarColor(value))}
+            initial={false}
+            animate={{ width: `${((value - 1) / 4) * 100}%` }}
           />
-        ))}
+        </div>
+
+        {/* Slider input nativo escondido para acessibilidade e controle */}
+        <input 
+          type="range"
+          min="1"
+          max="5"
+          step="1"
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value))}
+          className="absolute top-0 left-0 w-full h-12 opacity-0 cursor-pointer z-10"
+        />
+
+        {/* Custom Thumb & Indicator */}
+        <motion.div 
+          className="absolute top-3 flex flex-col items-center pointer-events-none"
+          initial={false}
+          animate={{ left: `${((value - 1) / 4) * 100}%` }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          style={{ x: "-50%" }}
+        >
+          {/* Thumb Dourado Metálico */}
+          <motion.div 
+            className="size-6 rounded-full bg-primary border-4 border-[#0F0F0F] shadow-[0_0_20px_rgba(244,190,98,0.4)] flex items-center justify-center relative group"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 1.2 }}
+          >
+            <div className="size-1 bg-black/40 rounded-full" />
+            <div className="absolute inset-0 rounded-full ring-4 ring-primary/20 scale-0 group-hover:scale-150 transition-transform duration-300" />
+          </motion.div>
+
+          {/* Indicador Textual Flutuante */}
+          <motion.span 
+            key={value}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn("absolute -top-10 whitespace-nowrap text-xs font-bold uppercase tracking-widest transition-colors duration-500", getLevelColor(value))}
+          >
+            {levels[value - 1]}
+          </motion.span>
+        </motion.div>
+
+        {/* Escala Numérica / Textual Inferior */}
+        <div className="absolute -bottom-2 left-0 right-0 flex justify-between px-1">
+          {subLabels.map((label, i) => (
+            <div key={label} className="flex flex-col items-center gap-1.5">
+              <span className={cn(
+                "text-[9px] font-bold tracking-tighter transition-colors duration-300", 
+                value === i + 1 ? "text-primary" : "text-muted-foreground/30"
+              )}>
+                {label}
+              </span>
+              <div className={cn(
+                "size-1 rounded-full transition-colors duration-300",
+                value === i + 1 ? "bg-primary" : "bg-white/10"
+              )} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
