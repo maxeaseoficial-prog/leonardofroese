@@ -89,13 +89,14 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
           initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-          className="relative w-full max-w-5xl bg-[#0F0F0F] border border-white/5 rounded-[2.5rem] p-8 lg:p-14 shadow-2xl"
+          className="relative w-full max-w-4xl bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-8 lg:p-12 shadow-2xl"
         >
           <button 
             onClick={onClose} 
-            className="absolute top-8 right-8 text-muted-foreground hover:text-primary transition-colors z-10"
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/5 text-muted-foreground hover:text-white hover:bg-white/10 transition-all z-10"
+            aria-label="Fechar"
           >
-            <X className="size-6" />
+            <X className="size-5" />
           </button>
 
           {!isSubmitted ? (
