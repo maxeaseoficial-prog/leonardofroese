@@ -190,7 +190,7 @@ export function Pillars() {
       <SectionLabel>Fundamentos</SectionLabel>
       <Reveal delay={0.1}>
         <h2 className="text-balance-tight mt-6 text-3xl font-bold leading-[1.1] sm:text-5xl">
-          Os pilares da Caliber.
+          Os pilares da Cáliber.
         </h2>
       </Reveal>
 
@@ -370,7 +370,7 @@ export function About() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-8 max-w-2xl text-base font-light leading-[1.85] text-muted-foreground">
-              Fundador da Caliber Gestão Empresarial, Leonardo atua há mais de 16 anos ao
+              Fundador da Cáliber Gestão Empresarial, Leonardo atua há mais de 16 anos ao
               lado de empresários que querem sair da operação e construir empresas que se
               sustentam sozinhas. Sua atuação combina gestão estratégica, disciplina
               financeira e estruturação comercial.
@@ -386,7 +386,7 @@ export function About() {
           <Reveal delay={0.4}>
             <div className="mt-10 h-px w-full hairline" />
             <p className="mt-6 text-sm font-light text-subtle">
-              Caliber Gestão Empresarial: consultoria para empresas que querem crescer com
+              Cáliber Gestão Empresarial: consultoria para empresas que querem crescer com
               estrutura.
             </p>
           </Reveal>
@@ -405,7 +405,7 @@ export function PresentationVideo() {
         <SectionLabel>Apresentação</SectionLabel>
         <Reveal delay={0.1}>
           <h2 className="text-balance-tight mt-6 max-w-3xl text-3xl font-bold leading-[1.1] sm:text-5xl">
-            Conheça a visão por trás da <span className="text-primary">Caliber.</span>
+            Conheça a visão por trás da <span className="text-primary">Cáliber.</span>
           </h2>
         </Reveal>
         
@@ -472,7 +472,7 @@ const chapters = [
     content: [
       "Com o passar dos anos a metodologia foi sendo validada.",
       "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
-      "Hoje a Caliber atua em diversos segmentos e estados brasileiros.",
+      "Hoje a Cáliber atua em diversos segmentos e estados brasileiros.",
       "Meu trabalho deixou de depender exclusivamente da minha agenda. Criamos uma empresa capaz de transformar negócios em escala.",
     ],
   },

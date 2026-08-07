@@ -15,7 +15,7 @@ import {
   Testimonials,
 } from "@/components/site/sections";
 
-const title = "Leonardo Froese | Caliber Gestão Empresarial";
+const title = "Leonardo Froese | Cáliber Gestão Empresarial";
 const description =
   "Consultoria de gestão para empresários: financeiro, processos, comercial e escala. Há 16 anos estruturando empresas lucrativas que não dependem do dono.";
 
