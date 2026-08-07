@@ -9,6 +9,7 @@ import {
   Crown,
   Gauge,
   Handshake,
+  Landmark,
   LineChart,
   Play,
   Quote,
@@ -308,7 +309,7 @@ export function Results() {
                 <p className="text-4xl font-bold tracking-tighter text-primary sm:text-5xl">
                   <CountUp 
                     to={ind.value} 
-                    prefix={ind.prefix} 
+                    prefix={ind.prefix || ""} 
                     suffix={ind.suffix}
                     duration={2.5}
                   />
