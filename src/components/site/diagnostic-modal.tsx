@@ -102,10 +102,10 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
           {!isSubmitted ? (
             <>
               {/* Header */}
-              <div className="mb-12">
+              <div className="mb-8">
                 <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-primary">Diagnóstico Inicial</span>
-                <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Raio-X Empresarial</h2>
-                <p className="mt-4 text-base font-light text-muted-foreground max-w-xl">
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">Raio-X Empresarial</h2>
+                <p className="mt-3 text-sm font-light text-muted-foreground max-w-xl">
                   Entenda os principais gargalos que travam o crescimento da sua empresa hoje.
                 </p>
                 
