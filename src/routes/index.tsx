@@ -10,6 +10,7 @@ import {
   Pillars,
   Problems,
   Results,
+  Storytelling,
   Testimonials,
 } from "@/components/site/sections";
 
@@ -42,8 +43,9 @@ function Index() {
         <div className="relative">
           <Problems />
           <Methodology />
-          <Pillars />
+          <Storytelling />
           <Results />
+          <Pillars />
           <About />
           <Testimonials />
           <ImpactBand />

@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   ArrowUpRight,
   BarChart3,
@@ -12,6 +13,7 @@ import {
   Quote,
   Repeat,
   Rocket,
+  Scroll,
   Target,
   TrendingUp,
   User,
@@ -334,6 +336,141 @@ export function About() {
         </div>
       </div>
     </Section>
+  );
+}
+
+/* ---------------- Sessão Storytelling — Narrativa ---------------- */
+
+const chapters = [
+  {
+    id: "01",
+    label: "Capítulo 01",
+    title: "SOBRE MIM",
+    content: [
+      "Prazer, sou Leonardo Froese.",
+      "Sou CEO da Cáliber Transformadoria, empresa especializada em transformar negócios na prática, construída a partir da vivência real dentro das empresas.",
+      "Ao longo da minha trajetória participei da estruturação de centenas de operações empresariais e acompanhei milhares de decisões estratégicas que impactaram diretamente o crescimento dos negócios.",
+      "Hoje nosso trabalho já contribuiu para mais de R$ 100 milhões em lucro gerado e centenas de empresas estruturadas.",
+    ],
+  },
+  {
+    id: "02",
+    label: "Capítulo 02",
+    title: "O PROBLEMA",
+    content: [
+      "Durante muitos anos acompanhei consultorias entregando soluções excelentes no papel, mas completamente desconectadas da realidade do empresário.",
+      "Planilhas perfeitas. Métodos sofisticados. Processos impecáveis.",
+      "Mas nada funcionava na prática.",
+      "Quem realmente conhece uma empresa é quem vive seus desafios todos os dias. Foi ali que percebi que o mercado precisava de algo diferente.",
+    ],
+  },
+  {
+    id: "03",
+    label: "Capítulo 03",
+    title: "O DESAFIO",
+    content: [
+      "Decidi construir uma metodologia baseada na prática.",
+      "Passei anos identificando os principais fatores que impedem empresas de crescer.",
+      "Mapeei processos. Financeiro. Comercial. Gestão. Operação.",
+      "Foi assim que nasceu uma metodologia capaz de organizar empresas, aumentar o lucro e reduzir a dependência do empresário nas operações do dia a dia.",
+    ],
+  },
+  {
+    id: "04",
+    label: "Capítulo 04",
+    title: "O SUCESSO",
+    content: [
+      "Com o passar dos anos a metodologia foi sendo validada.",
+      "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
+      "Hoje a Caliber atua em diversos segmentos e estados brasileiros.",
+      "Meu trabalho deixou de depender exclusivamente da minha agenda. Criamos uma empresa capaz de transformar negócios em escala.",
+    ],
+  },
+  {
+    id: "05",
+    label: "Capítulo 05",
+    title: "O PROPÓSITO",
+    content: [
+      "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
+      "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
+      "Foi por isso que decidi compartilhar esse conhecimento.",
+      "Meu propósito não é apenas organizar empresas. É ajudar empresários a construírem negócios lucrativos, estruturados e independentes do dono.",
+      "Esse é o trabalho que escolhi realizar.",
+    ],
+  },
+];
+
+export function Storytelling() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"],
+  });
+
+  return (
+    <div ref={containerRef} className="relative">
+      {/* Linha dourada conectora */}
+      <div className="absolute left-1/2 top-[10%] bottom-[10%] hidden w-px -translate-x-1/2 bg-border/40 lg:block">
+        <motion.div
+          style={{ height: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]) }}
+          className="w-px origin-top bg-gradient-to-b from-primary/20 via-primary to-primary/20 shadow-[0_0_15px_oklch(0.83_0.121_82.5/0.4)]"
+        />
+      </div>
+
+      {chapters.map((chapter, i) => (
+        <ChapterItem key={chapter.id} chapter={chapter} index={i} />
+      ))}
+    </div>
+  );
+}
+
+function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index: number }) {
+  const isEven = index % 2 === 0;
+
+  return (
+    <section className="relative flex min-h-[90vh] items-center px-6 py-20 lg:px-10">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-24">
+        {/* Texto */}
+        <div className={cn("relative z-10", !isEven && "lg:order-2")}>
+          <Reveal delay={0.1} y={20}>
+            <span className="mb-4 block text-[11px] font-bold uppercase tracking-[0.3em] text-primary/80">
+              {chapter.label}
+            </span>
+          </Reveal>
+          <Reveal delay={0.2} y={30} blur={true}>
+            <h3 className="text-balance-tight text-4xl font-bold leading-none tracking-tighter sm:text-6xl lg:text-7xl">
+              {chapter.title}
+            </h3>
+          </Reveal>
+          <div className="mt-8 space-y-6">
+            {chapter.content.map((text, j) => (
+              <Reveal key={j} delay={0.3 + j * 0.1} y={20} blur={true}>
+                <p className="max-w-xl text-lg font-light leading-relaxed text-muted-foreground sm:text-xl">
+                  {text}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Placeholder visual */}
+        <div className={cn("relative", isEven ? "lg:order-2" : "lg:order-1")}>
+          <Reveal delay={0.4} y={40} className="w-full">
+            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-surface-2 to-surface transition-all duration-700 hover:border-primary/20">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.83_0.121_82.5/0.05),transparent_70%)]" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-subtle/40 transition-colors duration-500 group-hover:text-subtle/60">
+                <Scroll className="size-10" strokeWidth={1} />
+                <span className="text-[10px] uppercase tracking-[0.3em]">
+                  Asset Placeholder {chapter.id}
+                </span>
+              </div>
+              {/* Efeito de luz acompanhando o card */}
+              <div className="absolute -inset-px rounded-3xl border border-primary/0 transition-colors duration-700 group-hover:border-primary/10" />
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
   );
 }
 
