@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Mail } from "lucide-react";
 import { MagneticButton } from "./primitives";
+import logoAsset from "@/assets/caliber-logo.png.asset.json";
 
 const links = [
   { label: "Diagnóstico", href: "#obstaculos" },
@@ -58,9 +59,13 @@ export function Footer() {
   return (
     <footer className="border-t border-border px-6 py-16 lg:px-10">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-base font-extrabold tracking-tight">CÁLIBER</p>
-          <p className="mt-2 text-xs font-light text-subtle">
+        <div className="flex flex-col gap-4">
+          <img 
+            src={logoAsset.url} 
+            alt="Cáliber Logo" 
+            className="h-20 w-auto object-contain brightness-0 invert" 
+          />
+          <p className="text-xs font-light text-subtle">
             Gestão Empresarial: Leonardo Froese
           </p>
         </div>
