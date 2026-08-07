@@ -139,3 +139,21 @@
     box-shadow: var(--shadow-soft), var(--glow-primary);
   }
 }
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(244, 190, 98, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(244, 190, 98, 0.4);
+  }
+}

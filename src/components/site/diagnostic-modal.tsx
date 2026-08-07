@@ -84,12 +84,12 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-md overflow-y-auto pt-6 pb-6 px-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-md overflow-y-auto py-8 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-          className="relative w-full max-w-3xl bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-6 lg:p-10 shadow-2xl"
+          className="relative w-full max-w-4xl bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-6 lg:p-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
         >
           <button 
             onClick={onClose} 
@@ -102,15 +102,15 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
           {!isSubmitted ? (
             <>
               {/* Header */}
-              <div className="mb-12">
+              <div className="mb-8">
                 <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-primary">Diagnóstico Inicial</span>
-                <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Raio-X Empresarial</h2>
-                <p className="mt-4 text-base font-light text-muted-foreground max-w-xl">
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">Raio-X Empresarial</h2>
+                <p className="mt-3 text-sm font-light text-muted-foreground max-w-xl">
                   Entenda os principais gargalos que travam o crescimento da sua empresa hoje.
                 </p>
                 
                 {/* Progress Tracker */}
-                <div className="mt-12">
+                <div className="mt-8">
                   <div className="flex justify-between mb-4">
                     {steps.map((s, i) => (
                       <div key={s.id} className={cn(
@@ -134,7 +134,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
               </div>
 
               {/* Form Content */}
-              <div className="min-h-[450px]">
+              <div className="min-h-[350px]">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step}
@@ -281,7 +281,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
               </div>
 
               {/* Footer */}
-              <div className="flex justify-between items-center mt-14 pt-10 border-t border-white/5">
+              <div className="flex justify-between items-center mt-8 pt-8 border-t border-white/5">
                 <button 
                   disabled={step === 1}
                   onClick={prevStep}
