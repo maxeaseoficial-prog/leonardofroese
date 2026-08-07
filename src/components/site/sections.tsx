@@ -212,16 +212,31 @@ export function Pillars() {
 /* ---------------- Sessão 5 — Resultados ---------------- */
 
 const results = [
-  { icon: Gauge, value: 16, prefix: "+", suffix: "", label: "anos de mercado" },
-  { icon: Target, value: 400, prefix: "+", suffix: "", label: "empresas estruturadas" },
+  { icon: Gauge, value: 16, prefix: "+", suffix: "", label: "anos de mercado", static: "" },
+  {
+    icon: Target,
+    value: 400,
+    prefix: "+",
+    suffix: "",
+    label: "empresas estruturadas",
+    static: "",
+  },
   {
     icon: TrendingUp,
     value: 100,
     prefix: "+R$ ",
     suffix: " mi",
     label: "em lucro gerado",
+    static: "",
   },
-  { icon: Repeat, value: 0, label: "empresas de diversos segmentos", static: "Multi" },
+  {
+    icon: Repeat,
+    value: 0,
+    prefix: "",
+    suffix: "",
+    label: "empresas de diversos segmentos",
+    static: "Multi",
+  },
 ];
 
 export function Results() {
