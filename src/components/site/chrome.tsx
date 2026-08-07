@@ -30,7 +30,7 @@ export function Nav() {
         scrolled ? "border-b border-border bg-background/70 backdrop-blur-xl" : ""
       }`}
     >
-      <nav className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+      <nav aria-label="Navegação Principal" className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#top" className="flex items-baseline gap-2">
           <span className="text-base font-extrabold tracking-tight uppercase text-foreground/90">
             Leonardo Froese

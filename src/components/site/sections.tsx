@@ -356,7 +356,10 @@ export function About() {
           >
             <img
               src={founderImg.url}
-              alt="Leonardo Froese"
+              alt="Leonardo Froese - Fundador da Cáliber Gestão Empresarial"
+              width={800}
+              height={1000}
+              loading="lazy"
               className="h-full w-full object-cover grayscale-[0.2] transition-all duration-700 hover:grayscale-0"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
