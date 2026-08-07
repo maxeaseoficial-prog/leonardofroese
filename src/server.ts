@@ -49,7 +49,16 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      
+      // Apply security headers to the response
+      const secureResponse = new Response(response.body, response);
+      secureResponse.headers.set("X-Frame-Options", "DENY");
+      secureResponse.headers.set("X-Content-Type-Options", "nosniff");
+      secureResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+      secureResponse.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+      secureResponse.headers.set("X-XSS-Protection", "1; mode=block");
+      
+      return await normalizeCatastrophicSsrResponse(secureResponse);
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
