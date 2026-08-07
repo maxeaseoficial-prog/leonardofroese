@@ -19,33 +19,33 @@ export function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section ref={ref} className="relative min-h-[100svh] overflow-hidden">
-      {/* Imagem de fundo com degrade cinematográfico */}
-      <motion.div style={{ y: yBg, scale: scaleBg }} className="absolute inset-0 -z-10 h-screen w-full" aria-hidden>
-        <div className="absolute inset-0">
-          <img
-            src={heroBg.url}
-            alt="Leonardo Froese"
-            className="h-full w-full object-cover object-center opacity-85 brightness-[0.85] contrast-[1.05]"
-          />
-          {/* Custom Cinematic Overlay based on user request */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(
-                90deg,
-                rgba(8,8,8,0.82) 0%,
-                rgba(8,8,8,0.60) 35%,
-                rgba(8,8,8,0.35) 65%,
-                rgba(8,8,8,0.20) 100%
-              )`
-            }}
-          />
-          {/* Subtle vignette and bottom darkening */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,8,8,0.4)_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-        </div>
-      </motion.div>
+    <section 
+      ref={ref} 
+      className="relative min-h-[100svh] overflow-hidden"
+      style={{
+        backgroundImage: `url(${heroBg.url})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Cinematic Overlays */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          background: `linear-gradient(
+            90deg,
+            rgba(8,8,8,0.82) 0%,
+            rgba(8,8,8,0.60) 35%,
+            rgba(8,8,8,0.35) 65%,
+            rgba(8,8,8,0.20) 100%
+          )`
+        }}
+      />
+      {/* Subtle vignette and bottom darkening */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,8,8,0.4)_100%)]" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+
 
       <div className="mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center px-6 pb-24 pt-36 lg:px-10">
         <motion.div style={{ y: yContent, opacity }} className="max-w-3xl">
