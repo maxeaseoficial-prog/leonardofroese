@@ -32,7 +32,7 @@ export function Nav() {
     >
       <nav className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#top" className="flex items-baseline gap-2">
-          <span className="text-base font-extrabold tracking-tight uppercase">
+          <span className="text-base font-extrabold tracking-tight uppercase text-foreground/90">
             Leonardo Froese
           </span>
         </a>
@@ -41,7 +41,7 @@ export function Nav() {
             <a
               key={l.href}
               href={l.href}
-              className="relative text-sm font-light text-muted-foreground transition-colors duration-300 hover:text-foreground after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100"
+              className="relative text-sm font-light text-foreground/70 transition-colors duration-300 hover:text-foreground after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100"
             >
               {l.label}
             </a>
