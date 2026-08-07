@@ -1,7 +1,8 @@
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { useRef, useState } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import { CountUp, MagneticButton, Reveal } from "./primitives";
+import { DiagnosticModal } from "./diagnostic-modal";
 import heroBg from "@/assets/hero-bg-v2.png.asset.json";
 
 const stats = [
@@ -11,6 +12,7 @@ const stats = [
 ];
 
 export function Hero() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
@@ -72,7 +74,7 @@ export function Hero() {
 
           <Reveal delay={0.4}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <MagneticButton href="#contato">
+              <MagneticButton onClick={() => setIsModalOpen(true)}>
                 Agendar Diagnóstico Estratégico
                 <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </MagneticButton>
