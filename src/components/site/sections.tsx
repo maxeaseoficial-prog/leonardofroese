@@ -170,7 +170,7 @@ const pillars = [
   {
     icon: BarChart3,
     title: "Financeiro",
-    text: "Margem, caixa e precificação sob controle — decisões guiadas por números reais.",
+    text: "Margem, caixa e precificação sob controle: decisões guiadas por números reais.",
   },
   {
     icon: Handshake,
@@ -386,7 +386,7 @@ export function About() {
           <Reveal delay={0.4}>
             <div className="mt-10 h-px w-full hairline" />
             <p className="mt-6 text-sm font-light text-subtle">
-              Caliber Gestão Empresarial — consultoria para empresas que querem crescer com
+              Caliber Gestão Empresarial: consultoria para empresas que querem crescer com
               estrutura.
             </p>
           </Reveal>
