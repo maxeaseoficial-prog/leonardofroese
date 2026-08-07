@@ -73,9 +73,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   const handleComplete = () => {
-    console.log("Diagnostic Final Data:", data);
-    // TODO: Futura integração com API/E-mail aqui
-    // Exemplo: await fetch('/api/public/diagnostic', { method: 'POST', body: JSON.stringify(data) });
+    // Audit: Removed sensitive console.log of user data
     setIsSubmitted(true);
     localStorage.removeItem("caliber_diagnostic_draft");
   };
@@ -245,7 +243,8 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
                           <label className="text-sm font-medium text-muted-foreground">Se pudesse resolver um problema em 90 dias, qual seria?</label>
                           <textarea 
                             value={data.principalProblema}
-                            onChange={e => setData({...data, principalProblema: e.target.value})}
+                            onChange={e => setData({...data, principalProblema: e.target.value.replace(/[<>]/g, "")})}
+
                             className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors min-h-[100px]"
                             placeholder="Descreva aqui..."
                           />
@@ -346,13 +345,16 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
 }
 
 function Input({ label, value, onChange, placeholder, type = "text" }: { label: string, value: string, onChange: (v: string) => void, placeholder: string, type?: string }) {
+  const sanitize = (val: string) => val.replace(/[<>]/g, "");
+
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-muted-foreground/80">{label}</label>
       <input 
         type={type}
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange(sanitize(e.target.value))}
+
         className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors"
         placeholder={placeholder}
       />
