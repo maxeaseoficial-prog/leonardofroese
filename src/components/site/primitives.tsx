@@ -145,23 +145,28 @@ export function MagneticButton({
   children,
   variant = "primary",
   className,
-  href = "#contato",
+  href,
+  onClick,
 }: {
   children: ReactNode;
   variant?: "primary" | "ghost";
   className?: string;
   href?: string;
+  onClick?: () => void;
 }) {
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<any>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 200, damping: 18 });
   const sy = useSpring(y, { stiffness: 200, damping: 18 });
 
+  const Component = href ? motion.a : motion.button;
+
   return (
-    <motion.a
+    <Component
       ref={ref}
       href={href}
+      onClick={onClick}
       style={{ x: sx, y: sy }}
       onMouseMove={(e) => {
         const r = ref.current?.getBoundingClientRect();
@@ -183,7 +188,7 @@ export function MagneticButton({
       )}
     >
       {children}
-    </motion.a>
+    </Component>
   );
 }
 

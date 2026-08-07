@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Instagram, Linkedin, Mail, Youtube } from "lucide-react";
+import { Mail } from "lucide-react";
 import { MagneticButton } from "./primitives";
 
 const links = [
@@ -86,16 +86,13 @@ export function Footer() {
           </a>
           <span className="hidden h-4 w-px bg-border sm:block" />
           <div className="flex items-center gap-4 text-muted-foreground">
-            {[Instagram, Linkedin, Youtube, Mail].map((Icon, i) => (
-              <a
-                key={i}
-                href="#contato"
-                aria-label="Rede social"
-                className="transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
-              >
-                <Icon className="size-4" strokeWidth={1.6} />
-              </a>
-            ))}
+            <a
+              href="#contato"
+              aria-label="E-mail"
+              className="transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
+            >
+              <Mail className="size-4" strokeWidth={1.6} />
+            </a>
           </div>
         </div>
       </div>
