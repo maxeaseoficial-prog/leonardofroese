@@ -281,7 +281,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
               </div>
 
               {/* Footer */}
-              <div className="flex justify-between items-center mt-14 pt-10 border-t border-white/5">
+              <div className="flex justify-between items-center mt-8 pt-8 border-t border-white/5">
                 <button 
                   disabled={step === 1}
                   onClick={prevStep}
