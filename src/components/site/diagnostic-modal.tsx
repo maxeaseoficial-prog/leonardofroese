@@ -110,7 +110,7 @@ export function DiagnosticModal({ isOpen, onClose }: DiagnosticModalProps) {
                 </p>
                 
                 {/* Progress Tracker */}
-                <div className="mt-12">
+                <div className="mt-8">
                   <div className="flex justify-between mb-4">
                     {steps.map((s, i) => (
                       <div key={s.id} className={cn(
