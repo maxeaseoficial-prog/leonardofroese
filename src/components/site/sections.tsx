@@ -1,0 +1,428 @@
+import { motion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
+import {
+  ArrowUpRight,
+  BarChart3,
+  Compass,
+  Crown,
+  Gauge,
+  Handshake,
+  LineChart,
+  Play,
+  Quote,
+  Repeat,
+  Rocket,
+  Target,
+  TrendingUp,
+  User,
+  Wallet,
+  Workflow,
+} from "lucide-react";
+import { CountUp, MagneticButton, Reveal, SectionLabel, TiltCard } from "./primitives";
+
+function Section({
+  id,
+  children,
+  className = "",
+}: {
+  id?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section id={id} className={`relative px-6 py-28 lg:px-10 lg:py-40 ${className}`}>
+      <div className="mx-auto w-full max-w-7xl">{children}</div>
+    </section>
+  );
+}
+
+/* ---------------- Sessão 2 — Obstáculos ---------------- */
+
+const problems = [
+  {
+    icon: Crown,
+    title: "Empresa dependente do dono",
+    text: "Todas as decisões passam por você. A operação para quando você para.",
+  },
+  {
+    icon: Wallet,
+    title: "Financeiro desorganizado",
+    text: "Faturamento alto, caixa apertado e nenhuma clareza sobre margem real.",
+  },
+  {
+    icon: Workflow,
+    title: "Processos ineficientes",
+    text: "Retrabalho, gargalos e times sem padrão de execução definido.",
+  },
+  {
+    icon: LineChart,
+    title: "Vendas sem previsibilidade",
+    text: "Meses bons e meses ruins, sem funil, sem meta e sem gestão comercial.",
+  },
+];
+
+export function Problems() {
+  return (
+    <Section id="obstaculos">
+      <SectionLabel>O diagnóstico</SectionLabel>
+      <Reveal delay={0.1}>
+        <h2 className="text-balance-tight mt-6 max-w-3xl text-3xl font-bold leading-[1.1] sm:text-5xl">
+          O maior obstáculo para o crescimento da sua empresa pode ser a{" "}
+          <span className="text-primary">falta de gestão.</span>
+        </h2>
+      </Reveal>
+
+      <div className="mt-16 grid gap-5 md:grid-cols-2">
+        {problems.map((p, i) => (
+          <Reveal key={p.title} delay={i * 0.08}>
+            <TiltCard className="group h-full p-8 lg:p-10">
+              <p.icon className="size-6 text-primary" strokeWidth={1.6} />
+              <h3 className="mt-8 text-xl font-semibold tracking-tight">{p.title}</h3>
+              <p className="mt-3 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
+                {p.text}
+              </p>
+            </TiltCard>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 3 — Timeline ---------------- */
+
+const steps = [
+  { title: "Diagnóstico", text: "Raio-x completo da operação, números e time." },
+  { title: "Planejamento", text: "Metas, prioridades e plano de ação por trimestre." },
+  { title: "Financeiro", text: "Fluxo de caixa, margem, precificação e DRE." },
+  { title: "Processos", text: "Padronização, rotinas e delegação estruturada." },
+  { title: "Comercial", text: "Funil, cadência e previsibilidade de receita." },
+  { title: "Indicadores", text: "Painel de gestão e ritmo de reuniões." },
+  { title: "Escala", text: "Crescimento sustentado sem depender do dono." },
+];
+
+export function Methodology() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 60%"] });
+  const width = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const height = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  return (
+    <Section id="metodologia" className="bg-surface/40">
+      <SectionLabel>Metodologia</SectionLabel>
+      <Reveal delay={0.1}>
+        <h2 className="text-balance-tight mt-6 max-w-3xl text-3xl font-bold leading-[1.1] sm:text-5xl">
+          Como transformamos empresas em operações lucrativas.
+        </h2>
+      </Reveal>
+
+      <div ref={ref} className="relative mt-20">
+        {/* linha desenhada — horizontal (desktop) */}
+        <div className="absolute left-0 right-0 top-[9px] hidden h-px bg-border lg:block">
+          <motion.div style={{ width }} className="h-px origin-left bg-primary" />
+        </div>
+        {/* linha desenhada — vertical (mobile) */}
+        <div className="absolute bottom-0 left-[9px] top-0 w-px bg-border lg:hidden">
+          <motion.div style={{ height }} className="w-px origin-top bg-primary" />
+        </div>
+
+        <ol className="grid gap-10 pl-10 lg:grid-cols-7 lg:gap-6 lg:pl-0">
+          {steps.map((s, i) => (
+            <li key={s.title} className="relative">
+              <motion.span
+                initial={{ scale: 0.5, opacity: 0.2 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                className="absolute -left-10 top-1 block size-[19px] rounded-full border border-primary/60 bg-background shadow-[0_0_22px_-4px_oklch(0.83_0.121_82.5/0.7)] lg:relative lg:left-0 lg:top-0"
+              >
+                <span className="absolute inset-[5px] rounded-full bg-primary" />
+              </motion.span>
+              <Reveal delay={i * 0.05} className="lg:mt-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-subtle">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-2 text-lg font-semibold tracking-tight">{s.title}</h3>
+                <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">
+                  {s.text}
+                </p>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 4 — Pilares ---------------- */
+
+const pillars = [
+  {
+    icon: Compass,
+    title: "Gestão Estratégica",
+    text: "Direção clara, prioridades definidas e um time que executa sem depender do dono.",
+  },
+  {
+    icon: BarChart3,
+    title: "Financeiro",
+    text: "Margem, caixa e precificação sob controle — decisões guiadas por números reais.",
+  },
+  {
+    icon: Handshake,
+    title: "Comercial",
+    text: "Máquina de vendas com funil, metas e previsibilidade mês após mês.",
+  },
+  {
+    icon: Rocket,
+    title: "Escala",
+    text: "Estrutura, indicadores e cultura para crescer com lucro e consistência.",
+  },
+];
+
+export function Pillars() {
+  return (
+    <Section id="pilares">
+      <SectionLabel>Fundamentos</SectionLabel>
+      <Reveal delay={0.1}>
+        <h2 className="text-balance-tight mt-6 text-3xl font-bold leading-[1.1] sm:text-5xl">
+          Os pilares da Caliber.
+        </h2>
+      </Reveal>
+
+      <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {pillars.map((p, i) => (
+          <Reveal key={p.title} delay={i * 0.08}>
+            <TiltCard className="group h-full p-8">
+              <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-background/50 transition-colors duration-500 group-hover:border-primary/40">
+                <p.icon className="size-5 text-primary" strokeWidth={1.6} />
+              </div>
+              <h3 className="mt-8 text-lg font-semibold tracking-tight">{p.title}</h3>
+              <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
+                {p.text}
+              </p>
+            </TiltCard>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 5 — Resultados ---------------- */
+
+const results = [
+  { icon: Gauge, value: 16, prefix: "+", suffix: "", label: "anos de mercado" },
+  { icon: Target, value: 400, prefix: "+", suffix: "", label: "empresas estruturadas" },
+  {
+    icon: TrendingUp,
+    value: 100,
+    prefix: "+R$ ",
+    suffix: " mi",
+    label: "em lucro gerado",
+  },
+  { icon: Repeat, value: 0, label: "empresas de diversos segmentos", static: "Multi" },
+];
+
+export function Results() {
+  return (
+    <Section id="resultados" className="bg-surface/40">
+      <SectionLabel>Resultados</SectionLabel>
+      <Reveal delay={0.1}>
+        <h2 className="text-balance-tight mt-6 text-3xl font-bold leading-[1.1] sm:text-5xl">
+          Resultados construídos na prática.
+        </h2>
+      </Reveal>
+
+      <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {results.map((r, i) => (
+          <Reveal key={r.label} delay={i * 0.08}>
+            <div className="card-premium h-full p-8">
+              <r.icon className="size-5 text-primary" strokeWidth={1.6} />
+              <p className="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">
+                {r.static ? (
+                  <span className="text-primary">{r.static}</span>
+                ) : (
+                  <CountUp
+                    to={r.value}
+                    prefix={r.prefix}
+                    suffix={r.suffix}
+                    className="text-primary"
+                  />
+                )}
+              </p>
+              <p className="mt-2 text-sm font-light text-muted-foreground">{r.label}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 6 — Leonardo ---------------- */
+
+export function About() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+
+  return (
+    <Section id="leonardo">
+      <div ref={ref} className="grid items-center gap-16 lg:grid-cols-12 lg:gap-24">
+        <Reveal className="lg:col-span-5">
+          {/* PLACEHOLDER — foto do Leonardo */}
+          <motion.div
+            style={{ y }}
+            data-image-placeholder="leonardo"
+            className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-surface-2 to-surface"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_20%,oklch(0.83_0.121_82.5/0.10),transparent_70%)]" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-subtle">
+              <User className="size-8" strokeWidth={1.2} />
+              <span className="text-[11px] uppercase tracking-[0.24em]">
+                Espaço para foto
+              </span>
+            </div>
+          </motion.div>
+        </Reveal>
+
+        <div className="lg:col-span-7">
+          <SectionLabel>Fundador</SectionLabel>
+          <Reveal delay={0.1}>
+            <h2 className="text-balance-tight mt-6 text-3xl font-bold leading-[1.1] sm:text-5xl">
+              Quem é Leonardo Froese.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="mt-8 max-w-2xl text-base font-light leading-[1.85] text-muted-foreground">
+              Fundador da Caliber Gestão Empresarial, Leonardo atua há mais de 16 anos ao
+              lado de empresários que querem sair da operação e construir empresas que se
+              sustentam sozinhas. Sua atuação combina gestão estratégica, disciplina
+              financeira e estruturação comercial.
+            </p>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <p className="mt-6 max-w-2xl text-base font-light leading-[1.85] text-muted-foreground">
+              Ao longo da carreira, participou da estruturação de mais de 400 empresas de
+              diferentes segmentos e portes, sempre com o mesmo princípio: método antes de
+              esforço, clareza antes de velocidade e lucro como consequência de gestão.
+            </p>
+          </Reveal>
+          <Reveal delay={0.4}>
+            <div className="mt-10 h-px w-full hairline" />
+            <p className="mt-6 text-sm font-light text-subtle">
+              Caliber Gestão Empresarial — consultoria para empresas que querem crescer com
+              estrutura.
+            </p>
+          </Reveal>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 7 — Depoimentos ---------------- */
+
+const cases = [
+  { name: "Indústria • 120 colaboradores", result: "Margem líquida reestruturada" },
+  { name: "Varejo • 8 lojas", result: "Operação independente do dono" },
+  { name: "Serviços B2B", result: "Previsibilidade comercial" },
+];
+
+export function Testimonials() {
+  return (
+    <Section id="cases" className="bg-surface/40">
+      <SectionLabel>Cases</SectionLabel>
+      <Reveal delay={0.1}>
+        <h2 className="text-balance-tight mt-6 max-w-2xl text-3xl font-bold leading-[1.1] sm:text-5xl">
+          Depoimentos de quem mudou o jogo.
+        </h2>
+      </Reveal>
+
+      <div className="mt-16 grid gap-5 lg:grid-cols-3">
+        {cases.map((c, i) => (
+          <Reveal key={c.name} delay={i * 0.1}>
+            <div className="card-premium group h-full overflow-hidden">
+              {/* PLACEHOLDER — vídeo de depoimento */}
+              <div
+                data-video-placeholder={`depoimento-${i + 1}`}
+                className="relative aspect-video w-full border-b border-border bg-gradient-to-br from-surface-2 to-background"
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="flex size-14 items-center justify-center rounded-full border border-border bg-background/60 backdrop-blur transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-[0_0_40px_-10px_oklch(0.83_0.121_82.5/0.7)]">
+                    <Play className="size-5 text-primary" strokeWidth={1.6} />
+                  </span>
+                </div>
+                <span className="absolute bottom-3 left-4 text-[10px] uppercase tracking-[0.22em] text-subtle">
+                  Espaço para vídeo
+                </span>
+              </div>
+              <div className="p-8">
+                <Quote className="size-4 text-primary" strokeWidth={1.8} />
+                <p className="mt-5 text-lg font-medium tracking-tight">{c.result}</p>
+                <p className="mt-2 text-sm font-light text-subtle">{c.name}</p>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- Sessão 8 — Faixa de impacto ---------------- */
+
+export function ImpactBand() {
+  return (
+    <section className="relative overflow-hidden border-y border-border bg-background px-6 py-32 lg:py-48">
+      <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_50%,oklch(0.83_0.121_82.5/0.07),transparent_70%)]" />
+      <div className="relative mx-auto max-w-4xl text-center">
+        <Reveal y={40}>
+          <p className="text-balance-tight text-3xl font-bold leading-[1.15] sm:text-5xl lg:text-6xl">
+            Sua empresa trabalha para você?
+          </p>
+        </Reveal>
+        <Reveal y={40} delay={0.18}>
+          <p className="text-balance-tight mt-4 text-3xl font-bold leading-[1.15] text-primary sm:text-5xl lg:text-6xl">
+            Ou você trabalha para sua empresa?
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- CTA Final ---------------- */
+
+export function FinalCta() {
+  return (
+    <section
+      id="contato"
+      className="relative flex min-h-[90svh] items-center overflow-hidden px-6 py-32"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_100%,oklch(0.83_0.121_82.5/0.10),transparent_70%)]" />
+      <div className="relative mx-auto max-w-4xl text-center">
+        <SectionLabel>Próximo passo</SectionLabel>
+        <Reveal delay={0.1} y={36}>
+          <h2 className="text-balance-tight mt-8 text-4xl font-extrabold leading-[1.06] sm:text-6xl lg:text-7xl">
+            Sua empresa pode crescer muito mais.
+          </h2>
+        </Reveal>
+        <Reveal delay={0.22} y={36}>
+          <p className="text-balance-tight mt-5 text-2xl font-light leading-tight text-muted-foreground sm:text-4xl">
+            Ela só precisa deixar de depender de você.
+          </p>
+        </Reveal>
+        <Reveal delay={0.36}>
+          <div className="mt-14 flex justify-center">
+            <MagneticButton href="#contato" className="px-9 py-4 text-base">
+              Agendar Diagnóstico Estratégico
+              <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </MagneticButton>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
