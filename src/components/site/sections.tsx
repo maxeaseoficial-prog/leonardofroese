@@ -567,8 +567,8 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
 /* ---------------- Sessão 7 — Depoimentos ---------------- */
 
 const cases = [
-  { name: "Indústria • 120 colaboradores", result: "Margem líquida reestruturada" },
-  { name: "Varejo • 8 lojas", result: "Operação independente do dono" },
+  { name: "Indústria: 120 colaboradores", result: "Margem líquida reestruturada" },
+  { name: "Varejo: 8 lojas", result: "Operação independente do dono" },
   { name: "Serviços B2B", result: "Previsibilidade comercial" },
 ];
 

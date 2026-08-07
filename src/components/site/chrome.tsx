@@ -61,7 +61,7 @@ export function Footer() {
         <div>
           <p className="text-base font-extrabold tracking-tight">CALIBER</p>
           <p className="mt-2 text-xs font-light text-subtle">
-            Gestão Empresarial • Leonardo Froese
+            Gestão Empresarial: Leonardo Froese
           </p>
         </div>
 
