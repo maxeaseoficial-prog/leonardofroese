@@ -188,7 +188,7 @@ export function MagneticButton({
       )}
     >
       {children}
-    </motion.a>
+    </Component>
   );
 }
 

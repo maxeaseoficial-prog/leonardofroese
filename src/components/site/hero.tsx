@@ -13,7 +13,6 @@ const stats = [
 
 export function Hero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
@@ -99,6 +98,9 @@ export function Hero() {
           className="block h-10 w-px bg-gradient-to-b from-transparent via-primary/70 to-transparent"
         />
       </motion.div>
+      <AnimatePresence>
+        {isModalOpen && <DiagnosticModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
+      </AnimatePresence>
     </section>
   );
 }
