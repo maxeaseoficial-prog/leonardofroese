@@ -23,6 +23,8 @@ import {
   Workflow,
 } from "lucide-react";
 import { CountUp, MagneticButton, Reveal, SectionLabel, TiltCard } from "./primitives";
+import { DiagnosticModal } from "./diagnostic-modal";
+import { AnimatePresence } from "motion/react";
 
 function Section({
   id,
@@ -638,6 +640,7 @@ export function ImpactBand() {
 /* ---------------- CTA Final ---------------- */
 
 export function FinalCta() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section
       id="contato"
@@ -658,12 +661,15 @@ export function FinalCta() {
         </Reveal>
         <Reveal delay={0.36}>
           <div className="mt-14 flex justify-center">
-            <MagneticButton href="#contato" className="px-9 py-4 text-base">
+            <MagneticButton onClick={() => setIsModalOpen(true)} className="px-9 py-4 text-base">
               Agendar Diagnóstico Estratégico
               <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </MagneticButton>
           </div>
         </Reveal>
+        <AnimatePresence>
+          {isModalOpen && <DiagnosticModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
+        </AnimatePresence>
       </div>
     </section>
   );
