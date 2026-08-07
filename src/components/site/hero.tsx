@@ -23,7 +23,9 @@ export function Hero() {
   return (
     <section 
       ref={ref} 
+      id="hero"
       className="relative min-h-[100svh] overflow-hidden"
+
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url(${heroBg.url})`,
         backgroundSize: 'cover',
