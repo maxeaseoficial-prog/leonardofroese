@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import { CountUp, MagneticButton, Reveal } from "./primitives";
+import heroBg from "@/assets/hero-bg.png.asset.json";
 
 const stats = [
   { label: "de mercado", value: 16, prefix: "+", suffix: " anos" },
@@ -18,21 +19,16 @@ export function Hero() {
 
   return (
     <section ref={ref} className="relative min-h-[100svh] overflow-hidden">
-      {/* VIDEO PLACEHOLDER — substituir por <video> fullscreen */}
+      {/* Imagem de fundo com degrade cinematográfico */}
       <motion.div style={{ y: yBg }} className="absolute inset-0 -z-10" aria-hidden>
-        <div
-          data-video-placeholder="hero"
-          className="absolute inset-0 bg-surface"
-          style={{
-            backgroundImage:
-              "radial-gradient(120% 90% at 70% 20%, oklch(0.28 0.02 80 / 0.55), transparent 60%), radial-gradient(90% 80% at 10% 90%, oklch(0.22 0 0), transparent 70%)",
-          }}
-        >
-          <motion.div
-            animate={{ opacity: [0.35, 0.6, 0.35] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 bg-[linear-gradient(115deg,transparent_35%,oklch(1_0_0/0.05)_50%,transparent_65%)]"
+        <div className="absolute inset-0">
+          <img
+            src={heroBg.url}
+            alt=""
+            className="h-full w-full object-cover object-center opacity-40 grayscale-[0.3]"
           />
+          {/* Degrade sobre a imagem */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background" />
         </div>
         {/* overlay cinematográfico + blur nas bordas */}
         <div className="absolute inset-0 bg-background/72" />
