@@ -338,6 +338,39 @@ export function About() {
   );
 }
 
+/* ---------------- Sessão Apresentação — Vídeo ---------------- */
+
+export function PresentationVideo() {
+  return (
+    <Section id="apresentacao" className="bg-surface/20">
+      <div className="flex flex-col items-center text-center">
+        <SectionLabel>Apresentação</SectionLabel>
+        <Reveal delay={0.1}>
+          <h2 className="text-balance-tight mt-6 max-w-3xl text-3xl font-bold leading-[1.1] sm:text-5xl">
+            Conheça a visão por trás da <span className="text-primary">Caliber.</span>
+          </h2>
+        </Reveal>
+        
+        <Reveal delay={0.3} className="mt-16 w-full max-w-5xl">
+          <div className="group relative aspect-video w-full overflow-hidden rounded-3xl border border-border/50 bg-surface shadow-2xl">
+            <iframe
+              src="https://www.youtube.com/embed/QQop_A9TSWw?si=Uv9688vCskvVn-C8"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              className="absolute inset-0 h-full w-full grayscale-[0.2] transition-all duration-700 group-hover:grayscale-0"
+            />
+            {/* Overlay para dar um toque premium */}
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10" />
+          </div>
+        </Reveal>
+      </div>
+    </Section>
+  );
+}
+
 /* ---------------- Sessão Storytelling — Narrativa ---------------- */
 
 const chapters = [
