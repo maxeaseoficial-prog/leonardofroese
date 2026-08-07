@@ -40,7 +40,7 @@ function Section({
   );
 }
 
-/* ---------------- Sessão 2 — Obstáculos ---------------- */
+/* ---------------- Sessão 2: Obstáculos ---------------- */
 
 const problems = [
   {
@@ -93,7 +93,7 @@ export function Problems() {
   );
 }
 
-/* ---------------- Sessão 3 — Timeline ---------------- */
+/* ---------------- Sessão 3: Timeline ---------------- */
 
 const steps = [
   { title: "Diagnóstico", text: "Raio-x completo da operação, números e time." },
@@ -121,11 +121,11 @@ export function Methodology() {
       </Reveal>
 
       <div ref={ref} className="relative mt-20">
-        {/* linha desenhada — horizontal (desktop) */}
+        {/* linha desenhada: horizontal (desktop) */}
         <div className="absolute left-0 right-0 top-[9px] hidden h-px bg-border lg:block">
           <motion.div style={{ width }} className="h-px origin-left bg-primary" />
         </div>
-        {/* linha desenhada — vertical (mobile) */}
+        {/* linha desenhada: vertical (mobile) */}
         <div className="absolute bottom-0 left-[9px] top-0 w-px bg-border lg:hidden">
           <motion.div style={{ height }} className="w-px origin-top bg-primary" />
         </div>
@@ -159,7 +159,7 @@ export function Methodology() {
   );
 }
 
-/* ---------------- Sessão 4 — Pilares ---------------- */
+/* ---------------- Sessão 4: Pilares ---------------- */
 
 const pillars = [
   {
@@ -170,7 +170,7 @@ const pillars = [
   {
     icon: BarChart3,
     title: "Financeiro",
-    text: "Margem, caixa e precificação sob controle — decisões guiadas por números reais.",
+    text: "Margem, caixa e precificação sob controle: decisões guiadas por números reais.",
   },
   {
     icon: Handshake,
@@ -213,7 +213,7 @@ export function Pillars() {
   );
 }
 
-/* ---------------- Sessão 5 — Resultados (Transformações) ---------------- */
+/* ---------------- Sessão 5: Resultados (Transformações) ---------------- */
 
 const transformations = [
   {
@@ -336,7 +336,7 @@ export function Results() {
   );
 }
 
-/* ---------------- Sessão 6 — Leonardo ---------------- */
+/* ---------------- Sessão 6: Leonardo ---------------- */
 
 export function About() {
   const ref = useRef<HTMLDivElement>(null);
@@ -347,7 +347,7 @@ export function About() {
     <Section id="leonardo">
       <div ref={ref} className="grid items-center gap-16 lg:grid-cols-12 lg:gap-24">
         <Reveal className="lg:col-span-5">
-          {/* PLACEHOLDER — foto do Leonardo */}
+          {/* PLACEHOLDER: foto do Leonardo */}
           <motion.div
             style={{ y }}
             className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-surface"
@@ -386,7 +386,7 @@ export function About() {
           <Reveal delay={0.4}>
             <div className="mt-10 h-px w-full hairline" />
             <p className="mt-6 text-sm font-light text-subtle">
-              Caliber Gestão Empresarial — consultoria para empresas que querem crescer com
+              Caliber Gestão Empresarial: consultoria para empresas que querem crescer com
               estrutura.
             </p>
           </Reveal>
@@ -396,7 +396,7 @@ export function About() {
   );
 }
 
-/* ---------------- Sessão Apresentação — Vídeo ---------------- */
+/* ---------------- Sessão Apresentação: Vídeo ---------------- */
 
 export function PresentationVideo() {
   return (
@@ -429,7 +429,7 @@ export function PresentationVideo() {
   );
 }
 
-/* ---------------- Sessão Storytelling — Narrativa ---------------- */
+/* ---------------- Sessão Storytelling: Narrativa ---------------- */
 
 const chapters = [
   {
@@ -564,11 +564,11 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
   );
 }
 
-/* ---------------- Sessão 7 — Depoimentos ---------------- */
+/* ---------------- Sessão 7: Depoimentos ---------------- */
 
 const cases = [
-  { name: "Indústria • 120 colaboradores", result: "Margem líquida reestruturada" },
-  { name: "Varejo • 8 lojas", result: "Operação independente do dono" },
+  { name: "Indústria: 120 colaboradores", result: "Margem líquida reestruturada" },
+  { name: "Varejo: 8 lojas", result: "Operação independente do dono" },
   { name: "Serviços B2B", result: "Previsibilidade comercial" },
 ];
 
@@ -586,7 +586,7 @@ export function Testimonials() {
         {cases.map((c, i) => (
           <Reveal key={c.name} delay={i * 0.1}>
             <div className="card-premium group h-full overflow-hidden">
-              {/* PLACEHOLDER — vídeo de depoimento */}
+              {/* PLACEHOLDER: vídeo de depoimento */}
               <div
                 data-video-placeholder={`depoimento-${i + 1}`}
                 className="relative aspect-video w-full border-b border-border bg-gradient-to-br from-surface-2 to-background"
@@ -613,7 +613,7 @@ export function Testimonials() {
   );
 }
 
-/* ---------------- Sessão 8 — Faixa de impacto ---------------- */
+/* ---------------- Sessão 8: Faixa de impacto ---------------- */
 
 export function ImpactBand() {
   return (
