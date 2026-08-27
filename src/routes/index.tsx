@@ -78,7 +78,6 @@ function Index() {
         <AmbientBackground />
         <div className="relative">
           <Problems />
-          <PresentationVideo />
           <Methodology />
           <Storytelling />
           <Results />
