@@ -8,7 +8,6 @@ import {
   ImpactBand,
   Methodology,
   Pillars,
-  PresentationVideo,
   Problems,
   Results,
   Storytelling,
@@ -78,7 +77,6 @@ function Index() {
         <AmbientBackground />
         <div className="relative">
           <Problems />
-          <PresentationVideo />
           <Methodology />
           <Storytelling />
           <Results />
