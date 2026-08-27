@@ -8,7 +8,6 @@ import {
   ImpactBand,
   Methodology,
   Pillars,
-  PresentationVideo,
   Problems,
   Results,
   Storytelling,
