@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TreinamentosIndexRouteImport } from './routes/treinamentos/index'
+import { Route as TreinamentosLucro2xRaioXRouteImport } from './routes/treinamentos/lucro-2x/raio-x'
 import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sitemap.xml'
 
 const IndexRoute = IndexRouteImport.update({
@@ -17,6 +19,17 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TreinamentosIndexRoute = TreinamentosIndexRouteImport.update({
+  id: '/treinamentos/',
+  path: '/treinamentos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreinamentosLucro2xRaioXRoute =
+  TreinamentosLucro2xRaioXRouteImport.update({
+    id: '/treinamentos/lucro-2x/raio-x',
+    path: '/treinamentos/lucro-2x/raio-x',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
   id: '/api/public/sitemap/xml',
   path: '/api/public/sitemap/xml',
@@ -25,27 +38,48 @@ const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/treinamentos/': typeof TreinamentosIndexRoute
+  '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/treinamentos': typeof TreinamentosIndexRoute
+  '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/treinamentos/': typeof TreinamentosIndexRoute
+  '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/sitemap/xml'
+  fullPaths:
+    | '/'
+    | '/treinamentos/'
+    | '/treinamentos/lucro-2x/raio-x'
+    | '/api/public/sitemap/xml'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/sitemap/xml'
-  id: '__root__' | '/' | '/api/public/sitemap/xml'
+  to:
+    | '/'
+    | '/treinamentos'
+    | '/treinamentos/lucro-2x/raio-x'
+    | '/api/public/sitemap/xml'
+  id:
+    | '__root__'
+    | '/'
+    | '/treinamentos/'
+    | '/treinamentos/lucro-2x/raio-x'
+    | '/api/public/sitemap/xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TreinamentosIndexRoute: typeof TreinamentosIndexRoute
+  TreinamentosLucro2xRaioXRoute: typeof TreinamentosLucro2xRaioXRoute
   ApiPublicSitemapXmlRoute: typeof ApiPublicSitemapXmlRoute
 }
 
@@ -56,6 +90,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treinamentos/': {
+      id: '/treinamentos/'
+      path: '/treinamentos'
+      fullPath: '/treinamentos/'
+      preLoaderRoute: typeof TreinamentosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treinamentos/lucro-2x/raio-x': {
+      id: '/treinamentos/lucro-2x/raio-x'
+      path: '/treinamentos/lucro-2x/raio-x'
+      fullPath: '/treinamentos/lucro-2x/raio-x'
+      preLoaderRoute: typeof TreinamentosLucro2xRaioXRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/sitemap/xml': {
@@ -70,6 +118,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TreinamentosIndexRoute: TreinamentosIndexRoute,
+  TreinamentosLucro2xRaioXRoute: TreinamentosLucro2xRaioXRoute,
   ApiPublicSitemapXmlRoute: ApiPublicSitemapXmlRoute,
 }
 export const routeTree = rootRouteImport

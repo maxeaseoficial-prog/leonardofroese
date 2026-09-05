@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
-import { Mail } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Mail, Menu, X } from "lucide-react";
 import { MagneticButton } from "./primitives";
 import logoAsset from "@/assets/caliber-logo.png.asset.json";
 
 const links = [
-  { label: "Diagnóstico", href: "#obstaculos" },
-  { label: "Metodologia", href: "#metodologia" },
-  { label: "Pilares", href: "#pilares" },
-  { label: "Resultados", href: "#resultados" },
-  { label: "Leonardo", href: "#leonardo" },
+  { label: "Diagnóstico", href: "/#obstaculos" },
+  { label: "Metodologia", href: "/#metodologia" },
+  { label: "Pilares", href: "/#pilares" },
+  { label: "Resultados", href: "/#resultados" },
+  { label: "Leonardo", href: "/#leonardo" },
+  { label: "Treinamentos", href: "/treinamentos" },
 ];
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
@@ -21,17 +24,29 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   return (
     <motion.header
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
-        scrolled ? "border-b border-border bg-background/70 backdrop-blur-xl" : ""
+        scrolled || mobileOpen ? "border-b border-border bg-background/90 backdrop-blur-xl" : ""
       }`}
     >
-      <nav aria-label="Navegação Principal" className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        <a href="#top" className="flex items-baseline gap-2">
+      <nav
+        aria-label="Navegação Principal"
+        className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10"
+      >
+        <a href="/" className="flex items-baseline gap-2" aria-label="Leonardo Froese — início">
           <span className="text-base font-extrabold tracking-tight uppercase text-foreground/90">
             Leonardo Froese
           </span>
@@ -47,10 +62,56 @@ export function Nav() {
             </a>
           ))}
         </div>
-        <MagneticButton href="#contato" className="hidden px-5 py-2.5 text-xs sm:inline-flex">
+        <MagneticButton href="/#contato" className="hidden px-5 py-2.5 text-xs lg:inline-flex">
           Agendar Diagnóstico
         </MagneticButton>
+        <button
+          type="button"
+          aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMobileOpen((open) => !open)}
+          className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface/70 text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+        >
+          {mobileOpen ? (
+            <X className="size-5" aria-hidden />
+          ) : (
+            <Menu className="size-5" aria-hidden />
+          )}
+        </button>
       </nav>
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            id="mobile-navigation"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t border-border bg-background/95 lg:hidden"
+          >
+            <div className="mx-auto flex w-full max-w-7xl flex-col px-6 py-5">
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="border-b border-border py-4 text-base font-medium text-foreground/80 transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <a
+                href="/#contato"
+                onClick={() => setMobileOpen(false)}
+                className="mt-5 inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                Agendar Diagnóstico
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
@@ -60,14 +121,12 @@ export function Footer() {
     <footer className="border-t border-border px-6 py-16 lg:px-10">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-4">
-          <img 
-            src={logoAsset.url} 
-            alt="Cáliber Logo" 
-            className="h-20 w-auto object-contain brightness-0 invert" 
+          <img
+            src={logoAsset.url}
+            alt="Cáliber Logo"
+            className="h-20 w-auto object-contain brightness-0 invert"
           />
-          <p className="text-xs font-light text-subtle">
-            Gestão Empresarial: Leonardo Froese
-          </p>
+          <p className="text-xs font-light text-subtle">Gestão Empresarial: Leonardo Froese</p>
         </div>
 
         <div className="flex flex-wrap gap-x-8 gap-y-3">
@@ -92,7 +151,7 @@ export function Footer() {
           <span className="hidden h-4 w-px bg-border sm:block" />
           <div className="flex items-center gap-4 text-muted-foreground">
             <a
-              href="#contato"
+              href="/#contato"
               aria-label="E-mail"
               className="transition-all duration-300 hover:-translate-y-0.5 hover:text-primary"
             >
@@ -102,8 +161,7 @@ export function Footer() {
         </div>
       </div>
       <p className="mx-auto mt-12 w-full max-w-7xl text-[11px] font-light text-subtle">
-        © {new Date().getFullYear()} Cáliber Gestão Empresarial. Todos os direitos
-        reservados.
+        © {new Date().getFullYear()} Cáliber Gestão Empresarial. Todos os direitos reservados.
       </p>
     </footer>
   );
