@@ -68,7 +68,7 @@ export function Hero() {
 
           <Reveal delay={0.4}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <MagneticButton href="/treinamentos/lucro-2x/raio-x">
+              <MagneticButton href="/treinamentos/lucro-2x/raio-x" className="bg-emerald-500 text-white hover:bg-emerald-600">
                 Fazer meu Raio-X
                 <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </MagneticButton>

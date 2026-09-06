@@ -128,7 +128,7 @@ function TrainingsPage() {
             <Reveal delay={0.3}>
               <Link
                 to="/treinamentos/lucro-2x/raio-x"
-                className="group mt-9 inline-flex min-h-13 items-center justify-center gap-3 rounded-full bg-primary px-7 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                className="group mt-9 inline-flex min-h-13 items-center justify-center gap-3 rounded-full bg-emerald-500 px-7 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
               >
                 Fazer meu Raio-X
                 <ArrowRight
