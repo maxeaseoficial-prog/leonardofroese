@@ -1,5 +1,10 @@
 import { motion, useScroll, useTransform } from "motion/react";
-import founderImg from "@/assets/leonardo-founder.png.asset.json";
+import founderImg from "@/assets/leonardo-DSC01026.jpg.asset.json";
+import chapter1Img from "@/assets/leonardo-DSC00683.jpg.asset.json";
+import chapter2Img from "@/assets/leonardo-DSC01034.jpg.asset.json";
+import chapter3Img from "@/assets/leonardo-DSC00784.jpg.asset.json";
+import chapter4Img from "@/assets/leonardo-DSC00709.jpg.asset.json";
+import chapter5Img from "@/assets/leonardo-DSC00917.jpg.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
