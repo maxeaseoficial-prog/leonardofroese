@@ -426,6 +426,7 @@ const chapters = [
     label: "Capítulo 02",
     title: "O PROBLEMA",
     image: chapter2Img.url,
+    objectPosition: "center 15%",
     content: [
       "Durante muitos anos acompanhei consultorias entregando soluções excelentes no papel, mas completamente desconectadas da realidade do empresário.",
       "Planilhas perfeitas. Métodos sofisticados. Processos impecáveis.",
@@ -450,6 +451,7 @@ const chapters = [
     label: "Capítulo 04",
     title: "O SUCESSO",
     image: chapter4Img.url,
+    objectPosition: "center 20%",
     content: [
       "Com o passar dos anos a metodologia foi sendo validada.",
       "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
@@ -462,6 +464,7 @@ const chapters = [
     label: "Capítulo 05",
     title: "O PROPÓSITO",
     image: chapter5Img.url,
+    objectPosition: "center 25%",
     content: [
       "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
       "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
@@ -533,6 +536,7 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
                 src={chapter.image}
                 alt={`Leonardo Froese: ${chapter.title}`}
                 loading="lazy"
+                style={{ objectPosition: chapter.objectPosition || "center" }}
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
