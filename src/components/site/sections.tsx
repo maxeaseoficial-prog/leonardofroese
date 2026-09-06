@@ -415,10 +415,10 @@ const chapters = [
     title: "SOBRE MIM",
     image: chapter1Img.url,
     content: [
-      "Prazer, sou Leonardo Froese.",
-      "Sou CEO da Cáliber Transformadoria, empresa especializada em transformar negócios na prática, construída a partir da vivência real dentro das empresas.",
-      "Ao longo da minha trajetória participei da estruturação de centenas de operações empresariais e acompanhei milhares de decisões estratégicas que impactaram diretamente o crescimento dos negócios.",
-      "Hoje nosso trabalho já contribuiu para mais de R$ 100 milhões em lucro gerado e centenas de empresas estruturadas.",
+      "Prazer, sou o Leonardo Froese.",
+      "Sou CEO da Cáliber Controladoria Estratégica, que Constrói, Estrutura na prática e Assume a Gestão das empresas para empresários recuperarem margens e crescerem sem perder o controle nem ter que ser herói do negócio.\n\nHá mais de 17 anos, eu e minha equipe vivemos empresas na prática, sem firula nem teoria de consultoria, e já ajudamos mais de 450 empresas.\n",
+      "\n",
+      "Hoje nosso trabalho já contribuiu para mais de R$ 100 milhões em LUCRO ADICIONAL gerado nas empresas que gerenciamos",
     ],
   },
   {
