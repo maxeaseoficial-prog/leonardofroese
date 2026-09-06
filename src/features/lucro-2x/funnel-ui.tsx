@@ -20,7 +20,7 @@ export function CheckoutButton({
   const base =
     level === "executivo"
       ? import.meta.env["VITE_KIWIFY_EXECUTIVO"]
-      : import.meta.env["VITE_KIWIFY_PADRAO"];
+      : "https://pay.kiwify.com.br/8v0QHJY";
   const open = () => {
     if (base)
       window.open(
@@ -32,7 +32,7 @@ export function CheckoutButton({
   return (
     <button
       type="button"
-      className={`${secondary ? "funnel-secondary" : "funnel-primary"} ${className}`}
+      className={`${secondary ? "funnel-secondary" : "funnel-primary"} ${level === "padrao" ? "funnel-checkout-padrao" : ""} ${className}`}
       onClick={open}
       disabled={!base}
     >

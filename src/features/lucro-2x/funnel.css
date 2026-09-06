@@ -148,6 +148,18 @@
 .funnel-secondary:not(:disabled):hover {
   background: rgba(216, 180, 92, 0.1);
 }
+.funnel-checkout-padrao,
+.funnel-secondary.funnel-checkout-padrao {
+  border: 0;
+  background: linear-gradient(180deg, #34d399, #16a34a);
+  color: #052e16;
+  box-shadow: 0 12px 30px rgba(22, 163, 74, 0.24);
+}
+.funnel-checkout-padrao:not(:disabled):hover,
+.funnel-secondary.funnel-checkout-padrao:not(:disabled):hover {
+  background: linear-gradient(180deg, #4ade80, #16a34a);
+  filter: brightness(1.04);
+}
 .funnel-primary:active,
 .funnel-secondary:active {
   transform: translateY(1px);
