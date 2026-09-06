@@ -440,7 +440,7 @@ function DiagnosticPage() {
                       href="https://pay.kiwify.com.br/8v0QHJY"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group mt-9 inline-flex min-h-13 w-full items-center justify-center gap-3 rounded-full bg-primary px-6 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                      className="group mt-9 inline-flex min-h-13 w-full items-center justify-center gap-3 rounded-full bg-emerald-500 px-6 text-center text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
                     >
                       Quero estruturar minha empresa
                       <ArrowRight
