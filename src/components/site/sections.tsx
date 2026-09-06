@@ -1,5 +1,10 @@
 import { motion, useScroll, useTransform } from "motion/react";
-import founderImg from "@/assets/leonardo-founder.png.asset.json";
+import founderImg from "@/assets/leonardo-DSC01026.jpg.asset.json";
+import chapter1Img from "@/assets/leonardo-DSC00683.jpg.asset.json";
+import chapter2Img from "@/assets/leonardo-DSC01034.jpg.asset.json";
+import chapter3Img from "@/assets/leonardo-DSC00784.jpg.asset.json";
+import chapter4Img from "@/assets/leonardo-DSC00709.jpg.asset.json";
+import chapter5Img from "@/assets/leonardo-DSC00917.jpg.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -15,7 +20,6 @@ import {
   Quote,
   Repeat,
   Rocket,
-  Scroll,
   Target,
   TrendingUp,
   User,
@@ -409,6 +413,7 @@ const chapters = [
     id: "01",
     label: "Capítulo 01",
     title: "SOBRE MIM",
+    image: chapter1Img.url,
     content: [
       "Prazer, sou Leonardo Froese.",
       "Sou CEO da Cáliber Transformadoria, empresa especializada em transformar negócios na prática, construída a partir da vivência real dentro das empresas.",
@@ -420,6 +425,7 @@ const chapters = [
     id: "02",
     label: "Capítulo 02",
     title: "O PROBLEMA",
+    image: chapter2Img.url,
     content: [
       "Durante muitos anos acompanhei consultorias entregando soluções excelentes no papel, mas completamente desconectadas da realidade do empresário.",
       "Planilhas perfeitas. Métodos sofisticados. Processos impecáveis.",
@@ -431,6 +437,7 @@ const chapters = [
     id: "03",
     label: "Capítulo 03",
     title: "O DESAFIO",
+    image: chapter3Img.url,
     content: [
       "Decidi construir uma metodologia baseada na prática.",
       "Passei anos identificando os principais fatores que impedem empresas de crescer.",
@@ -442,6 +449,7 @@ const chapters = [
     id: "04",
     label: "Capítulo 04",
     title: "O SUCESSO",
+    image: chapter4Img.url,
     content: [
       "Com o passar dos anos a metodologia foi sendo validada.",
       "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
@@ -453,6 +461,7 @@ const chapters = [
     id: "05",
     label: "Capítulo 05",
     title: "O PROPÓSITO",
+    image: chapter5Img.url,
     content: [
       "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
       "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
@@ -516,17 +525,17 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
           </div>
         </div>
 
-        {/* Placeholder visual */}
+        {/* Foto do capítulo */}
         <div className={cn("relative", isEven ? "lg:order-2" : "lg:order-1")}>
           <Reveal delay={0.4} y={40} className="w-full">
-            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-surface-2 to-surface transition-all duration-700 hover:border-primary/20">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.83_0.121_82.5/0.05),transparent_70%)]" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-subtle/40 transition-colors duration-500 group-hover:text-subtle/60">
-                <Scroll className="size-10" strokeWidth={1} />
-                <span className="text-[10px] uppercase tracking-[0.3em]">
-                  Asset Placeholder {chapter.id}
-                </span>
-              </div>
+            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/50 transition-all duration-700 hover:border-primary/20">
+              <img
+                src={chapter.image}
+                alt={`Leonardo Froese: ${chapter.title}`}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
               {/* Efeito de luz acompanhando o card */}
               <div className="absolute -inset-px rounded-3xl border border-primary/0 transition-colors duration-700 group-hover:border-primary/10" />
             </div>
