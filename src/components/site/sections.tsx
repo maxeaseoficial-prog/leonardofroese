@@ -414,6 +414,7 @@ const chapters = [
     id: "01",
     label: "Capítulo 01",
     title: "SOBRE MIM",
+    image: chapter1Img.url,
     content: [
       "Prazer, sou Leonardo Froese.",
       "Sou CEO da Cáliber Transformadoria, empresa especializada em transformar negócios na prática, construída a partir da vivência real dentro das empresas.",
@@ -425,6 +426,7 @@ const chapters = [
     id: "02",
     label: "Capítulo 02",
     title: "O PROBLEMA",
+    image: chapter2Img.url,
     content: [
       "Durante muitos anos acompanhei consultorias entregando soluções excelentes no papel, mas completamente desconectadas da realidade do empresário.",
       "Planilhas perfeitas. Métodos sofisticados. Processos impecáveis.",
@@ -436,6 +438,7 @@ const chapters = [
     id: "03",
     label: "Capítulo 03",
     title: "O DESAFIO",
+    image: chapter3Img.url,
     content: [
       "Decidi construir uma metodologia baseada na prática.",
       "Passei anos identificando os principais fatores que impedem empresas de crescer.",
@@ -447,6 +450,7 @@ const chapters = [
     id: "04",
     label: "Capítulo 04",
     title: "O SUCESSO",
+    image: chapter4Img.url,
     content: [
       "Com o passar dos anos a metodologia foi sendo validada.",
       "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
@@ -458,6 +462,7 @@ const chapters = [
     id: "05",
     label: "Capítulo 05",
     title: "O PROPÓSITO",
+    image: chapter5Img.url,
     content: [
       "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
       "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
