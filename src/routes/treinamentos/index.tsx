@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, Cog, Target } from "lucide-react";
 import { motion } from "motion/react";
 import { Footer, Nav } from "@/components/site/chrome";
 import { AmbientBackground, Reveal, ScrollProgress } from "@/components/site/primitives";
@@ -25,11 +24,7 @@ export const Route = createFileRoute("/treinamentos/")({
   component: TrainingsPage,
 });
 
-const foundations = [
-  { icon: BarChart3, label: "Diagnóstico estratégico" },
-  { icon: Cog, label: "Processos que funcionam" },
-  { icon: Target, label: "Lucro com sistema" },
-];
+const foundations = ["Diagnóstico estratégico", "Processos que funcionam", "Lucro com sistema"];
 
 function TrainingsPage() {
   return (
@@ -81,7 +76,7 @@ function TrainingsPage() {
                 Diagnóstico e Plano de Estruturação Empresarial
               </p>
               <p className="mt-5 max-w-xl text-base font-light leading-8 text-muted-foreground">
-                Descubra onde sua empresa perde eficiência, margem e capacidade de crescer — e dê o
+                Descubra onde sua empresa perde eficiência, margem e capacidade de crescer. Dê o
                 primeiro passo para construir uma operação mais estruturada e lucrativa.
               </p>
             </Reveal>
@@ -103,6 +98,8 @@ function TrainingsPage() {
               alt="Arte oficial do Cáliber Lucro 2X com Leonardo Froese"
               width={1122}
               height={1402}
+              loading="lazy"
+              decoding="async"
               className="h-auto w-full rounded-3xl border border-white/10 object-contain shadow-[0_32px_90px_-48px_rgba(244,190,98,0.35)]"
             />
           </motion.div>
@@ -110,16 +107,9 @@ function TrainingsPage() {
           <div className="max-w-xl lg:col-start-1 lg:row-start-2">
             <div className="grid border-y border-border sm:grid-cols-3">
               {foundations.map((item, index) => (
-                <Reveal key={item.label} delay={0.14 + index * 0.06}>
-                  <div className="flex h-full items-center gap-3 border-b border-border py-5 last:border-b-0 sm:block sm:border-b-0 sm:border-l sm:px-5 sm:first:border-l-0 sm:first:pl-0 sm:last:pr-0">
-                    <item.icon
-                      className="size-5 shrink-0 text-primary"
-                      strokeWidth={1.5}
-                      aria-hidden
-                    />
-                    <span className="text-sm font-medium leading-5 text-foreground/85 sm:mt-3 sm:block">
-                      {item.label}
-                    </span>
+                <Reveal key={item} delay={0.14 + index * 0.06}>
+                  <div className="flex h-full items-center border-b border-border py-5 last:border-b-0 sm:block sm:border-b-0 sm:border-l sm:px-5 sm:first:border-l-0 sm:first:pl-0 sm:last:pr-0">
+                    <span className="text-sm font-medium leading-5 text-foreground/85">{item}</span>
                   </div>
                 </Reveal>
               ))}
@@ -127,14 +117,10 @@ function TrainingsPage() {
 
             <Reveal delay={0.3}>
               <Link
-                to="/treinamentos/lucro-2x/raio-x"
-                className="group mt-9 inline-flex min-h-13 items-center justify-center gap-3 rounded-full bg-emerald-500 px-7 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
+                to="/raio-x"
+                className="mt-9 inline-flex min-h-14 items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,#e0c176,#c19a3e)] px-7 text-sm font-semibold text-[#14120c] shadow-[0_12px_30px_rgba(193,154,62,.2)] transition-[filter] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e0c176]"
               >
-                Fazer meu Raio-X
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-1"
-                  aria-hidden
-                />
+                Começar meu raio-x
               </Link>
               <p className="mt-4 text-xs leading-5 text-muted-foreground">
                 12 perguntas · aproximadamente 2 minutos · resultado na hora

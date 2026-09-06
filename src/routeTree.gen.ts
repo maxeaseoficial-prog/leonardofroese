@@ -10,6 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as RaioXIndexRouteImport } from './routes/raio-x/index'
+import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
+import { Route as RaioXPerguntasRouteImport } from './routes/raio-x/perguntas'
+import { Route as RaioXResultadoRouteImport } from './routes/raio-x/resultado'
 import { Route as TreinamentosIndexRouteImport } from './routes/treinamentos/index'
 import { Route as TreinamentosLucro2xRaioXRouteImport } from './routes/treinamentos/lucro-2x/raio-x'
 import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sitemap.xml'
@@ -17,6 +22,31 @@ import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sit
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioXIndexRoute = RaioXIndexRouteImport.update({
+  id: '/raio-x/',
+  path: '/raio-x/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioXDadosRoute = RaioXDadosRouteImport.update({
+  id: '/raio-x/dados',
+  path: '/raio-x/dados',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioXPerguntasRoute = RaioXPerguntasRouteImport.update({
+  id: '/raio-x/perguntas',
+  path: '/raio-x/perguntas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioXResultadoRoute = RaioXResultadoRouteImport.update({
+  id: '/raio-x/resultado',
+  path: '/raio-x/resultado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TreinamentosIndexRoute = TreinamentosIndexRouteImport.update({
@@ -38,12 +68,22 @@ const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/raio-x/dados': typeof RaioXDadosRoute
+  '/raio-x/perguntas': typeof RaioXPerguntasRoute
+  '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raio-x/': typeof RaioXIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/raio-x/dados': typeof RaioXDadosRoute
+  '/raio-x/perguntas': typeof RaioXPerguntasRoute
+  '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raio-x': typeof RaioXIndexRoute
   '/treinamentos': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
@@ -51,6 +91,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/raio-x/dados': typeof RaioXDadosRoute
+  '/raio-x/perguntas': typeof RaioXPerguntasRoute
+  '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raio-x/': typeof RaioXIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
@@ -59,18 +104,33 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/obrigado'
+    | '/raio-x/dados'
+    | '/raio-x/perguntas'
+    | '/raio-x/resultado'
+    | '/raio-x/'
     | '/treinamentos/'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/obrigado'
+    | '/raio-x/dados'
+    | '/raio-x/perguntas'
+    | '/raio-x/resultado'
+    | '/raio-x'
     | '/treinamentos'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
   id:
     | '__root__'
     | '/'
+    | '/obrigado'
+    | '/raio-x/dados'
+    | '/raio-x/perguntas'
+    | '/raio-x/resultado'
+    | '/raio-x/'
     | '/treinamentos/'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
@@ -78,6 +138,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ObrigadoRoute: typeof ObrigadoRoute
+  RaioXDadosRoute: typeof RaioXDadosRoute
+  RaioXPerguntasRoute: typeof RaioXPerguntasRoute
+  RaioXResultadoRoute: typeof RaioXResultadoRoute
+  RaioXIndexRoute: typeof RaioXIndexRoute
   TreinamentosIndexRoute: typeof TreinamentosIndexRoute
   TreinamentosLucro2xRaioXRoute: typeof TreinamentosLucro2xRaioXRoute
   ApiPublicSitemapXmlRoute: typeof ApiPublicSitemapXmlRoute
@@ -90,6 +155,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raio-x/': {
+      id: '/raio-x/'
+      path: '/raio-x'
+      fullPath: '/raio-x/'
+      preLoaderRoute: typeof RaioXIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raio-x/dados': {
+      id: '/raio-x/dados'
+      path: '/raio-x/dados'
+      fullPath: '/raio-x/dados'
+      preLoaderRoute: typeof RaioXDadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raio-x/perguntas': {
+      id: '/raio-x/perguntas'
+      path: '/raio-x/perguntas'
+      fullPath: '/raio-x/perguntas'
+      preLoaderRoute: typeof RaioXPerguntasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raio-x/resultado': {
+      id: '/raio-x/resultado'
+      path: '/raio-x/resultado'
+      fullPath: '/raio-x/resultado'
+      preLoaderRoute: typeof RaioXResultadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/treinamentos/': {
@@ -118,6 +218,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ObrigadoRoute: ObrigadoRoute,
+  RaioXDadosRoute: RaioXDadosRoute,
+  RaioXPerguntasRoute: RaioXPerguntasRoute,
+  RaioXResultadoRoute: RaioXResultadoRoute,
+  RaioXIndexRoute: RaioXIndexRoute,
   TreinamentosIndexRoute: TreinamentosIndexRoute,
   TreinamentosLucro2xRaioXRoute: TreinamentosLucro2xRaioXRoute,
   ApiPublicSitemapXmlRoute: ApiPublicSitemapXmlRoute,
