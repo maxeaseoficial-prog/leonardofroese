@@ -4,7 +4,7 @@ import { Mail, Menu, X } from "lucide-react";
 import { MagneticButton } from "./primitives";
 import logoAsset from "@/assets/caliber-logo.png.asset.json";
 
-const links = [
+const footerLinks = [
   { label: "Diagnóstico", href: "/#obstaculos" },
   { label: "Metodologia", href: "/#metodologia" },
   { label: "Pilares", href: "/#pilares" },
@@ -12,6 +12,8 @@ const links = [
   { label: "Leonardo", href: "/#leonardo" },
   { label: "Treinamentos", href: "/treinamentos" },
 ];
+
+const navLinks = footerLinks.filter((link) => link.label !== "Leonardo");
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -52,7 +54,7 @@ export function Nav() {
           </span>
         </a>
         <div className="hidden items-center gap-9 lg:flex">
-          {links.map((l) => (
+          {navLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
@@ -91,7 +93,7 @@ export function Nav() {
             className="overflow-hidden border-t border-border bg-background/95 lg:hidden"
           >
             <div className="mx-auto flex w-full max-w-7xl flex-col px-6 py-5">
-              {links.map((link) => (
+              {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -130,7 +132,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-wrap gap-x-8 gap-y-3">
-          {links.map((l) => (
+          {footerLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
