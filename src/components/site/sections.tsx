@@ -451,6 +451,7 @@ const chapters = [
     label: "Capítulo 04",
     title: "O SUCESSO",
     image: chapter4Img.url,
+    objectPosition: "center 20%",
     content: [
       "Com o passar dos anos a metodologia foi sendo validada.",
       "A equipe cresceu. A atuação se expandiu. Centenas de empresas passaram pela transformação.",
