@@ -536,6 +536,7 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
                 src={chapter.image}
                 alt={`Leonardo Froese: ${chapter.title}`}
                 loading="lazy"
+                style={{ objectPosition: chapter.objectPosition || "center" }}
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
