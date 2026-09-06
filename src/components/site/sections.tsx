@@ -526,17 +526,17 @@ function ChapterItem({ chapter, index }: { chapter: (typeof chapters)[0]; index:
           </div>
         </div>
 
-        {/* Placeholder visual */}
+        {/* Foto do capítulo */}
         <div className={cn("relative", isEven ? "lg:order-2" : "lg:order-1")}>
           <Reveal delay={0.4} y={40} className="w-full">
-            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-surface-2 to-surface transition-all duration-700 hover:border-primary/20">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.83_0.121_82.5/0.05),transparent_70%)]" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-subtle/40 transition-colors duration-500 group-hover:text-subtle/60">
-                <Scroll className="size-10" strokeWidth={1} />
-                <span className="text-[10px] uppercase tracking-[0.3em]">
-                  Asset Placeholder {chapter.id}
-                </span>
-              </div>
+            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/50 transition-all duration-700 hover:border-primary/20">
+              <img
+                src={chapter.image}
+                alt={`Leonardo Froese: ${chapter.title}`}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
               {/* Efeito de luz acompanhando o card */}
               <div className="absolute -inset-px rounded-3xl border border-primary/0 transition-colors duration-700 group-hover:border-primary/10" />
             </div>
