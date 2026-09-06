@@ -249,7 +249,7 @@ const transformations = [
 ];
 
 const indicators = [
-  { value: 16, suffix: "+", label: "Anos estruturando empresas" },
+  { value: 17, suffix: "+", label: "Anos estruturando empresas" },
   { value: 450, suffix: "+", label: "Empresas transformadas" },
   { value: 100, prefix: "R$", suffix: " milhões+", label: "Em lucro gerado" },
   { value: 12000, suffix: "+", label: "Pessoas treinadas" },
