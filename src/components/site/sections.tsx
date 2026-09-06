@@ -416,7 +416,7 @@ const chapters = [
     image: chapter1Img.url,
     content: [
       "Prazer, sou o Leonardo Froese.",
-      "Sou CEO da Cáliber Controladoria Estratégica, que Constrói, Estrutura na prática e Assume a Gestão das empresas para empresários recuperarem margens e crescerem sem perder o controle nem ter que ser herói do negócio.\n\nHá mais de 17 anos, eu e minha equipe vivemos empresas na prática, sem firula nem teoria de consultoria, e já ajudamos mais de 450 empresas.\n",
+      "Sou CEO do Grupo Froese e da Cáliber Controladoria Estratégica, que Constrói, Estrutura na prática e Assume a Gestão das empresas para empresários recuperarem margens e crescerem sem perder o controle nem ter que ser herói do negócio. \n\n\n Há mais de 17 anos, eu e minha equipe vivemos empresas na prática, sem firula nem teoria de consultoria, e já ajudamos mais de 450 empresas.",
       "\n",
       "Hoje nosso trabalho já contribuiu para mais de R$ 100 milhões em LUCRO ADICIONAL gerado nas empresas que gerenciamos",
     ],
