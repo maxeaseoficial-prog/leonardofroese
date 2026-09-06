@@ -20,7 +20,6 @@ import {
   Quote,
   Repeat,
   Rocket,
-  Scroll,
   Target,
   TrendingUp,
   User,
