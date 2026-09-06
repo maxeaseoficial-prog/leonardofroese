@@ -464,9 +464,10 @@ const chapters = [
     label: "Capítulo 05",
     title: "O PROPÓSITO",
     image: chapter5Img.url,
+    objectPosition: "center 25%",
     content: [
       "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
-      "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
+      "Quantos empresários ainda enfrentam osmesmos problemas que eu enfrentei?",
       "Foi por isso que decidi compartilhar esse conhecimento.",
       "Meu propósito não é apenas organizar empresas. É ajudar empresários a construírem negócios lucrativos, estruturados e independentes do dono.",
       "Esse é o trabalho que escolhi realizar.",
