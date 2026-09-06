@@ -426,6 +426,7 @@ const chapters = [
     label: "Capítulo 02",
     title: "O PROBLEMA",
     image: chapter2Img.url,
+    objectPosition: "center 15%",
     content: [
       "Durante muitos anos acompanhei consultorias entregando soluções excelentes no papel, mas completamente desconectadas da realidade do empresário.",
       "Planilhas perfeitas. Métodos sofisticados. Processos impecáveis.",
