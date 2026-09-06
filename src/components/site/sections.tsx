@@ -469,8 +469,8 @@ const chapters = [
       "Mesmo depois de tantos resultados, uma pergunta continuava me acompanhando.",
       "Quantos empresários ainda enfrentam os mesmos problemas que eu enfrentei?",
       "Foi por isso que decidi compartilhar esse conhecimento.",
-      "Meu propósito não é apenas organizar empresas. É ajudar empresários a construírem negócios lucrativos, estruturados e independentes do dono.",
-      "Esse é o trabalho que escolhi realizar.",
+      "Meu propósito não é apenas organizar empresas. \nÉ ajudar empresários a construírem negócios lucrativos, estruturados e independentes do dono.",
+      "Esse é o trabalho que escolhi realizar. \nMinha vida é Transformar Negócios, é ajudar empresários a vencerem os desafios, pois eu sei como é e vivi essa realidade centenas de vezes.\n\nMas você não precisa mais passar por isso.",
     ],
   },
 ];
