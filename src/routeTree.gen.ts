@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as Lucro2xObrigadoRouteImport } from './routes/lucro2x/obrigado'
 import { Route as RaioXIndexRouteImport } from './routes/raio-x/index'
 import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
 import { Route as RaioXPerguntasRouteImport } from './routes/raio-x/perguntas'
@@ -27,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Lucro2xObrigadoRoute = Lucro2xObrigadoRouteImport.update({
+  id: '/lucro2x/obrigado',
+  path: '/lucro2x/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RaioXIndexRoute = RaioXIndexRouteImport.update({
@@ -69,6 +75,7 @@ const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/obrigado'
+    | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/obrigado'
+    | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/obrigado'
+    | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
@@ -139,6 +151,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  Lucro2xObrigadoRoute: typeof Lucro2xObrigadoRoute
   RaioXDadosRoute: typeof RaioXDadosRoute
   RaioXPerguntasRoute: typeof RaioXPerguntasRoute
   RaioXResultadoRoute: typeof RaioXResultadoRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/obrigado'
       fullPath: '/obrigado'
       preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lucro2x/obrigado': {
+      id: '/lucro2x/obrigado'
+      path: '/lucro2x/obrigado'
+      fullPath: '/lucro2x/obrigado'
+      preLoaderRoute: typeof Lucro2xObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/raio-x/': {
@@ -219,6 +239,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ObrigadoRoute: ObrigadoRoute,
+  Lucro2xObrigadoRoute: Lucro2xObrigadoRoute,
   RaioXDadosRoute: RaioXDadosRoute,
   RaioXPerguntasRoute: RaioXPerguntasRoute,
   RaioXResultadoRoute: RaioXResultadoRoute,
