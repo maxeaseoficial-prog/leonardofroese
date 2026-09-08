@@ -52,7 +52,6 @@ export default {
       
       // Apply security headers to the response
       const secureResponse = new Response(response.body, response);
-      secureResponse.headers.set("X-Frame-Options", "DENY");
       secureResponse.headers.set("X-Content-Type-Options", "nosniff");
       secureResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
       secureResponse.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
