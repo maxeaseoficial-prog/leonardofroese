@@ -9,6 +9,7 @@ import {
 import { loadDiagnostic, saveDiagnostic } from "@/features/lucro-2x/diagnostic-session";
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
+import { submitDiagnostic } from "@/features/lucro-2x/notify.functions";
 
 export const Route = createFileRoute("/raio-x/dados")({
   head: () => funnelHead,
@@ -79,7 +80,11 @@ function DataCapture() {
       navigate({ to: "/raio-x/perguntas" });
       return;
     }
-    saveDiagnostic({ ...saved, contact });
+    const next = { ...saved, contact };
+    saveDiagnostic(next);
+    submitDiagnostic({ data: { contact, answers: next.answers, utm: next.utm } }).catch((error) =>
+      console.error("Falha ao notificar diagnóstico", error),
+    );
     navigate({ to: "/raio-x/resultado" });
   };
   return (
