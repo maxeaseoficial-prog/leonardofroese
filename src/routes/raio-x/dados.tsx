@@ -80,7 +80,11 @@ function DataCapture() {
       navigate({ to: "/raio-x/perguntas" });
       return;
     }
-    saveDiagnostic({ ...saved, contact });
+    const next = { ...saved, contact };
+    saveDiagnostic(next);
+    submitDiagnostic({ data: { contact, answers: next.answers, utm: next.utm } }).catch((error) =>
+      console.error("Falha ao notificar diagnóstico", error),
+    );
     navigate({ to: "/raio-x/resultado" });
   };
   return (
