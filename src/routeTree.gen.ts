@@ -16,6 +16,9 @@ import { Route as RaioXIndexRouteImport } from './routes/raio-x/index'
 import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
 import { Route as RaioXPerguntasRouteImport } from './routes/raio-x/perguntas'
 import { Route as RaioXResultadoRouteImport } from './routes/raio-x/resultado'
+import { Route as RaioxIndexRouteImport } from './routes/raiox/index'
+import { Route as RaioxDadosRouteImport } from './routes/raiox/dados'
+import { Route as RaioxPerguntasRouteImport } from './routes/raiox/perguntas'
 import { Route as TreinamentosIndexRouteImport } from './routes/treinamentos/index'
 import { Route as TreinamentosLucro2xRaioXRouteImport } from './routes/treinamentos/lucro-2x/raio-x'
 import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sitemap.xml'
@@ -55,6 +58,21 @@ const RaioXResultadoRoute = RaioXResultadoRouteImport.update({
   path: '/raio-x/resultado',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RaioxIndexRoute = RaioxIndexRouteImport.update({
+  id: '/raiox/',
+  path: '/raiox/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioxDadosRoute = RaioxDadosRouteImport.update({
+  id: '/raiox/dados',
+  path: '/raiox/dados',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RaioxPerguntasRoute = RaioxPerguntasRouteImport.update({
+  id: '/raiox/perguntas',
+  path: '/raiox/perguntas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TreinamentosIndexRoute = TreinamentosIndexRouteImport.update({
   id: '/treinamentos/',
   path: '/treinamentos/',
@@ -79,7 +97,10 @@ export interface FileRoutesByFullPath {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
+  '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x/': typeof RaioXIndexRoute
+  '/raiox/': typeof RaioxIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
@@ -91,7 +112,10 @@ export interface FileRoutesByTo {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
+  '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x': typeof RaioXIndexRoute
+  '/raiox': typeof RaioxIndexRoute
   '/treinamentos': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
@@ -104,7 +128,10 @@ export interface FileRoutesById {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
+  '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x/': typeof RaioXIndexRoute
+  '/raiox/': typeof RaioxIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
   '/treinamentos/lucro-2x/raio-x': typeof TreinamentosLucro2xRaioXRoute
   '/api/public/sitemap/xml': typeof ApiPublicSitemapXmlRoute
@@ -118,7 +145,10 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
+    | '/raiox/perguntas'
     | '/raio-x/'
+    | '/raiox/'
     | '/treinamentos/'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
@@ -130,7 +160,10 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
+    | '/raiox/perguntas'
     | '/raio-x'
+    | '/raiox'
     | '/treinamentos'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
@@ -142,7 +175,10 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
+    | '/raiox/perguntas'
     | '/raio-x/'
+    | '/raiox/'
     | '/treinamentos/'
     | '/treinamentos/lucro-2x/raio-x'
     | '/api/public/sitemap/xml'
@@ -155,7 +191,10 @@ export interface RootRouteChildren {
   RaioXDadosRoute: typeof RaioXDadosRoute
   RaioXPerguntasRoute: typeof RaioXPerguntasRoute
   RaioXResultadoRoute: typeof RaioXResultadoRoute
+  RaioxDadosRoute: typeof RaioxDadosRoute
+  RaioxPerguntasRoute: typeof RaioxPerguntasRoute
   RaioXIndexRoute: typeof RaioXIndexRoute
+  RaioxIndexRoute: typeof RaioxIndexRoute
   TreinamentosIndexRoute: typeof TreinamentosIndexRoute
   TreinamentosLucro2xRaioXRoute: typeof TreinamentosLucro2xRaioXRoute
   ApiPublicSitemapXmlRoute: typeof ApiPublicSitemapXmlRoute
@@ -212,6 +251,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RaioXResultadoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/raiox/': {
+      id: '/raiox/'
+      path: '/raiox'
+      fullPath: '/raiox/'
+      preLoaderRoute: typeof RaioxIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raiox/dados': {
+      id: '/raiox/dados'
+      path: '/raiox/dados'
+      fullPath: '/raiox/dados'
+      preLoaderRoute: typeof RaioxDadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raiox/perguntas': {
+      id: '/raiox/perguntas'
+      path: '/raiox/perguntas'
+      fullPath: '/raiox/perguntas'
+      preLoaderRoute: typeof RaioxPerguntasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/treinamentos/': {
       id: '/treinamentos/'
       path: '/treinamentos'
@@ -243,7 +303,10 @@ const rootRouteChildren: RootRouteChildren = {
   RaioXDadosRoute: RaioXDadosRoute,
   RaioXPerguntasRoute: RaioXPerguntasRoute,
   RaioXResultadoRoute: RaioXResultadoRoute,
+  RaioxDadosRoute: RaioxDadosRoute,
+  RaioxPerguntasRoute: RaioxPerguntasRoute,
   RaioXIndexRoute: RaioXIndexRoute,
+  RaioxIndexRoute: RaioxIndexRoute,
   TreinamentosIndexRoute: TreinamentosIndexRoute,
   TreinamentosLucro2xRaioXRoute: TreinamentosLucro2xRaioXRoute,
   ApiPublicSitemapXmlRoute: ApiPublicSitemapXmlRoute,
