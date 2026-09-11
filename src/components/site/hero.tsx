@@ -1,19 +1,14 @@
 import { motion, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
-import { heroBackgroundFixed } from "@/assets/hero-background-fixed";
+import { heroFinalBackground } from "@/assets/hero-final-data";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
-  const [heroBackground, setHeroBackground] = useState<string | null>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
-  useEffect(() => {
-    setHeroBackground(heroBackgroundFixed);
-  }, []);
 
   return (
     <section
@@ -21,12 +16,14 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* A imagem grande entra apenas no cliente para evitar serialização/truncamento no SSR. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={heroBackground ? { backgroundImage: `url(${heroBackground})` } : undefined}
-      />
+      {/* Imagem final da Hero enviada pelo usuário — asset WebP validado. */}
+      <div aria-hidden className="absolute inset-0">
+        <img
+          src={heroFinalBackground}
+          alt=""
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
 
       {/* Overlay mínimo: a própria imagem já contém a composição escura à esquerda. */}
       <div
