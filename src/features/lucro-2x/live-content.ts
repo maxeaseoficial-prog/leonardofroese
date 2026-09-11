@@ -6,8 +6,8 @@
 /** URL do YouTube da VSL. Deixe vazio para exibir o placeholder premium. */
 export const vslYoutubeUrl = "";
 
-/** URL do checkout/gateway. Enquanto vazio, o botão "Quero participar" fica desabilitado. */
-export const checkoutUrl = "";
+/** URL do checkout/gateway da Live Lucro 2X. */
+export const checkoutUrl = "https://pay.kiwify.com.br/GBRe5Du";
 
 /** Depoimentos em vídeo. Preencha as URLs do YouTube quando existirem. */
 export const testimonialVideos: { label: string; url: string }[] = [
