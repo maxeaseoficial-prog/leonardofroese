@@ -35,6 +35,7 @@ import faqPhotoOne from "@/assets/leonardo-DSC00683.jpg.asset.json";
 import faqPhotoTwo from "@/assets/leonardo-DSC01026.jpg.asset.json";
 import faqPhotoThree from "@/assets/leonardo-DSC00784.jpg.asset.json";
 import "./live.css";
+import "./live-fixes.css";
 
 const timelineIcons = [Play, Layers3, BarChart3, Target, Workflow, Gauge, Settings2, WalletCards, Clock3];
 
@@ -42,22 +43,21 @@ export function LiveExperience() {
   const reduceMotion = useReducedMotion();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [timelineIndex, setTimelineIndex] = useState(0);
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
   const timelineRef = useRef<HTMLDivElement>(null);
-  const testimonialRef = useRef<HTMLDivElement>(null);
 
   const goTimeline = (index: number) => {
     const clamped = Math.max(0, Math.min(liveTimeline.length - 1, index));
     setTimelineIndex(clamped);
-    const node = timelineRef.current?.querySelector<HTMLElement>(`[data-timeline-index="${clamped}"]`);
-    node?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest", inline: "center" });
-  };
 
-  const goTestimonial = (index: number) => {
-    const clamped = Math.max(0, Math.min(testimonialVideos.length - 1, index));
-    setTestimonialIndex(clamped);
-    const node = testimonialRef.current?.querySelector<HTMLElement>(`[data-testimonial-index="${clamped}"]`);
-    node?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest", inline: "center" });
+    const container = timelineRef.current;
+    const node = container?.querySelector<HTMLElement>(`[data-timeline-index="${clamped}"]`);
+    if (!container || !node) return;
+
+    const targetLeft = node.offsetLeft - (container.clientWidth - node.offsetWidth) / 2;
+    container.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   };
 
   return (
@@ -135,7 +135,7 @@ export function LiveExperience() {
                   data-timeline-index={index}
                   className={`live-timeline-card live-glow-card ${timelineIndex === index ? "is-active" : ""}`}
                   onMouseMove={trackPointer}
-                  onClick={() => setTimelineIndex(index)}
+                  onClick={() => goTimeline(index)}
                   initial={reduceMotion ? false : { opacity: 0, y: 22 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
@@ -185,52 +185,22 @@ export function LiveExperience() {
           <span className="live-proof-side-note">Empresários reais.<br />Resultados reais.</span>
         </div>
 
-        <div className="live-carousel-wrap live-proof-wrap">
-          <button
-            className="live-carousel-arrow live-carousel-arrow-left"
-            onClick={() => goTestimonial(testimonialIndex - 1)}
-            disabled={testimonialIndex === 0}
-            aria-label="Depoimento anterior"
-          >
-            <ChevronLeft />
-          </button>
-          <div className="live-testimonial-scroll" ref={testimonialRef}>
-            {testimonialVideos.map((video, index) => (
-              <motion.article
-                key={video.label}
-                data-testimonial-index={index}
-                className={`live-proof-card live-glow-card ${testimonialIndex === index ? "is-active" : ""}`}
-                onMouseMove={trackPointer}
-                onClick={() => setTestimonialIndex(index)}
-                whileHover={reduceMotion ? undefined : { y: -5 }}
-              >
-                <VideoFrame url={video.url} label={video.label} compact />
-                <div className="live-proof-copy">
-                  <div className="live-proof-index">0{index + 1}<span /></div>
-                  <h3>Depoimento em vídeo</h3>
-                  <p>Espaço preparado para um case real da Cáliber, sem inserir números ou promessas antes da validação do material.</p>
-                  <small>{video.label}</small>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-          <button
-            className="live-carousel-arrow live-carousel-arrow-right"
-            onClick={() => goTestimonial(testimonialIndex + 1)}
-            disabled={testimonialIndex === testimonialVideos.length - 1}
-            aria-label="Próximo depoimento"
-          >
-            <ChevronRight />
-          </button>
-        </div>
-        <div className="live-dots live-proof-dots">
+        <div className="live-testimonial-grid">
           {testimonialVideos.map((video, index) => (
-            <button
-              key={`${video.label}-dot`}
-              className={testimonialIndex === index ? "is-active" : ""}
-              onClick={() => goTestimonial(index)}
-              aria-label={`Ir para depoimento ${index + 1}`}
-            />
+            <motion.article
+              key={video.label}
+              className="live-proof-card live-glow-card"
+              onMouseMove={trackPointer}
+              whileHover={reduceMotion ? undefined : { y: -5 }}
+            >
+              <VideoFrame url={video.url} label={video.label} compact />
+              <div className="live-proof-copy">
+                <div className="live-proof-index">0{index + 1}<span /></div>
+                <h3>Depoimento em vídeo</h3>
+                <p>Espaço preparado para um case real da Cáliber, sem inserir números ou promessas antes da validação do material.</p>
+                <small>{video.label}</small>
+              </div>
+            </motion.article>
           ))}
         </div>
       </RevealBlock>
@@ -276,15 +246,17 @@ export function LiveExperience() {
                       <span>{faq.question}</span>
                       <ChevronDown size={20} strokeWidth={1.7} />
                     </button>
-                    <motion.div
-                      id={answerId}
-                      initial={false}
-                      animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                      transition={{ duration: reduceMotion ? 0 : 0.26 }}
-                      className="live-faq-answer-wrap"
-                    >
-                      <p className="live-faq-a">{faq.answer}</p>
-                    </motion.div>
+                    {isOpen ? (
+                      <motion.div
+                        id={answerId}
+                        initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.1 }}
+                        className="live-faq-answer-wrap"
+                      >
+                        <p className="live-faq-a">{faq.answer}</p>
+                      </motion.div>
+                    ) : null}
                   </article>
                 );
               })}
