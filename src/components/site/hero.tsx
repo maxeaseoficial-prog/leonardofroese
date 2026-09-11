@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
+import { heroBackgroundFixed } from "@/assets/hero-background-fixed";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -18,7 +19,7 @@ export function Hero() {
       {/* Imagem final da Hero enviada pelo usuário. */}
       <div aria-hidden className="absolute inset-0">
         <img
-          src="/images/hero-lucro2x-bg.jpg"
+          src={heroBackgroundFixed}
           alt=""
           className="h-full w-full object-cover object-center"
         />
