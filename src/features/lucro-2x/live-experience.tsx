@@ -1,5 +1,4 @@
 import {
-  useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
@@ -10,8 +9,6 @@ import {
   BarChart3,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Play,
   ShieldCheck,
   Target,
@@ -46,23 +43,6 @@ const timelineIcons = [BarChart3, Target, Workflow];
 export function LiveExperience() {
   const reduceMotion = useReducedMotion();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [timelineIndex, setTimelineIndex] = useState(0);
-  const timelineRef = useRef<HTMLDivElement>(null);
-
-  const goTimeline = (index: number) => {
-    const clamped = Math.max(0, Math.min(liveTimeline.length - 1, index));
-    setTimelineIndex(clamped);
-
-    const container = timelineRef.current;
-    const node = container?.querySelector<HTMLElement>(`[data-timeline-index="${clamped}"]`);
-    if (!container || !node) return;
-
-    const targetLeft = node.offsetLeft - (container.clientWidth - node.offsetWidth) / 2;
-    container.scrollTo({
-      left: Math.max(0, targetLeft),
-      behavior: reduceMotion ? "auto" : "smooth",
-    });
-  };
 
   return (
     <div className="live-experience">
@@ -153,61 +133,38 @@ export function LiveExperience() {
           centered
         />
 
-        <div className="live-carousel-wrap live-timeline-wrap">
-          <button
-            className="live-carousel-arrow live-carousel-arrow-left"
-            onClick={() => goTimeline(timelineIndex - 1)}
-            disabled={timelineIndex === 0}
-            aria-label="Etapa anterior"
-          >
-            <ChevronLeft />
-          </button>
-          <div className="live-timeline-scroll" ref={timelineRef}>
-            {liveTimeline.map((item, index) => {
-              const Icon = timelineIcons[index % timelineIcons.length];
-              return (
-                <motion.article
-                  key={`${item.step}-${item.title}`}
-                  data-timeline-index={index}
-                  className={`live-timeline-card live-glow-card ${timelineIndex === index ? "is-active" : ""}`}
-                  onMouseMove={trackPointer}
-                  onClick={() => goTimeline(index)}
-                  initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.25 }}
-                  transition={{ duration: reduceMotion ? 0 : 0.36, delay: reduceMotion ? 0 : index * 0.05 }}
-                >
-                  <span className="live-timeline-number">{index + 1}</span>
-                  <div className="live-timeline-icon"><Icon size={36} strokeWidth={1.45} /></div>
-                  <div className="live-timeline-time">{item.step}</div>
-                  <span className="live-timeline-rule" />
-                  <h3 className="live-card-title">{item.title}</h3>
-                  <p>{item.description}</p>
-                </motion.article>
-              );
-            })}
-          </div>
-          <button
-            className="live-carousel-arrow live-carousel-arrow-right"
-            onClick={() => goTimeline(timelineIndex + 1)}
-            disabled={timelineIndex === liveTimeline.length - 1}
-            aria-label="Próxima etapa"
-          >
-            <ChevronRight />
-          </button>
-        </div>
-        <div className="live-carousel-status" aria-label="Navegação do roteiro">
-          <div className="live-dots">
-            {liveTimeline.map((item, index) => (
-              <button
-                key={`${item.step}-${index}`}
-                className={timelineIndex === index ? "is-active" : ""}
-                onClick={() => goTimeline(index)}
-                aria-label={`Ir para etapa ${index + 1}`}
-              />
-            ))}
-          </div>
-          <span>{timelineIndex + 1} / {liveTimeline.length}</span>
+        <div
+          style={{
+            width: "min(100%, 1120px)",
+            margin: "48px auto 0",
+            paddingTop: 24,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+            gap: 20,
+            alignItems: "stretch",
+          }}
+        >
+          {liveTimeline.map((item, index) => {
+            const Icon = timelineIcons[index % timelineIcons.length];
+            return (
+              <motion.article
+                key={`${item.step}-${item.title}`}
+                className="live-timeline-card live-glow-card"
+                onMouseMove={trackPointer}
+                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: reduceMotion ? 0 : 0.36, delay: reduceMotion ? 0 : index * 0.05 }}
+              >
+                <span className="live-timeline-number">{index + 1}</span>
+                <div className="live-timeline-icon"><Icon size={36} strokeWidth={1.45} /></div>
+                <div className="live-timeline-time">{item.step}</div>
+                <span className="live-timeline-rule" />
+                <h3 className="live-card-title">{item.title}</h3>
+                <p>{item.description}</p>
+              </motion.article>
+            );
+          })}
         </div>
         <div className="live-outcome-card">
           <strong>{liveOutcome.title}</strong>
