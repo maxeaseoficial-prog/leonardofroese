@@ -7,8 +7,8 @@ import heroPhoto from "@/assets/leonardo-DSC00683.jpg.asset.json";
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-  const scaleBg = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
+  const scaleBg = useTransform(scrollYProgress, [0, 1], [1, 1.02]);
   const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
@@ -18,38 +18,38 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* Foto original do Leonardo — preservada, apenas reposicionada e tratada por CSS. */}
+      {/* Foto original do Leonardo — enquadramento preservado no desktop, sem zoom/crop excessivo. */}
       <motion.div
         aria-hidden
         style={{ y: yBg, scale: scaleBg }}
-        className="absolute inset-y-[-4%] left-0 right-0 sm:left-[4%] lg:left-[18%] lg:right-[-8%]"
+        className="absolute inset-0"
       >
         <img
           src={heroPhoto.url}
           alt=""
-          className="h-full w-full object-cover object-[50%_44%]"
-          style={{ filter: "brightness(.62) saturate(.82) contrast(1.08)" }}
+          className="h-full w-full object-cover object-[54%_center] lg:object-contain lg:object-right"
+          style={{ filter: "brightness(.78) saturate(.9) contrast(1.04)" }}
         />
       </motion.div>
 
-      {/* Tratamento cinematográfico da referência: área de leitura escura à esquerda. */}
+      {/* Fundo escuro à esquerda e transição suave sobre a foto, como na referência. */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, rgba(5,5,5,.97) 0%, rgba(5,5,5,.93) 24%, rgba(5,5,5,.78) 42%, rgba(5,5,5,.46) 58%, rgba(5,5,5,.20) 78%, rgba(5,5,5,.24) 100%)",
+            "linear-gradient(90deg, rgba(5,5,5,.99) 0%, rgba(5,5,5,.96) 18%, rgba(5,5,5,.88) 34%, rgba(5,5,5,.63) 49%, rgba(5,5,5,.25) 66%, rgba(5,5,5,.08) 82%, rgba(5,5,5,.10) 100%)",
         }}
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(244,190,98,0.10),transparent_34%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(244,190,98,0.08),transparent_38%)]"
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,rgba(0,0,0,0.32)_100%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.24)_100%)]"
       />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/10" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/5" />
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center px-6 pb-24 pt-36 lg:px-10">
         <motion.div style={{ y: yContent, opacity }} className="max-w-[760px]">
