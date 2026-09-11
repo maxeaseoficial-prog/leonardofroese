@@ -145,10 +145,12 @@ function Result() {
         <RevealBlock className="live-block">
           <div className="live-heading">
             <div className="funnel-kicker">Live Lucro 2X</div>
-            <h2 className="funnel-serif">Veja como transformar diagnóstico em direção.</h2>
+            <h2 className="funnel-serif">
+              Descubra onde o lucro vaza — e o que fazer com essa informação.
+            </h2>
             <p>
-              Assista à apresentação da Live Lucro 2X e entenda a proposta antes de decidir
-              participar.
+              O Raio-X mostrou a percepção. Agora entram os números reais da sua empresa para
+              identificar os drenos, entender a causa e tomar uma decisão prática.
             </p>
           </div>
           <VideoFrame url={vslYoutubeUrl} label="VSL da Live Lucro 2X" featured />
@@ -162,7 +164,11 @@ function Result() {
                 Quero participar
               </button>
             )}
-            {!checkoutUrl && <p className="live-cta-note">Inscrições serão liberadas em breve.</p>}
+            {!checkoutUrl && (
+              <p className="live-cta-note">
+                Investimento da Live: R$ 97. O link de inscrição será liberado em breve.
+              </p>
+            )}
           </div>
         </RevealBlock>
 
@@ -182,7 +188,10 @@ function Result() {
                   initial={reduceMotion ? false : { opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: reduceMotion ? 0 : 0.45, delay: reduceMotion ? 0 : index * 0.06 }}
+                  transition={{
+                    duration: reduceMotion ? 0 : 0.45,
+                    delay: reduceMotion ? 0 : index * 0.06,
+                  }}
                 >
                   <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
                   <h3>{area.title}</h3>
@@ -195,11 +204,13 @@ function Result() {
 
         <RevealBlock className="live-block">
           <div className="live-heading">
-            <div className="funnel-kicker">O que vai ter na Live</div>
-            <h2 className="funnel-serif">Do diagnóstico ao plano de ação.</h2>
+            <div className="funnel-kicker">Roteiro da Live</div>
+            <h2 className="funnel-serif">
+              Cerca de 2 horas para sair da percepção e chegar a uma decisão.
+            </h2>
             <p>
-              Uma trajetória clara para conectar os gargalos encontrados no seu raio-x às decisões
-              que precisam entrar na pauta da empresa.
+              Você entra com faturamento, lucro e caixa do último mês e percorre o Mapa de Drenagem
+              até identificar a causa dominante e definir uma decisão para os próximos 7 dias.
             </p>
           </div>
           <div className="live-timeline">
@@ -218,7 +229,10 @@ function Result() {
                 initial={reduceMotion ? false : { opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: reduceMotion ? 0 : 0.48, delay: reduceMotion ? 0 : index * 0.08 }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.48,
+                  delay: reduceMotion ? 0 : index * 0.08,
+                }}
               >
                 <div className="live-step-num">{item.step}</div>
                 <h3>{item.title}</h3>
@@ -230,9 +244,9 @@ function Result() {
 
         <RevealBlock className="live-block">
           <div className="live-heading">
-            <div className="funnel-kicker">Resultados na prática</div>
-            <h2 className="funnel-serif">Experiências de quem já viveu a transformação.</h2>
-            <p>Os depoimentos em vídeo serão adicionados aqui.</p>
+            <div className="funnel-kicker">Prova real</div>
+            <h2 className="funnel-serif">Resultados construídos na prática.</h2>
+            <p>Aqui entram histórias reais de empresários e empresas, com números e autorização para uso.</p>
           </div>
           <div className="live-testimonials">
             {testimonialVideos.map((video) => (
