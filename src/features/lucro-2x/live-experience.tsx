@@ -8,24 +8,28 @@ import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   BarChart3,
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Clock3,
-  Gauge,
-  Layers3,
   Play,
-  Settings2,
+  ShieldCheck,
   Target,
-  WalletCards,
   Workflow,
+  X,
 } from "lucide-react";
 import {
+  audienceFit,
   checkoutUrl,
-  liveAreas,
+  conductor,
+  finalCta,
   liveFaqs,
   liveIntro,
+  liveOutcome,
   liveTimeline,
+  offer,
+  proofCopy,
+  structuralDebt,
   testimonialVideos,
   transitionCopy,
   vslYoutubeUrl,
@@ -37,7 +41,7 @@ import faqPhotoThree from "@/assets/leonardo-DSC00784.jpg.asset.json";
 import "./live.css";
 import "./live-fixes.css";
 
-const timelineIcons = [Play, Layers3, BarChart3, Target, Workflow, Gauge, Settings2, WalletCards, Clock3];
+const timelineIcons = [BarChart3, Target, Workflow];
 
 export function LiveExperience() {
   const reduceMotion = useReducedMotion();
@@ -74,46 +78,78 @@ export function LiveExperience() {
 
       <RevealBlock className="live-section live-vsl-section">
         <SectionHeading
-          eyebrow="Live Lucro 2X"
-          title="Descubra onde o lucro vaza — e o que fazer com essa informação."
-          copy="O Raio-X mostrou a percepção. Agora entram os números reais da sua empresa para identificar os drenos, entender a causa e tomar uma decisão prática."
+          eyebrow={liveIntro.kicker}
+          title={liveIntro.title}
+          copy={liveIntro.copy}
           centered
         />
         <VideoFrame url={vslYoutubeUrl} label="VSL da Live Lucro 2X" featured />
+        <div className="live-meta-row">
+          <span>{liveIntro.meta}</span>
+          <span>{liveIntro.payment}</span>
+        </div>
         <ParticipationCta />
       </RevealBlock>
 
-      <RevealBlock className="live-section live-section-framed">
-        <SectionHeading eyebrow={liveIntro.kicker} title={liveIntro.title} copy={liveIntro.copy} centered />
-        <div className="live-areas">
-          {liveAreas.map((area, index) => {
-            const Icon = iconForArea(area.icon);
-            return (
-              <motion.article
-                key={area.title}
-                className="live-area live-glow-card"
-                onMouseMove={trackPointer}
-                initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                whileHover={reduceMotion ? undefined : { y: -8, scale: 1.012 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: reduceMotion ? 0 : 0.5, delay: reduceMotion ? 0 : index * 0.07 }}
-              >
-                <div className="live-icon-box"><Icon size={26} strokeWidth={1.55} /></div>
-                <h3 className="live-card-title">{area.title}</h3>
-                <span className="live-gold-dash" aria-hidden="true" />
-                <p>{area.description}</p>
-              </motion.article>
-            );
-          })}
+      <RevealBlock className="live-section live-fit-section">
+        <SectionHeading
+          eyebrow="Antes de participar"
+          title={audienceFit.title}
+          copy="A Live foi desenhada para empresários que já têm equipe e precisam transformar crescimento em estrutura, lucro e autonomia."
+        />
+        <div className="live-fit-grid">
+          <article className="live-fit-card is-yes">
+            <h3>{audienceFit.yesTitle}</h3>
+            <ul>
+              {audienceFit.yes.map((item) => (
+                <li key={item}><Check size={17} /> <span>{item}</span></li>
+              ))}
+            </ul>
+          </article>
+          <article className="live-fit-card is-no">
+            <h3>{audienceFit.noTitle}</h3>
+            <ul>
+              {audienceFit.no.map((item) => (
+                <li key={item}><X size={17} /> <span>{item}</span></li>
+              ))}
+            </ul>
+          </article>
         </div>
+      </RevealBlock>
+
+      <RevealBlock className="live-section live-debt-section">
+        <SectionHeading
+          eyebrow={structuralDebt.kicker}
+          title={structuralDebt.title}
+          copy={structuralDebt.copy}
+          centered
+        />
+        <div className="live-debt-flow" aria-hidden="true">
+          <span>Faturamento</span>
+          <div className="live-debt-pipe"><i /><i /><i /><i /></div>
+          <span>Lucro que fica</span>
+        </div>
+        <div className="live-debt-grid">
+          {structuralDebt.scenarios.map((scenario) => (
+            <motion.article
+              key={scenario.title}
+              className="live-debt-card live-glow-card"
+              onMouseMove={trackPointer}
+              whileHover={reduceMotion ? undefined : { y: -5 }}
+            >
+              <h3>{scenario.title}</h3>
+              <p>{scenario.description}</p>
+            </motion.article>
+          ))}
+        </div>
+        <p className="live-debt-closing">{structuralDebt.closing}</p>
       </RevealBlock>
 
       <RevealBlock className="live-section live-timeline-section">
         <SectionHeading
-          eyebrow="Roteiro da Live"
-          title="Cerca de 2 horas para sair da percepção e chegar a uma decisão."
-          copy="Você entra com faturamento, lucro e caixa do último mês e percorre o Mapa de Drenagem até identificar a causa dominante e definir uma decisão para os próximos 7 dias."
+          eyebrow="O que acontece nas 2 horas"
+          title="Você trabalha nos seus próprios números e sai sabendo onde agir primeiro."
+          copy="A sequência é prática: entender o número, localizar o vazamento e identificar a causa."
           centered
         />
 
@@ -136,14 +172,14 @@ export function LiveExperience() {
                   className={`live-timeline-card live-glow-card ${timelineIndex === index ? "is-active" : ""}`}
                   onMouseMove={trackPointer}
                   onClick={() => goTimeline(index)}
-                  initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
-                  transition={{ duration: reduceMotion ? 0 : 0.45, delay: reduceMotion ? 0 : Math.min(index, 4) * 0.05 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.36, delay: reduceMotion ? 0 : index * 0.05 }}
                 >
                   <span className="live-timeline-number">{index + 1}</span>
                   <div className="live-timeline-icon"><Icon size={36} strokeWidth={1.45} /></div>
-                  <div className="live-timeline-time"><Clock3 size={15} /> {item.step}</div>
+                  <div className="live-timeline-time">{item.step}</div>
                   <span className="live-timeline-rule" />
                   <h3 className="live-card-title">{item.title}</h3>
                   <p>{item.description}</p>
@@ -173,15 +209,38 @@ export function LiveExperience() {
           </div>
           <span>{timelineIndex + 1} / {liveTimeline.length}</span>
         </div>
+        <div className="live-outcome-card">
+          <strong>{liveOutcome.title}</strong>
+          <span>{liveOutcome.note}</span>
+        </div>
+        <ParticipationCta />
+      </RevealBlock>
+
+      <RevealBlock className="live-section live-conductor-section">
+        <div className="live-conductor-grid">
+          <motion.img
+            src={faqPhotoThree.url}
+            alt="Leonardo Froese"
+            className="live-conductor-photo"
+            whileHover={reduceMotion ? undefined : { scale: 1.015 }}
+          />
+          <div>
+            <SectionHeading eyebrow={conductor.kicker} title={conductor.title} copy={conductor.copy} />
+            <div className="live-stats-grid">
+              {conductor.stats.map((stat) => (
+                <div className="live-stat" key={stat.label}>
+                  <strong>{stat.value}</strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </RevealBlock>
 
       <RevealBlock className="live-section live-proof-section">
         <div className="live-proof-heading-row">
-          <SectionHeading
-            eyebrow="Prova real"
-            title="Resultados construídos na prática."
-            copy="Os depoimentos reais em vídeo entram aqui assim que os links e autorizações forem definidos."
-          />
+          <SectionHeading eyebrow={proofCopy.kicker} title={proofCopy.title} copy={proofCopy.copy} />
           <span className="live-proof-side-note">Empresários reais.<br />Resultados reais.</span>
         </div>
 
@@ -197,11 +256,38 @@ export function LiveExperience() {
               <div className="live-proof-copy">
                 <div className="live-proof-index">0{index + 1}<span /></div>
                 <h3>Depoimento em vídeo</h3>
-                <p>Espaço preparado para um case real da Cáliber, sem inserir números ou promessas antes da validação do material.</p>
+                <p>Espaço reservado para um caso real autorizado, com contexto, empresa e o que mudou na prática.</p>
                 <small>{video.label}</small>
               </div>
             </motion.article>
           ))}
+        </div>
+      </RevealBlock>
+
+      <RevealBlock className="live-section live-offer-section">
+        <SectionHeading eyebrow={offer.kicker} title={offer.title} centered />
+        <div className="live-offer-grid">
+          <div className="live-offer-includes">
+            <h3>O que está incluído</h3>
+            <ul>
+              {offer.includes.map((item) => (
+                <li key={item}><Check size={18} /><span>{item}</span></li>
+              ))}
+            </ul>
+          </div>
+          <div className="live-offer-price">
+            <small>Investimento</small>
+            <strong>{offer.price}</strong>
+            <span>{offer.payment}</span>
+            <ParticipationCta />
+          </div>
+        </div>
+        <div className="live-guarantee">
+          <ShieldCheck size={30} />
+          <div>
+            <strong>{offer.guaranteeTitle}</strong>
+            <p>{offer.guaranteeCopy}</p>
+          </div>
         </div>
       </RevealBlock>
 
@@ -249,9 +335,9 @@ export function LiveExperience() {
                     {isOpen ? (
                       <motion.div
                         id={answerId}
-                        initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+                        initial={reduceMotion ? false : { opacity: 0, y: -3 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: reduceMotion ? 0 : 0.1 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.08 }}
                         className="live-faq-answer-wrap"
                       >
                         <p className="live-faq-a">{faq.answer}</p>
@@ -263,6 +349,10 @@ export function LiveExperience() {
             </div>
           </div>
         </div>
+      </RevealBlock>
+
+      <RevealBlock className="live-section live-final-section">
+        <SectionHeading eyebrow={finalCta.kicker} title={finalCta.title} copy={finalCta.copy} centered />
         <ParticipationCta final />
       </RevealBlock>
     </div>
@@ -290,7 +380,7 @@ function SectionHeading({
 }
 
 function highlightTitle(title: string) {
-  const highlights = ["sem ser o herói dela.", "2 horas", "na prática.", "participar."];
+  const highlights = ["sem ser o herói dela", "dívida estrutural.", "nos próximos 7 dias", "estrutura funciona", "2 horas"];
   const highlight = highlights.find((piece) => title.includes(piece));
   if (!highlight) return title;
   const [before, after = ""] = title.split(highlight);
@@ -312,8 +402,8 @@ function ParticipationCta({ final = false }: { final?: boolean }) {
           href={checkoutUrl}
           target="_blank"
           rel="noopener noreferrer"
-          whileHover={{ y: -3, scale: 1.01 }}
-          whileTap={{ scale: 0.985 }}
+          whileHover={{ y: -2, scale: 1.006 }}
+          whileTap={{ scale: 0.988 }}
         >
           {content}
         </motion.a>
@@ -322,9 +412,6 @@ function ParticipationCta({ final = false }: { final?: boolean }) {
           {content}
         </button>
       )}
-      {!checkoutUrl && !final ? (
-        <p className="live-cta-note">Investimento da Live: R$ 97. O link de inscrição será liberado em breve.</p>
-      ) : null}
     </div>
   );
 }
@@ -375,29 +462,14 @@ function RevealBlock({
   return (
     <motion.section
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 34, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: reduceMotion ? 0 : 0.72, ease: [0.22, 1, 0.36, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.08 }}
+      transition={{ duration: reduceMotion ? 0 : 0.46, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.section>
   );
-}
-
-function iconForArea(icon: string) {
-  switch (icon) {
-    case "wallet":
-      return WalletCards;
-    case "target":
-      return Target;
-    case "workflow":
-      return Workflow;
-    case "gauge":
-      return Gauge;
-    default:
-      return Gauge;
-  }
 }
 
 function trackPointer(event: ReactMouseEvent<HTMLElement>) {
