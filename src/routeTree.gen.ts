@@ -19,6 +19,7 @@ import { Route as RaioXResultadoRouteImport } from './routes/raio-x/resultado'
 import { Route as RaioxIndexRouteImport } from './routes/raiox/index'
 import { Route as RaioxDadosRouteImport } from './routes/raiox/dados'
 import { Route as RaioxPerguntasRouteImport } from './routes/raiox/perguntas'
+import { Route as RaioxResultadoRouteImport } from './routes/raiox/resultado'
 import { Route as TreinamentosIndexRouteImport } from './routes/treinamentos/index'
 import { Route as TreinamentosLucro2xRaioXRouteImport } from './routes/treinamentos/lucro-2x/raio-x'
 import { Route as ApiPublicSitemapXmlRouteImport } from './routes/api/public/sitemap.xml'
@@ -73,6 +74,11 @@ const RaioxPerguntasRoute = RaioxPerguntasRouteImport.update({
   path: '/raiox/perguntas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RaioxResultadoRoute = RaioxResultadoRouteImport.update({
+  id: '/raiox/resultado',
+  path: '/raiox/resultado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TreinamentosIndexRoute = TreinamentosIndexRouteImport.update({
   id: '/treinamentos/',
   path: '/treinamentos/',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/raio-x/resultado': typeof RaioXResultadoRoute
   '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
+  '/raiox/resultado': typeof RaioxResultadoRoute
   '/raio-x/': typeof RaioXIndexRoute
   '/raiox/': typeof RaioxIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/raio-x/resultado': typeof RaioXResultadoRoute
   '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
+  '/raiox/resultado': typeof RaioxResultadoRoute
   '/raio-x': typeof RaioXIndexRoute
   '/raiox': typeof RaioxIndexRoute
   '/treinamentos': typeof TreinamentosIndexRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/raio-x/resultado': typeof RaioXResultadoRoute
   '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
+  '/raiox/resultado': typeof RaioxResultadoRoute
   '/raio-x/': typeof RaioXIndexRoute
   '/raiox/': typeof RaioxIndexRoute
   '/treinamentos/': typeof TreinamentosIndexRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/raio-x/resultado'
     | '/raiox/dados'
     | '/raiox/perguntas'
+    | '/raiox/resultado'
     | '/raio-x/'
     | '/raiox/'
     | '/treinamentos/'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/raio-x/resultado'
     | '/raiox/dados'
     | '/raiox/perguntas'
+    | '/raiox/resultado'
     | '/raio-x'
     | '/raiox'
     | '/treinamentos'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/raio-x/resultado'
     | '/raiox/dados'
     | '/raiox/perguntas'
+    | '/raiox/resultado'
     | '/raio-x/'
     | '/raiox/'
     | '/treinamentos/'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   RaioXResultadoRoute: typeof RaioXResultadoRoute
   RaioxDadosRoute: typeof RaioxDadosRoute
   RaioxPerguntasRoute: typeof RaioxPerguntasRoute
+  RaioxResultadoRoute: typeof RaioxResultadoRoute
   RaioXIndexRoute: typeof RaioXIndexRoute
   RaioxIndexRoute: typeof RaioxIndexRoute
   TreinamentosIndexRoute: typeof TreinamentosIndexRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RaioxPerguntasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/raiox/resultado': {
+      id: '/raiox/resultado'
+      path: '/raiox/resultado'
+      fullPath: '/raiox/resultado'
+      preLoaderRoute: typeof RaioxResultadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/treinamentos/': {
       id: '/treinamentos/'
       path: '/treinamentos'
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   RaioXResultadoRoute: RaioXResultadoRoute,
   RaioxDadosRoute: RaioxDadosRoute,
   RaioxPerguntasRoute: RaioxPerguntasRoute,
+  RaioxResultadoRoute: RaioxResultadoRoute,
   RaioXIndexRoute: RaioXIndexRoute,
   RaioxIndexRoute: RaioxIndexRoute,
   TreinamentosIndexRoute: TreinamentosIndexRoute,

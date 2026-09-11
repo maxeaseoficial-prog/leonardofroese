@@ -32,13 +32,12 @@ export const submitDiagnostic = createServerFn({ method: "POST" })
       return data;
     },
   )
-
   .handler(async ({ data }) => {
     const lovableKey = process.env["LOVABLE_API_KEY"];
     const resendKey = process.env["RESEND_API_KEY"];
     if (!lovableKey || !resendKey) throw new Error("Configuração de e-mail ausente");
 
-    const { contact, answers, utm } = data;
+    const { contact, answers, utm, source } = data;
     const result = calculateDiagnostic(answers, contact.faturamento);
 
     const answersHtml = diagnosticQuestions
@@ -87,7 +86,10 @@ export const submitDiagnostic = createServerFn({ method: "POST" })
         from: "Raio-X Cáliber <onboarding@resend.dev>",
         to: [NOTIFY_EMAIL],
         reply_to: contact.email,
-        subject: `Raio-X: ${contact.empresa} (${result.score}/100 - ${result.classification})`,
+        subject:
+          source === "live"
+            ? "Lead Live lucro 2x"
+            : `Raio-X: ${contact.empresa} (${result.score}/100 - ${result.classification})`,
         html,
       }),
     });
