@@ -2,13 +2,11 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
-import heroPhoto from "@/assets/leonardo-DSC00683.jpg.asset.json";
+import { heroLeonardoOriginal } from "@/assets/hero-leonardo-original";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
-  const scaleBg = useTransform(scrollYProgress, [0, 1], [1, 1.02]);
   const yContent = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
@@ -18,21 +16,17 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* Foto original do Leonardo — enquadramento preservado no desktop, sem zoom/crop excessivo. */}
-      <motion.div
-        aria-hidden
-        style={{ y: yBg, scale: scaleBg }}
-        className="absolute inset-0"
-      >
+      {/* Foto original enviada pelo usuário. No desktop ela aparece inteira, sem zoom nem crop. */}
+      <div aria-hidden className="absolute inset-0 flex items-center justify-end">
         <img
-          src={heroPhoto.url}
+          src={heroLeonardoOriginal}
           alt=""
-          className="h-full w-full object-cover object-[54%_center] lg:object-contain lg:object-right"
+          className="h-full w-full object-cover object-center lg:h-full lg:w-auto lg:max-w-none lg:object-contain"
           style={{ filter: "brightness(.78) saturate(.9) contrast(1.04)" }}
         />
-      </motion.div>
+      </div>
 
-      {/* Fundo escuro à esquerda e transição suave sobre a foto, como na referência. */}
+      {/* Fundo escuro à esquerda e transição suave sobre a fotografia. */}
       <div
         aria-hidden
         className="absolute inset-0"
