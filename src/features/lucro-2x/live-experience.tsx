@@ -76,6 +76,7 @@ export function LiveExperience() {
           eyebrow="Antes de participar"
           title={audienceFit.title}
           copy="A Live foi desenhada para empresários que já têm equipe e precisam transformar crescimento em estrutura, lucro e autonomia."
+          centered
         />
         <div className="live-fit-grid">
           <article className="live-fit-card is-yes">
