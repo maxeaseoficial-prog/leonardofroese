@@ -1,4 +1,4 @@
-/* Ajustes finos de interação e performance das seções novas da Live Lucro 2X. */
+/* Ajustes finos de interação, conteúdo e performance da Live Lucro 2X. */
 
 /* O número circular da timeline deve respirar acima do card sem ser recortado. */
 .live-timeline-scroll {
@@ -13,6 +13,239 @@
 
 .live-timeline-card::before {
   border-radius: 18px;
+}
+
+/* Informações objetivas logo abaixo da VSL. */
+.live-meta-row {
+  width: min(100%, 1040px);
+  margin: 18px auto 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  color: rgba(247, 242, 233, 0.58);
+  font: 11px/1.5 "IBM Plex Mono", monospace;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.live-meta-row span + span {
+  color: var(--live-gold-soft);
+}
+
+/* Filtro de estágio. */
+.live-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 38px;
+}
+
+.live-fit-card {
+  min-height: 300px;
+  padding: 30px;
+  border: 1px solid rgba(244, 190, 98, 0.26);
+  border-radius: 18px;
+  background: rgba(12, 11, 10, 0.84);
+}
+
+.live-fit-card.is-yes {
+  background:
+    linear-gradient(145deg, rgba(244, 190, 98, 0.065), transparent 50%),
+    rgba(12, 11, 10, 0.88);
+}
+
+.live-fit-card.is-no {
+  border-color: rgba(247, 242, 233, 0.12);
+}
+
+.live-fit-card h3,
+.live-offer-includes h3 {
+  margin: 0 0 22px;
+  font: 400 30px/1.05 "Instrument Serif", Georgia, serif;
+}
+
+.live-fit-card ul,
+.live-offer-includes ul {
+  display: grid;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.live-fit-card li,
+.live-offer-includes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  color: rgba(247, 242, 233, 0.76);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.live-fit-card li svg,
+.live-offer-includes li svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--live-gold);
+}
+
+.live-fit-card.is-no li svg {
+  color: rgba(247, 242, 233, 0.38);
+}
+
+/* Dívida estrutural — o inimigo nomeado no material oficial. */
+.live-debt-section {
+  padding: 64px 44px 58px;
+  border: 1px solid rgba(244, 190, 98, 0.16);
+  border-radius: 24px;
+  background:
+    radial-gradient(50% 50% at 50% 0%, rgba(244, 190, 98, 0.08), transparent 72%),
+    linear-gradient(145deg, rgba(15, 22, 31, 0.92), rgba(8, 9, 11, 0.96));
+}
+
+.live-debt-flow {
+  width: min(100%, 880px);
+  margin: 42px auto 32px;
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  color: rgba(247, 242, 233, 0.62);
+  font: 10px/1 "IBM Plex Mono", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.live-debt-pipe {
+  position: relative;
+  height: 12px;
+  border: 1px solid rgba(244, 190, 98, 0.48);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(244, 190, 98, 0.26), rgba(244, 190, 98, 0.06));
+}
+
+.live-debt-pipe i {
+  position: absolute;
+  top: 15px;
+  width: 6px;
+  height: 18px;
+  border-radius: 0 0 999px 999px;
+  background: #a63a2b;
+  box-shadow: 0 4px 14px rgba(166, 58, 43, 0.3);
+}
+
+.live-debt-pipe i:nth-child(1) { left: 18%; }
+.live-debt-pipe i:nth-child(2) { left: 39%; height: 26px; }
+.live-debt-pipe i:nth-child(3) { left: 62%; height: 13px; }
+.live-debt-pipe i:nth-child(4) { left: 80%; height: 22px; }
+
+.live-debt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 48px;
+}
+
+.live-debt-card {
+  padding: 28px;
+  border: 1px solid rgba(244, 190, 98, 0.22);
+  border-radius: 17px;
+  background: rgba(9, 13, 18, 0.78);
+}
+
+.live-debt-card h3 {
+  margin: 0 0 12px;
+  color: var(--live-ink);
+  font: 400 27px/1.08 "Instrument Serif", Georgia, serif;
+}
+
+.live-debt-card p,
+.live-debt-closing {
+  color: var(--live-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.live-debt-card p {
+  margin: 0;
+}
+
+.live-debt-closing {
+  margin: 28px auto 0;
+  max-width: 760px;
+  color: var(--live-gold-soft);
+  text-align: center;
+  font-size: 16px;
+}
+
+/* Resultado prático do encontro. */
+.live-outcome-card {
+  width: min(100%, 900px);
+  margin: 34px auto 0;
+  padding: 24px 28px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(244, 190, 98, 0.34);
+  border-radius: 16px;
+  text-align: center;
+  background: rgba(244, 190, 98, 0.045);
+}
+
+.live-outcome-card strong {
+  font: 400 clamp(23px, 2.6vw, 34px)/1.08 "Instrument Serif", Georgia, serif;
+}
+
+.live-outcome-card span {
+  color: var(--live-muted);
+  font-size: 13px;
+}
+
+/* Quem conduz. */
+.live-conductor-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.25fr);
+  gap: 50px;
+  align-items: center;
+}
+
+.live-conductor-photo {
+  width: 100%;
+  max-height: 680px;
+  object-fit: cover;
+  object-position: 50% 32%;
+  border: 1px solid rgba(244, 190, 98, 0.38);
+  border-radius: 22px;
+  box-shadow: 0 32px 70px -50px rgba(244, 190, 98, 0.55);
+}
+
+.live-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.live-stat {
+  min-height: 124px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top: 1px solid rgba(244, 190, 98, 0.34);
+  background: linear-gradient(180deg, rgba(244, 190, 98, 0.035), transparent);
+}
+
+.live-stat strong {
+  color: var(--live-gold-soft);
+  font: 400 clamp(30px, 3.4vw, 46px)/1 "Instrument Serif", Georgia, serif;
+}
+
+.live-stat span {
+  margin-top: 8px;
+  color: var(--live-muted);
+  font-size: 12px;
 }
 
 /* Depoimentos: três cards fixos e centralizados no desktop, sem carrossel. */
@@ -44,16 +277,114 @@
   font-size: 27px;
 }
 
+/* Oferta. */
+.live-offer-section {
+  padding: 64px 44px;
+  border: 1px solid rgba(244, 190, 98, 0.22);
+  border-radius: 24px;
+  background:
+    radial-gradient(55% 75% at 50% 0%, rgba(244, 190, 98, 0.08), transparent 70%),
+    linear-gradient(145deg, rgba(16, 23, 32, 0.98), rgba(7, 9, 12, 0.98));
+}
+
+.live-offer-grid {
+  width: min(100%, 980px);
+  margin: 42px auto 0;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
+}
+
+.live-offer-includes,
+.live-offer-price {
+  padding: 30px;
+  border: 1px solid rgba(244, 190, 98, 0.2);
+  border-radius: 18px;
+  background: rgba(8, 10, 13, 0.72);
+}
+
+.live-offer-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.live-offer-price small {
+  color: var(--live-muted);
+  font: 10px/1 "IBM Plex Mono", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.live-offer-price > strong {
+  margin-top: 14px;
+  color: var(--live-gold-soft);
+  font: 400 clamp(52px, 6vw, 80px)/0.92 "Instrument Serif", Georgia, serif;
+}
+
+.live-offer-price > span {
+  margin-top: 10px;
+  color: var(--live-muted);
+  font-size: 13px;
+}
+
+.live-offer-price .live-cta-wrap {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.live-offer-price .live-cta {
+  min-width: 0;
+  width: 100%;
+}
+
+.live-guarantee {
+  width: min(100%, 980px);
+  margin: 18px auto 0;
+  padding: 22px 26px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border: 1px solid rgba(244, 190, 98, 0.38);
+  border-radius: 16px;
+  color: var(--live-gold-soft);
+  background: rgba(244, 190, 98, 0.035);
+}
+
+.live-guarantee svg {
+  flex: none;
+}
+
+.live-guarantee strong {
+  display: block;
+  font-size: 15px;
+}
+
+.live-guarantee p {
+  margin: 6px 0 0;
+  color: var(--live-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 /* FAQ: a altura deixa de ser animada; a resposta aparece imediatamente. */
 .live-faq-answer-wrap {
   overflow: visible;
 }
 
+/* Chamada final. */
+.live-final-section {
+  padding: 70px 24px 20px;
+  text-align: center;
+}
+
 /*
  * Performance de scroll:
- * - Motion continua usando opacity/translate, mas o blur animado é removido.
- * - Os glows ambientes deixam de usar filter: blur(120px), que força repaint pesado.
- * - O pulso dos botões de vídeo passa a animar apenas transform/opacity.
+ * - Motion usa opacity/translate, sem blur animado.
+ * - Os glows ambientes não usam filter: blur(120px).
+ * - O pulso dos botões de vídeo anima apenas transform/opacity.
  */
 .live-experience .live-transition,
 .live-experience .live-section {
@@ -98,7 +429,29 @@
   }
 }
 
+@media (max-width: 1050px) {
+  .live-conductor-grid {
+    grid-template-columns: 0.85fr 1fr;
+    gap: 28px;
+  }
+
+  .live-offer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
+  .live-fit-grid,
+  .live-debt-grid,
+  .live-conductor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .live-conductor-photo {
+    max-width: 620px;
+    max-height: 560px;
+  }
+
   .live-testimonial-grid {
     grid-template-columns: 1fr;
     max-width: 680px;
@@ -115,6 +468,41 @@
     padding-top: 36px;
   }
 
+  .live-meta-row {
+    display: grid;
+    gap: 7px;
+  }
+
+  .live-fit-card,
+  .live-debt-card,
+  .live-offer-includes,
+  .live-offer-price {
+    padding: 24px 20px;
+  }
+
+  .live-debt-section,
+  .live-offer-section {
+    padding: 48px 18px;
+    border-radius: 18px;
+  }
+
+  .live-debt-flow {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    text-align: center;
+  }
+
+  .live-debt-pipe {
+    order: 2;
+  }
+
+  .live-debt-flow span:first-child { order: 1; }
+  .live-debt-flow span:last-child { order: 3; margin-top: 22px; }
+
+  .live-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .live-testimonial-grid .live-proof-card {
     flex-direction: column;
     min-height: auto;
@@ -126,6 +514,10 @@
     aspect-ratio: 16 / 9;
     border-radius: 16px 16px 0 0;
     border-width: 0 0 1px 0;
+  }
+
+  .live-guarantee {
+    padding: 20px;
   }
 }
 
