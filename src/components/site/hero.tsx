@@ -2,7 +2,6 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
-import { heroLeonardoOriginal } from "@/assets/hero-leonardo-original";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -16,34 +15,25 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* Foto original enviada pelo usuário. No desktop ela aparece inteira, sem zoom nem crop. */}
-      <div aria-hidden className="absolute inset-0 flex items-center justify-end">
+      {/* Imagem final da Hero enviada pelo usuário. */}
+      <div aria-hidden className="absolute inset-0">
         <img
-          src={heroLeonardoOriginal}
+          src="/images/hero-lucro2x-bg.jpg"
           alt=""
-          className="h-full w-full object-cover object-center lg:h-full lg:w-auto lg:max-w-none lg:object-contain"
-          style={{ filter: "brightness(.78) saturate(.9) contrast(1.04)" }}
+          className="h-full w-full object-cover object-center"
         />
       </div>
 
-      {/* Fundo escuro à esquerda e transição suave sobre a fotografia. */}
+      {/* Overlay mínimo: a própria imagem já contém a composição escura à esquerda. */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, rgba(5,5,5,.99) 0%, rgba(5,5,5,.96) 18%, rgba(5,5,5,.88) 34%, rgba(5,5,5,.63) 49%, rgba(5,5,5,.25) 66%, rgba(5,5,5,.08) 82%, rgba(5,5,5,.10) 100%)",
+            "linear-gradient(90deg, rgba(5,5,5,.12) 0%, rgba(5,5,5,.08) 34%, rgba(5,5,5,.02) 64%, rgba(5,5,5,.04) 100%)",
         }}
       />
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(244,190,98,0.08),transparent_38%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.24)_100%)]"
-      />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/5" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background/45 via-transparent to-black/5" />
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center px-6 pb-24 pt-36 lg:px-10">
         <motion.div style={{ y: yContent, opacity }} className="max-w-[760px]">
