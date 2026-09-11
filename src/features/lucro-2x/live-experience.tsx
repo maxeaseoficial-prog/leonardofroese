@@ -198,8 +198,7 @@ export function LiveExperience() {
 
       <RevealBlock className="live-section live-proof-section">
         <div className="live-proof-heading-row">
-          <SectionHeading eyebrow={proofCopy.kicker} title={proofCopy.title} copy={proofCopy.copy} />
-          <span className="live-proof-side-note">Empresários reais.<br />Resultados reais.</span>
+          <SectionHeading eyebrow={proofCopy.kicker} title={proofCopy.title} copy={proofCopy.copy} centered />
         </div>
 
         <div className="live-testimonial-grid">
