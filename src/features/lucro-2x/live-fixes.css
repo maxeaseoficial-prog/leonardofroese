@@ -1,0 +1,81 @@
+/* Ajustes finos de interação das seções novas da Live Lucro 2X. */
+
+/* O número circular da timeline deve respirar acima do card sem ser recortado. */
+.live-timeline-scroll {
+  padding-top: 38px;
+  padding-bottom: 22px;
+  overscroll-behavior-x: contain;
+}
+
+.live-timeline-card {
+  overflow: visible;
+}
+
+.live-timeline-card::before {
+  border-radius: 18px;
+}
+
+/* Depoimentos: três cards fixos e centralizados no desktop, sem carrossel. */
+.live-testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 40px;
+  align-items: stretch;
+}
+
+.live-testimonial-grid .live-proof-card {
+  width: 100%;
+  min-width: 0;
+  min-height: 300px;
+  cursor: default;
+}
+
+.live-testimonial-grid .live-frame-compact {
+  width: 42%;
+  min-width: 145px;
+}
+
+.live-testimonial-grid .live-proof-copy {
+  padding: 28px 22px;
+}
+
+.live-testimonial-grid .live-proof-copy h3 {
+  font-size: 27px;
+}
+
+/* FAQ: a altura deixa de ser animada; a resposta aparece imediatamente. */
+.live-faq-answer-wrap {
+  overflow: visible;
+}
+
+@media (max-width: 900px) {
+  .live-testimonial-grid {
+    grid-template-columns: 1fr;
+    max-width: 680px;
+    margin-inline: auto;
+  }
+
+  .live-testimonial-grid .live-proof-card {
+    min-height: 285px;
+  }
+}
+
+@media (max-width: 720px) {
+  .live-timeline-scroll {
+    padding-top: 36px;
+  }
+
+  .live-testimonial-grid .live-proof-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .live-testimonial-grid .live-frame-compact {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 16 / 9;
+    border-radius: 16px 16px 0 0;
+    border-width: 0 0 1px 0;
+  }
+}
