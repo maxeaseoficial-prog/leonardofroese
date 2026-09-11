@@ -526,3 +526,44 @@
     animation: none;
   }
 }
+
+/* Capa temporária da VSL: será substituída automaticamente quando houver URL do YouTube. */
+.live-frame-vsl .live-placeholder {
+  padding: 0;
+  background-color: #08080a;
+  background-image: url("/live-lucro-2x-vsl-cover.webp");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.live-frame-vsl .live-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.08) 72%, rgba(0, 0, 0, 0.22) 100%);
+}
+
+.live-frame-vsl .live-placeholder > strong,
+.live-frame-vsl .live-placeholder > span {
+  display: none;
+}
+
+.live-frame-vsl .live-play {
+  position: relative;
+  z-index: 2;
+  width: 76px;
+  height: 76px;
+  color: #ffd37c;
+  border-color: rgba(255, 211, 124, 0.82);
+  background: rgba(7, 7, 7, 0.7);
+  box-shadow: 0 0 0 1px rgba(244, 190, 98, 0.12), 0 10px 34px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 720px) {
+  .live-frame-vsl .live-play {
+    width: 60px;
+    height: 60px;
+  }
+}
