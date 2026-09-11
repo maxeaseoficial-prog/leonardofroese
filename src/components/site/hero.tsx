@@ -2,7 +2,6 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
-import { heroFinalBackground } from "@/assets/hero-final-data";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -16,10 +15,10 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* Imagem final da Hero enviada pelo usuário — asset WebP validado. */}
+      {/* Imagem final da Hero enviada pelo usuário — asset público validado. */}
       <div aria-hidden className="absolute inset-0">
         <img
-          src={heroFinalBackground}
+          src="/images/hero-leonardo-final.webp"
           alt=""
           className="h-full w-full object-cover object-center"
         />
