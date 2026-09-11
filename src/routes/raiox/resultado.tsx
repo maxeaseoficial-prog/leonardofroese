@@ -1,7 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "motion/react";
-import { ChevronDown, Gauge, Play, Target, WalletCards, Workflow } from "lucide-react";
 import {
   calculateDiagnostic,
   pillars,
@@ -13,18 +11,7 @@ import {
 } from "@/features/lucro-2x/live-session";
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
-import {
-  checkoutUrl,
-  liveAreas,
-  liveFaqs,
-  liveIntro,
-  liveTimeline,
-  testimonialVideos,
-  transitionCopy,
-  vslYoutubeUrl,
-  youtubeId,
-} from "@/features/lucro-2x/live-content";
-import "@/features/lucro-2x/live.css";
+import { LiveExperience } from "@/features/lucro-2x/live-experience";
 
 export const Route = createFileRoute("/raiox/resultado")({
   head: () => funnelHead,
@@ -33,9 +20,7 @@ export const Route = createFileRoute("/raiox/resultado")({
 
 function Result() {
   const navigate = useNavigate();
-  const reduceMotion = useReducedMotion();
   const [session, setSession] = useState<LiveDiagnosticSession | null>(null);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const saved = loadLiveDiagnostic();
@@ -134,238 +119,7 @@ function Result() {
         </section>
       </article>
 
-      <div className="live-experience">
-        <RevealBlock className="live-transition">
-          <div className="funnel-kicker">{transitionCopy.kicker}</div>
-          <h2 className="funnel-serif">{transitionCopy.title}</h2>
-          <p>{transitionCopy.subtitle}</p>
-          <div className="live-arrow" aria-hidden="true" />
-        </RevealBlock>
-
-        <RevealBlock className="live-block">
-          <div className="live-heading">
-            <div className="funnel-kicker">Live Lucro 2X</div>
-            <h2 className="funnel-serif">
-              Descubra onde o lucro vaza — e o que fazer com essa informação.
-            </h2>
-            <p>
-              O Raio-X mostrou a percepção. Agora entram os números reais da sua empresa para
-              identificar os drenos, entender a causa e tomar uma decisão prática.
-            </p>
-          </div>
-          <VideoFrame url={vslYoutubeUrl} label="VSL da Live Lucro 2X" featured />
-          <div className="live-cta-wrap">
-            {checkoutUrl ? (
-              <a className="live-cta" href={checkoutUrl} target="_blank" rel="noopener noreferrer">
-                Quero participar
-              </a>
-            ) : (
-              <button className="live-cta" type="button" disabled>
-                Quero participar
-              </button>
-            )}
-            {!checkoutUrl && (
-              <p className="live-cta-note">
-                Investimento da Live: R$ 97. O link de inscrição será liberado em breve.
-              </p>
-            )}
-          </div>
-        </RevealBlock>
-
-        <RevealBlock className="live-block">
-          <div className="live-heading">
-            <div className="funnel-kicker">{liveIntro.kicker}</div>
-            <h2 className="funnel-serif">{liveIntro.title}</h2>
-            <p>{liveIntro.copy}</p>
-          </div>
-          <div className="live-areas">
-            {liveAreas.map((area, index) => {
-              const Icon = iconForArea(area.icon);
-              return (
-                <motion.article
-                  className="live-area"
-                  key={area.title}
-                  initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{
-                    duration: reduceMotion ? 0 : 0.45,
-                    delay: reduceMotion ? 0 : index * 0.06,
-                  }}
-                >
-                  <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
-                  <h3>{area.title}</h3>
-                  <p>{area.description}</p>
-                </motion.article>
-              );
-            })}
-          </div>
-        </RevealBlock>
-
-        <RevealBlock className="live-block">
-          <div className="live-heading">
-            <div className="funnel-kicker">Roteiro da Live</div>
-            <h2 className="funnel-serif">
-              Cerca de 2 horas para sair da percepção e chegar a uma decisão.
-            </h2>
-            <p>
-              Você entra com faturamento, lucro e caixa do último mês e percorre o Mapa de Drenagem
-              até identificar a causa dominante e definir uma decisão para os próximos 7 dias.
-            </p>
-          </div>
-          <div className="live-timeline">
-            <motion.div
-              className="live-timeline-line"
-              aria-hidden="true"
-              initial={reduceMotion ? false : { opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: reduceMotion ? 0 : 0.9 }}
-            />
-            {liveTimeline.map((item, index) => (
-              <motion.article
-                className="live-step"
-                key={item.step}
-                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{
-                  duration: reduceMotion ? 0 : 0.48,
-                  delay: reduceMotion ? 0 : index * 0.08,
-                }}
-              >
-                <div className="live-step-num">{item.step}</div>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-              </motion.article>
-            ))}
-          </div>
-        </RevealBlock>
-
-        <RevealBlock className="live-block">
-          <div className="live-heading">
-            <div className="funnel-kicker">Prova real</div>
-            <h2 className="funnel-serif">Resultados construídos na prática.</h2>
-            <p>Aqui entram histórias reais de empresários e empresas, com números e autorização para uso.</p>
-          </div>
-          <div className="live-testimonials">
-            {testimonialVideos.map((video) => (
-              <VideoFrame key={video.label} url={video.url} label={video.label} />
-            ))}
-          </div>
-        </RevealBlock>
-
-        <RevealBlock className="live-block" delay={0.04}>
-          <div className="live-heading">
-            <div className="funnel-kicker">Dúvidas frequentes</div>
-            <h2 className="funnel-serif">Antes de participar.</h2>
-          </div>
-          <div className="live-faq">
-            {liveFaqs.map((faq, index) => {
-              const isOpen = openFaq === index;
-              const answerId = `live-faq-answer-${index}`;
-              return (
-                <article className="live-faq-item" data-open={isOpen} key={faq.question}>
-                  <button
-                    className="live-faq-q"
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={answerId}
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                  >
-                    <span>{faq.question}</span>
-                    <ChevronDown size={18} strokeWidth={1.8} aria-hidden="true" />
-                  </button>
-                  {isOpen && (
-                    <motion.div
-                      id={answerId}
-                      initial={reduceMotion ? false : { opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      transition={{ duration: reduceMotion ? 0 : 0.24 }}
-                    >
-                      <p className="live-faq-a">{faq.answer}</p>
-                    </motion.div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-        </RevealBlock>
-      </div>
+      <LiveExperience />
     </FunnelShell>
   );
-}
-
-function RevealBlock({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className: string;
-  delay?: number;
-}) {
-  const reduceMotion = useReducedMotion();
-  return (
-    <motion.section
-      className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: reduceMotion ? 0 : 0.58, delay: reduceMotion ? 0 : delay }}
-    >
-      {children}
-    </motion.section>
-  );
-}
-
-function VideoFrame({
-  url,
-  label,
-  featured = false,
-}: {
-  url: string;
-  label: string;
-  featured?: boolean;
-}) {
-  const id = youtubeId(url);
-  const className = `live-frame ${featured ? "live-frame-vsl" : "live-frame-small"}`;
-
-  return (
-    <div className={className}>
-      {id ? (
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}?rel=0`}
-          title={label}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      ) : (
-        <div className="live-placeholder">
-          <div className="live-play" aria-hidden="true">
-            <Play size={featured ? 26 : 20} fill="currentColor" strokeWidth={1.4} />
-          </div>
-          <strong>{label}</strong>
-          <span>Vídeo será adicionado aqui</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function iconForArea(icon: string) {
-  switch (icon) {
-    case "wallet":
-      return WalletCards;
-    case "target":
-      return Target;
-    case "workflow":
-      return Workflow;
-    case "gauge":
-      return Gauge;
-    default:
-      return Gauge;
-  }
 }
