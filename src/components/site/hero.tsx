@@ -4,7 +4,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
 
 const heroBackground =
-  "/__l5e/assets-v1/679f22e6-7822-4aa5-baa3-c025b5f120ef/hero-bg-v2.png";
+  "/__l5e/assets-v1/679f22e6-7822-4aa5-baa3-c025b5f120ef/hero-bg-v2.png?v=hero-hq-20260911";
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -18,14 +18,17 @@ export function Hero() {
       id="hero"
       className="relative min-h-[100svh] overflow-hidden bg-[#080808]"
     >
-      {/* Fundo original em alta qualidade servido pelo asset nativo da Lovable. */}
-      <div aria-hidden className="absolute inset-0">
+      {/* Fundo da Hero em alta qualidade, sem resize no asset e com cache-bust. */}
+      <div aria-hidden className="absolute inset-0 bg-[#080808]">
         <img
           src={heroBackground}
           alt=""
-          className="h-full w-full object-cover object-center"
+          width={2048}
+          height={1152}
+          className="absolute inset-0 h-full w-full object-cover object-center"
           fetchPriority="high"
-          decoding="async"
+          decoding="sync"
+          draggable={false}
         />
       </div>
 
