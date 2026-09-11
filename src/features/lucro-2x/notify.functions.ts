@@ -19,12 +19,20 @@ const row = (label: string, value: string) =>
   </tr>`;
 
 export const submitDiagnostic = createServerFn({ method: "POST" })
-  .inputValidator((data: { contact: DiagnosticContact; answers: number[]; utm: Record<string, string> }) => {
-    if (!data?.contact?.email || !Array.isArray(data.answers) || data.answers.length < 12) {
-      throw new Error("Dados do diagnóstico incompletos");
-    }
-    return data;
-  })
+  .inputValidator(
+    (data: {
+      contact: DiagnosticContact;
+      answers: number[];
+      utm: Record<string, string>;
+      source?: "raio-x" | "live";
+    }) => {
+      if (!data?.contact?.email || !Array.isArray(data.answers) || data.answers.length < 12) {
+        throw new Error("Dados do diagnóstico incompletos");
+      }
+      return data;
+    },
+  )
+
   .handler(async ({ data }) => {
     const lovableKey = process.env["LOVABLE_API_KEY"];
     const resendKey = process.env["RESEND_API_KEY"];

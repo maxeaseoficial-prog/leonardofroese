@@ -17,6 +17,7 @@ import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
 import { Route as RaioXPerguntasRouteImport } from './routes/raio-x/perguntas'
 import { Route as RaioXResultadoRouteImport } from './routes/raio-x/resultado'
 import { Route as RaioxIndexRouteImport } from './routes/raiox/index'
+import { Route as RaioxDadosRouteImport } from './routes/raiox/dados'
 import { Route as RaioxPerguntasRouteImport } from './routes/raiox/perguntas'
 import { Route as TreinamentosIndexRouteImport } from './routes/treinamentos/index'
 import { Route as TreinamentosLucro2xRaioXRouteImport } from './routes/treinamentos/lucro-2x/raio-x'
@@ -62,6 +63,11 @@ const RaioxIndexRoute = RaioxIndexRouteImport.update({
   path: '/raiox/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RaioxDadosRoute = RaioxDadosRouteImport.update({
+  id: '/raiox/dados',
+  path: '/raiox/dados',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RaioxPerguntasRoute = RaioxPerguntasRouteImport.update({
   id: '/raiox/perguntas',
   path: '/raiox/perguntas',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x/': typeof RaioXIndexRoute
   '/raiox/': typeof RaioxIndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x': typeof RaioXIndexRoute
   '/raiox': typeof RaioxIndexRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
   '/raio-x/resultado': typeof RaioXResultadoRoute
+  '/raiox/dados': typeof RaioxDadosRoute
   '/raiox/perguntas': typeof RaioxPerguntasRoute
   '/raio-x/': typeof RaioXIndexRoute
   '/raiox/': typeof RaioxIndexRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
     | '/raiox/perguntas'
     | '/raio-x/'
     | '/raiox/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
     | '/raiox/perguntas'
     | '/raio-x'
     | '/raiox'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/raio-x/dados'
     | '/raio-x/perguntas'
     | '/raio-x/resultado'
+    | '/raiox/dados'
     | '/raiox/perguntas'
     | '/raio-x/'
     | '/raiox/'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   RaioXDadosRoute: typeof RaioXDadosRoute
   RaioXPerguntasRoute: typeof RaioXPerguntasRoute
   RaioXResultadoRoute: typeof RaioXResultadoRoute
+  RaioxDadosRoute: typeof RaioxDadosRoute
   RaioxPerguntasRoute: typeof RaioxPerguntasRoute
   RaioXIndexRoute: typeof RaioXIndexRoute
   RaioxIndexRoute: typeof RaioxIndexRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RaioxIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/raiox/dados': {
+      id: '/raiox/dados'
+      path: '/raiox/dados'
+      fullPath: '/raiox/dados'
+      preLoaderRoute: typeof RaioxDadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/raiox/perguntas': {
       id: '/raiox/perguntas'
       path: '/raiox/perguntas'
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   RaioXDadosRoute: RaioXDadosRoute,
   RaioXPerguntasRoute: RaioXPerguntasRoute,
   RaioXResultadoRoute: RaioXResultadoRoute,
+  RaioxDadosRoute: RaioxDadosRoute,
   RaioxPerguntasRoute: RaioxPerguntasRoute,
   RaioXIndexRoute: RaioXIndexRoute,
   RaioxIndexRoute: RaioxIndexRoute,
