@@ -1,6 +1,6 @@
 /**
  * Conteúdo e configurações editáveis da experiência Live Lucro 2X.
- * Copy alinhada ao Guia da Esteira Cáliber — Setembro de 2026.
+ * Fonte de verdade: Página de Vendas da Live Lucro 2X — Setembro de 2026.
  */
 
 /** URL do YouTube da VSL. Deixe vazio para exibir o placeholder premium. */
@@ -17,144 +17,174 @@ export const testimonialVideos: { label: string; url: string }[] = [
 ];
 
 export const transitionCopy = {
-  kicker: "Do diagnóstico à ação",
-  title: "Seu Raio-X mostrou onde sua estrutura perde força. Agora descubra onde o lucro vaza.",
+  kicker: "Do Raio-X à decisão",
+  title: "O Raio-X mostrou a sua percepção. Agora falta medir quanto isso custa em reais.",
   subtitle:
-    "O Raio-X mede percepção. A Live Lucro 2X coloca os números na mesa para transformar diagnóstico em clareza.",
+    "É isso que vamos medir juntos, ao vivo, usando os números reais da sua empresa.",
 };
 
 export const liveIntro = {
   kicker: "Live Lucro 2X",
-  title: "Como dobrar o lucro da sua empresa sem ser o herói dela.",
+  title: "Como dobrar o lucro da sua empresa sem ser o herói dela",
   copy:
-    "Uma live online de cerca de 2 horas para empresários que já têm equipe e ainda carregam a empresa nas costas. Com os números do último mês em mãos, você preenche o Mapa de Drenagem de Lucro, identifica a causa dominante dos vazamentos e define uma decisão prática para os próximos 7 dias.",
+    "Em 2 horas ao vivo, você mapeia com os números da sua empresa onde o lucro vaza, por que vaza e qual decisão tomar nos próximos 7 dias.",
+  meta: "Online e ao vivo | Cerca de 2 horas | Mapa de Drenagem incluso",
+  payment: "R$ 97 | Pix, cartão ou boleto",
 };
 
-export const liveAreas: { title: string; description: string; icon: string }[] = [
-  {
-    title: "O número",
-    description:
-      "Entenda por que lucro no papel, caixa no banco e patrimônio contam histórias diferentes — e por que vender mais nem sempre resolve.",
-    icon: "wallet",
-  },
-  {
-    title: "O vazamento",
-    description:
-      "Percorra os 12 drenos de lucro nos trechos Margem, Estrutura, Giro, Destino e a válvula geral, marcando a intensidade de cada um.",
-    icon: "target",
-  },
-  {
-    title: "A causa",
-    description:
-      "Classifique cada dreno pela causa dominante: Pessoas, Processos ou Ferramentas. Se a causa é estrutural, trabalhar mais não fecha o vazamento.",
-    icon: "workflow",
-  },
-  {
-    title: "Resultado em 7 dias",
-    description:
-      "Saia com a reunião semanal de lucro: 30 minutos, 3 números e 1 decisão prática para a próxima semana.",
-    icon: "gauge",
-  },
-];
+export const audienceFit = {
+  title: "Para quem já tem equipe e ainda carrega a empresa nas costas",
+  yesTitle: "É para você se",
+  yes: [
+    "A empresa cresceu, mas o lucro não acompanhou.",
+    "A operação para quando você para.",
+    "Você fecha o mês sem saber se deu lucro ou se só entrou dinheiro.",
+    "Você já cortou, recomeçou e cortou de novo sem sair do lugar.",
+  ],
+  noTitle: "Não é para você se",
+  no: [
+    "Você procura motivação ou fórmula rápida.",
+    "Você ainda não tem equipe nem pretende ter.",
+    "Você não quer olhar os próprios números.",
+  ],
+};
+
+export const structuralDebt = {
+  kicker: "O inimigo",
+  title: "O problema não é o mercado. É a dívida estrutural.",
+  copy:
+    "Quando o faturamento cresce mais rápido do que a estrutura, a empresa contrai uma dívida que não aparece no balanço. Ela é paga todo mês, em lucro que some e em horas que você deixa de ter.",
+  scenarios: [
+    {
+      title: "Cenário 1: a empresa consome e não gera dinheiro",
+      description:
+        "A margem desaparece, o crescimento trava e cada venda nova dá mais trabalho do que resultado.",
+    },
+    {
+      title: "Cenário 2: a empresa gera dinheiro e consome você",
+      description:
+        "Não sobra tempo para planejar, inovar ou acompanhar o mercado, enquanto concorrentes estruturados planejam o futuro.",
+    },
+  ],
+  closing: "Nos dois casos, a saída não é trabalhar mais. É fechar os vazamentos na origem.",
+};
 
 export const liveTimeline: { step: string; title: string; description: string }[] = [
   {
-    step: "5 min",
-    title: "Abertura",
-    description:
-      "Promessa, regra do jogo e os três números do último mês em mãos: faturamento, lucro e caixa.",
-  },
-  {
-    step: "15 min",
-    title: "Fundamento",
-    description:
-      "O que é Força Estrutural, por que empresas que crescem sem estrutura acumulam dívida estrutural e como isso prende o dono no centro da operação.",
-  },
-  {
-    step: "25 min",
+    step: "Parte 1",
     title: "O número",
     description:
-      "A Tríade simplificada: resultado e lucratividade, caixa e patrimônio. Três leituras diferentes para entender por que o lucro nem sempre aparece na conta.",
+      "Por que o lucro aparece no papel e não aparece na conta. Você lê a sua empresa pelos três relatórios que contam histórias diferentes: resultado, caixa e patrimônio.",
   },
   {
-    step: "25 min",
+    step: "Parte 2",
     title: "O vazamento",
     description:
-      "Os 12 drenos organizados em Margem, Estrutura, Giro, Destino e a válvula geral. Você marca a intensidade de cada dreno no seu mapa.",
+      "Os 12 drenos de lucro que mais encontro em empresas que cresceram. Você marca, ao vivo, quais existem na sua empresa e com que intensidade.",
   },
   {
-    step: "20 min",
+    step: "Parte 3",
     title: "A causa",
     description:
-      "Cada dreno é ligado à causa dominante — Pessoas, Processos ou Ferramentas — para mostrar por que esforço sem estrutura não resolve.",
-  },
-  {
-    step: "10 min",
-    title: "Resultado em 7 dias",
-    description:
-      "Você define a reunião semanal de lucro: 30 minutos, 3 números e 1 decisão para os próximos 7 dias.",
-  },
-  {
-    step: "5 min",
-    title: "Prova prática",
-    description:
-      "Casos reais mostram o que muda quando a empresa ganha estrutura e deixa de depender do dono em cada decisão.",
-  },
-  {
-    step: "20 min",
-    title: "Ponte e oferta",
-    description:
-      "Você já sabe onde vaza e por quê. Para quem quiser continuar, Leonardo apresenta o programa Lucro 2X: ordem de ataque, ferramentas e acompanhamento por 8 semanas.",
-  },
-  {
-    step: "10–15 min",
-    title: "Perguntas",
-    description:
-      "Espaço final para dúvidas sobre o conteúdo da Live, o Mapa de Drenagem e o próximo passo para quem quiser avançar.",
+      "Cada vazamento nasce em Pessoas, Processos ou Ferramentas. Quando a causa é estrutural, trabalhar mais não resolve. Você sai sabendo onde agir primeiro.",
   },
 ];
 
+export const liveOutcome = {
+  title: "Você sai com o Mapa de Drenagem da sua empresa preenchido e uma decisão para os próximos 7 dias.",
+  note: "O mapa em branco chega no grupo dos participantes antes da live.",
+};
+
+export const conductor = {
+  kicker: "Quem conduz",
+  title: "Leonardo Froese, fundador da Cáliber",
+  copy:
+    "Comecei na controladoria aos 18 anos e abri minha empresa aos 20. Aos 22, perdi o maior cliente e fiquei a 30 dias de não conseguir pagar as contas. Aprendi do jeito difícil que faturar não é lucrar e que empresa sem estrutura depende de um herói. Hoje a Cáliber estrutura empresas que faturam de R$ 300 mil a R$ 130 milhões por mês, e a minha equipe resolve problemas sem precisar de mim.",
+  stats: [
+    { value: "+450", label: "empresas estruturadas" },
+    { value: "+R$ 100 mi", label: "de lucro gerado para clientes" },
+    { value: "16 anos", label: "de controladoria" },
+    { value: "10 estados", label: "com clientes atendidos" },
+  ],
+};
+
+export const proofCopy = {
+  kicker: "Prova real",
+  title: "O que muda quando a estrutura funciona",
+  copy:
+    "Aqui entram histórias reais de empresários e empresas, com autorização para uso. Os três espaços abaixo ficam reservados para os depoimentos em vídeo.",
+};
+
+export const offer = {
+  kicker: "Sua vaga na Live",
+  title: "Tudo o que você precisa para transformar percepção em decisão",
+  includes: [
+    "Live ao vivo de cerca de 2 horas com Leonardo Froese",
+    "Mapa de Drenagem de Lucro, enviado antes da live",
+    "Exercício guiado com os números da sua empresa",
+    "Decisão dos 7 dias definida ao final",
+    "Grupo dos participantes com lembretes e materiais",
+  ],
+  price: "R$ 97",
+  payment: "Pix, cartão ou boleto",
+  guaranteeTitle: "Garantia de 7 dias",
+  guaranteeCopy:
+    "Participe da live e avalie a experiência com seus próprios números. As condições de reembolso seguem a garantia configurada no checkout.",
+};
+
 export const liveFaqs: { question: string; answer: string }[] = [
   {
-    question: "O que é a Live Lucro 2X?",
+    question: "Vai ter venda no final?",
     answer:
-      "É uma live online de cerca de 2 horas. A proposta é sair da percepção do Raio-X e colocar os números reais da empresa na mesa para entender onde o lucro vaza e por quê.",
+      "Sim. Ao final, Leonardo apresenta o programa Lucro 2X para quem quiser continuar com acompanhamento. É opcional. O conteúdo da live é completo sem ele.",
   },
   {
-    question: "Para quem é a Live?",
+    question: "A live fica gravada?",
     answer:
-      "Para empresários e gestores que já têm equipe e ainda carregam a empresa nas costas. Não é uma aula motivacional: é um encontro prático sobre estrutura, números e decisão.",
+      "A gravação é um item opcional na tela de pagamento. Quem não adicionar assiste apenas ao vivo.",
   },
   {
-    question: "O que preciso ter em mãos para participar?",
+    question: "O que preciso ter em mãos?",
     answer:
-      "Os números do último mês: faturamento, lucro e caixa. Eles serão usados durante o preenchimento do Mapa de Drenagem de Lucro.",
+      "O faturamento, o lucro e o saldo de caixa do último mês. Se não souber o lucro, traga o que tiver: a live mostra por que isso acontece.",
   },
   {
-    question: "O que eu levo da Live?",
+    question: "Minha empresa é pequena. Serve para mim?",
     answer:
-      "O Mapa de Drenagem da sua empresa preenchido, a causa dominante dos vazamentos identificada e uma decisão prática para os próximos 7 dias.",
+      "Serve se você já tem equipe. A live foi desenhada para empresas que cresceram e ainda dependem do dono para funcionar.",
   },
   {
-    question: "Qual o investimento?",
-    answer: "O investimento da Live Lucro 2X é de R$ 97.",
+    question: "Funciona para o meu segmento?",
+    answer:
+      "Os drenos aparecem em comércio, indústria, distribuição e serviços. O que muda é a intensidade de cada um, e é isso que você vai medir.",
   },
   {
-    question: "Vai ter oferta no final?",
+    question: "Como recebo o acesso?",
     answer:
-      "Sim. Com transparência: ao final, Leonardo apresenta o programa Lucro 2X para quem quiser continuar e transformar o mapa em ordem de ataque, ferramentas e execução acompanhada por 8 semanas.",
+      "Logo após a compra, você entra no grupo dos participantes pela página de confirmação e recebe o acesso por e-mail. O link da sala chega no grupo e no e-mail no dia da live.",
   },
   {
-    question: "A gravação está incluída?",
+    question: "Posso assistir com meu sócio?",
     answer:
-      "A gravação e uma planilha de apoio estão previstas como uma oferta adicional no checkout, separada do ingresso da Live.",
+      "Sim, na mesma tela. Para receber o mapa e entrar no grupo, cada pessoa precisa da própria vaga.",
   },
   {
-    question: "Quando e onde acontece?",
+    question: "E se eu não gostar?",
     answer:
-      "A Live será online. A data, o horário e os detalhes de acesso serão divulgados junto da abertura das inscrições.",
+      "A compra possui garantia conforme as condições exibidas no checkout. O pedido de reembolso segue esse prazo.",
+  },
+  {
+    question: "Quais são as formas de pagamento?",
+    answer:
+      "Pix, cartão e boleto. O boleto pode levar até 3 dias úteis para compensar; perto da data, prefira Pix ou cartão.",
   },
 ];
+
+export const finalCta = {
+  kicker: "Próximo passo",
+  title: "O mapa da sua empresa em 2 horas",
+  copy: "Ao vivo e online. Trabalhe com os seus próprios números e saia com uma decisão prática para os próximos 7 dias.",
+};
 
 /** Extrai o ID de um vídeo do YouTube a partir das formas mais comuns de URL. */
 export function youtubeId(url: string): string | null {
