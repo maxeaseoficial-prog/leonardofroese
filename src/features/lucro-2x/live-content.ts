@@ -182,7 +182,7 @@ export const liveFaqs: { question: string; answer: string }[] = [
 
 export const finalCta = {
   kicker: "Próximo passo",
-  title: "O mapa da sua empresa em 2 horas",
+  title: "O Mapa do Lucro da sua empresa em 2 horas",
   copy: "Ao vivo e online. Trabalhe com os seus próprios números e saia com uma decisão prática para os próximos 7 dias.",
 };
 
