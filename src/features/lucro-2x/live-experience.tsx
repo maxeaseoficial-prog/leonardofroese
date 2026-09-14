@@ -37,6 +37,7 @@ import faqPhotoTwo from "@/assets/leonardo-DSC01026.jpg.asset.json";
 import faqPhotoThree from "@/assets/leonardo-DSC00784.jpg.asset.json";
 import "./live.css";
 import "./live-fixes.css";
+import "./live-mobile.css";
 
 const timelineIcons = [BarChart3, Target, Workflow];
 
@@ -116,7 +117,7 @@ export function LiveExperience() {
               key={scenario.title}
               className="live-debt-card live-glow-card"
               onMouseMove={trackPointer}
-              whileHover={reduceMotion ? {} : { y: -5 }}
+              whileHover={reduceMotion ? undefined : { y: -5 }}
             >
               <h3>{scenario.title}</h3>
               <p>{scenario.description}</p>
@@ -146,7 +147,7 @@ export function LiveExperience() {
           }}
         >
           {liveTimeline.map((item, index) => {
-            const Icon = timelineIcons[index % timelineIcons.length] ?? BarChart3;
+            const Icon = timelineIcons[index % timelineIcons.length];
             return (
               <motion.article
                 key={`${item.step}-${item.title}`}
@@ -180,7 +181,7 @@ export function LiveExperience() {
             src={faqPhotoThree.url}
             alt="Leonardo Froese"
             className="live-conductor-photo"
-            whileHover={reduceMotion ? {} : { scale: 1.015 }}
+            whileHover={reduceMotion ? undefined : { scale: 1.015 }}
           />
           <div>
             <SectionHeading eyebrow={conductor.kicker} title={conductor.title} copy={conductor.copy} />
@@ -207,7 +208,7 @@ export function LiveExperience() {
               key={video.label}
               className="live-proof-card live-glow-card"
               onMouseMove={trackPointer}
-              whileHover={reduceMotion ? {} : { y: -5 }}
+              whileHover={reduceMotion ? undefined : { y: -5 }}
             >
               <VideoFrame url={video.url} label={video.label} compact />
               <div className="live-proof-copy">
@@ -255,19 +256,19 @@ export function LiveExperience() {
               src={faqPhotoOne.url}
               alt="Leonardo Froese"
               className="live-faq-photo live-faq-photo-a"
-              whileHover={reduceMotion ? {} : { scale: 1.025, y: -4 }}
+              whileHover={reduceMotion ? undefined : { scale: 1.025, y: -4 }}
             />
             <motion.img
               src={faqPhotoTwo.url}
               alt="Leonardo Froese"
               className="live-faq-photo live-faq-photo-b"
-              whileHover={reduceMotion ? {} : { scale: 1.025, y: -4 }}
+              whileHover={reduceMotion ? undefined : { scale: 1.025, y: -4 }}
             />
             <motion.img
               src={faqPhotoThree.url}
               alt="Leonardo Froese"
               className="live-faq-photo live-faq-photo-c"
-              whileHover={reduceMotion ? {} : { scale: 1.025, y: -4 }}
+              whileHover={reduceMotion ? undefined : { scale: 1.025, y: -4 }}
             />
           </div>
 
