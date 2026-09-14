@@ -1,3 +1,3 @@
 # Roadmap
 
-- [ ] Corrigir todos os erros atuais de typecheck/build do preview
+- [x] Corrigir todos os erros atuais de typecheck/build do preview
