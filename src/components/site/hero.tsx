@@ -3,8 +3,10 @@ import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
 import heroCoverAsset from "@/assets/hero-leonardo-capa.png.asset.json";
+import heroMobileAsset from "@/assets/hero-leonardo-mobile.png.asset.json";
 
 const heroBackground = heroCoverAsset.url;
+const heroMobileBackground = heroMobileAsset.url;
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -20,16 +22,19 @@ export function Hero() {
     >
       {/* Fundo da Hero em alta qualidade, sem resize no asset e com cache-bust. */}
       <div aria-hidden className="absolute inset-0 bg-[#080808]">
-        <img
-          src={heroBackground}
-          alt=""
-          width={2048}
-          height={1152}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          fetchPriority="high"
-          decoding="sync"
-          draggable={false}
-        />
+        <picture className="absolute inset-0 block h-full w-full">
+          <source media="(max-width: 767px)" srcSet={heroMobileBackground} />
+          <img
+            src={heroBackground}
+            alt=""
+            width={2048}
+            height={1152}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            fetchPriority="high"
+            decoding="sync"
+            draggable={false}
+          />
+        </picture>
       </div>
 
       {/* Overlay mínimo: a própria imagem já contém a composição escura à esquerda. */}
