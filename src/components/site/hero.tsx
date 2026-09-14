@@ -2,9 +2,9 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MagneticButton, Reveal } from "./primitives";
+import heroCoverAsset from "@/assets/hero-leonardo-capa.png.asset.json";
 
-const heroBackground =
-  "/__l5e/assets-v1/679f22e6-7822-4aa5-baa3-c025b5f120ef/hero-bg-v2.png?v=hero-hq-20260911";
+const heroBackground = heroCoverAsset.url;
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
