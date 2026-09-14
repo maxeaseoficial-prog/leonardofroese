@@ -1,0 +1,267 @@
+/* Mobile hardening for the Live Lucro 2X sales experience. */
+@media (max-width: 720px) {
+  .live-experience {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 14px;
+    overflow-x: clip;
+  }
+
+  .live-experience *,
+  .live-experience *::before,
+  .live-experience *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  .live-experience::before {
+    inset-inline: 0;
+  }
+
+  .live-section,
+  .live-transition,
+  .live-heading,
+  .live-heading p,
+  .live-display {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .live-heading,
+  .live-heading.is-centered {
+    padding-inline: 0;
+  }
+
+  .live-display {
+    font-size: clamp(32px, 10.2vw, 44px) !important;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .live-heading p,
+  .live-transition p {
+    font-size: 15px;
+    line-height: 1.55;
+    overflow-wrap: break-word;
+  }
+
+  .live-eyebrow {
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+    font-size: 8.5px;
+    letter-spacing: 0.16em;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .live-eyebrow > span {
+    width: 26px;
+    flex: 0 0 26px;
+  }
+
+  /* Desktop used a negative full-bleed margin here. On mobile it caused the
+     heading/cards to render wider than the viewport. */
+  .live-timeline-section {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0 !important;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .live-timeline-section > div[style] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 34px !important;
+    padding-top: 24px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 26px !important;
+  }
+
+  .live-timeline-card {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    padding: 40px 22px 28px;
+  }
+
+  .live-timeline-card .live-card-title {
+    font-size: 28px;
+  }
+
+  .live-outcome-card {
+    padding: 20px 18px;
+  }
+
+  /* Fixed testimonial cards: one per row on phones, never wider than screen. */
+  .live-testimonial-grid {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .live-testimonial-grid .live-proof-card,
+  .live-proof-card {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .live-proof-copy {
+    width: 100%;
+    padding: 24px 20px !important;
+  }
+
+  /* FAQ collage becomes a predictable vertical mobile composition:
+     featured photo full-width, two supporting photos beneath it. */
+  .live-faq-section {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 78px;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .live-faq-layout {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .live-faq-collage {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: 8px;
+    margin: 0 0 34px;
+  }
+
+  .live-faq-photo {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    object-fit: cover;
+    transform: none !important;
+  }
+
+  .live-faq-photo-a {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    aspect-ratio: 4 / 3;
+    max-height: 430px;
+    object-position: 50% 34%;
+  }
+
+  .live-faq-photo-b {
+    grid-column: 1;
+    grid-row: 2;
+    aspect-ratio: 1 / 1;
+    object-position: 50% 28%;
+  }
+
+  .live-faq-photo-c {
+    grid-column: 2;
+    grid-row: 2;
+    aspect-ratio: 1 / 1;
+    object-position: 52% 30%;
+  }
+
+  .live-faq-panel {
+    width: 100%;
+    max-width: 100%;
+    padding-top: 0;
+  }
+
+  .live-faq-panel .live-heading {
+    text-align: center;
+  }
+
+  .live-faq-panel .live-eyebrow {
+    justify-content: center;
+  }
+
+  .live-faq-panel .live-display {
+    font-size: clamp(36px, 11vw, 48px) !important;
+    text-align: center;
+  }
+
+  .live-faq {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 24px;
+  }
+
+  .live-faq-item,
+  .live-faq-q,
+  .live-faq-answer-wrap,
+  .live-faq-a {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .live-faq-q {
+    min-height: 60px;
+    gap: 12px;
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .live-faq-q > span {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  .live-faq-a {
+    padding: 0 16px 18px;
+    font-size: 14px;
+    line-height: 1.58;
+    overflow-wrap: break-word;
+  }
+
+  .live-fit-grid,
+  .live-debt-grid,
+  .live-offer-grid,
+  .live-stats-grid,
+  .live-conductor-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .live-cta,
+  .live-cta-wrap,
+  .live-frame-vsl,
+  .live-meta-row,
+  .live-guarantee {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .live-experience {
+    padding-inline: 10px;
+  }
+
+  .live-display {
+    font-size: clamp(30px, 9.7vw, 40px) !important;
+  }
+
+  .live-faq-photo-a {
+    aspect-ratio: 1 / 1;
+    max-height: none;
+  }
+
+  .live-faq-q {
+    padding-inline: 14px;
+  }
+}
