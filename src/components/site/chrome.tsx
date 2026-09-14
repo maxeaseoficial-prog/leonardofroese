@@ -14,6 +14,7 @@ const footerLinks = [
 ];
 
 const navLinks = footerLinks.filter((link) => link.label !== "Leonardo");
+const headerRaioXUrl = "https://www.leonardofroese.com.br/raiox";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -65,7 +66,7 @@ export function Nav() {
           ))}
         </div>
         <MagneticButton
-          href="/treinamentos/lucro-2x/raio-x"
+          href={headerRaioXUrl}
           className="hidden bg-emerald-500 px-5 py-2.5 text-xs text-white hover:bg-emerald-600 lg:inline-flex"
         >
           Fazer meu Raio-X
@@ -107,7 +108,7 @@ export function Nav() {
                 </a>
               ))}
               <a
-                href="/treinamentos/lucro-2x/raio-x"
+                href={headerRaioXUrl}
                 onClick={() => setMobileOpen(false)}
                 className="mt-5 inline-flex min-h-12 items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
