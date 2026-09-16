@@ -35,6 +35,7 @@ import {
 import faqPhotoOne from "@/assets/leonardo-DSC00683.jpg.asset.json";
 import faqPhotoTwo from "@/assets/leonardo-DSC01026.jpg.asset.json";
 import faqPhotoThree from "@/assets/leonardo-DSC00784.jpg.asset.json";
+import { ClientLogos } from "@/components/site/client-logos";
 import "./live.css";
 import "./live-fixes.css";
 import "./live-mobile.css";
@@ -49,6 +50,7 @@ export function LiveExperience() {
     <div className="live-experience">
       <div className="live-ambient live-ambient-a" aria-hidden="true" />
       <div className="live-ambient live-ambient-b" aria-hidden="true" />
+      <ClientLogos className="pt-16 sm:pt-20" />
 
       <RevealBlock className="live-transition">
         <div className="live-eyebrow">{transitionCopy.kicker}</div>

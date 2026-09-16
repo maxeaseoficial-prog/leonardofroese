@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { CountUp, MagneticButton, Reveal, SectionLabel, TiltCard } from "./primitives";
 import { DiagnosticModal } from "./diagnostic-modal";
+import { ClientLogos } from "./client-logos";
 import { AnimatePresence } from "motion/react";
 
 function Section({
@@ -338,6 +339,7 @@ export function Results() {
           />
         </div>
       </div>
+      <ClientLogos className="mt-28" />
     </Section>
   );
 }
