@@ -18,33 +18,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Restore generator and reconstruct one consistent historical source
+      - name: Restore generator with correct binary reconstruction
         shell: bash
         run: |
           python - <<'PYEXTRACT'
           import subprocess
           from pathlib import Path
 
-          text = subprocess.check_output(
-              ['git', 'show', '03a1c3c28e1c5165b2a94316b3eb9a31b18a5cd7:.github/workflows/repair-client-logos.yml'],
-              text=True,
-          )
-          start = "          cat > /tmp/split_client_logos.py <<'PY'\n"
-          end = "\n          PY\n"
-          body = text.split(start, 1)[1].split(end, 1)[0]
-          lines = [line[10:] if line.startswith('          ') else line for line in body.splitlines()]
-          script = '\n'.join(lines) + '\n'
-          script = script.replace('import io\n', 'import io\nimport re\nimport subprocess\n')
-          old = "raw_b64 = (out / 'clients-strip.b64.txt').read_text(encoding='utf-8').strip()"
-          source_commit = '9cd591fff9891082b1ba8cbde3d4276521c6282a'
-          new = f"source_commit = '{source_commit}'\nparts = []\nfor index in range(8):\n    chunk_text = subprocess.check_output(['git', 'show', f'{{source_commit}}:src/assets/client-logo-strip/chunk{{index}}.ts'], text=True)\n    match = re.search(r'\\\"([^\\\"]+)\\\"', chunk_text)\n    if not match:\n        raise RuntimeError(f'Could not parse historical chunk{{index}}.ts')\n    parts.append(match.group(1))\nraw_b64 = ''.join(parts)\nraw_b64 += '=' * (-len(raw_b64) % 4)\nprint(f'Reconstructed source from one historical revision; chunks={{len(parts)}}, padded base64 chars={{len(raw_b64)}}')"
-          if old not in script:
-              raise SystemExit('Source line to patch was not found')
-          script = script.replace(old, new)
-          Path('/tmp/split_client_logos.py').write_text(script, encoding='utf-8')
-          print('Generator restored using all eight chunks from the same historical commit.')
+          text = subprocess.check_output(['git','show','03a1c3c28e1c5165b2a94316b3eb9a31b18a5cd7:.github/workflows/repair-client-logos.yml'], text=True)
+          body = text.split("          cat > /tmp/split_client_logos.py <<'PY'\n",1)[1].split("\n          PY\n",1)[0]
+          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines()) + '\n'
+          script = script.replace('import io\n','import io\nimport re\n')
+          old = "raw_b64 = (out / 'clients-strip.b64.txt').read_text(encoding='utf-8').strip()\nsource = Image.open(io.BytesIO(base64.b64decode(raw_b64))).convert('RGB')"
+          new = "parts=[]\nfor i in range(8):\n    s=(root/'src/assets/client-logo-strip'/f'chunk{i}.ts').read_text(encoding='utf-8')\n    m=re.search(r'\\\"([^\\\"]+)\\\"',s)\n    if not m: raise RuntimeError(f'Could not parse chunk{i}')\n    parts.append(base64.b64decode(m.group(1)))\nsource_bytes=b''.join(parts)\nprint(f'Reconstructed {len(source_bytes)} binary bytes from {len(parts)} independently encoded chunks')\nsource=Image.open(io.BytesIO(source_bytes)).convert('RGB')"
+          if old not in script: raise SystemExit('generator source block not found')
+          Path('/tmp/split_client_logos.py').write_text(script.replace(old,new),encoding='utf-8')
           PYEXTRACT
-      - name: Install image tooling
+      - name: Install Pillow
         run: python -m pip install --disable-pip-version-check pillow
       - name: Generate individual transparent assets
         run: python /tmp/split_client_logos.py
@@ -53,14 +43,13 @@ jobs:
         run: |
           bun install --frozen-lockfile
           bun run build
-      - name: Commit generated repair
+      - name: Commit repair
         shell: bash
         run: |
           git diff --check
-          git status --short
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet && { echo "No generated changes"; exit 1; }
+          git diff --cached --quiet && exit 1
           git commit -m "fix: use individual transparent client logos"
           git push origin main
