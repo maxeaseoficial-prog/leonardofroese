@@ -36,8 +36,12 @@ if not match:
     raise RuntimeError("Could not extract the local WebP base64 source")
 
 encoded = re.sub(r"\s+", "", match.group(1))
+# The historical source contains a few non-base64 characters introduced during
+# earlier copy/chunk operations. Ignore only those transport artifacts, then
+# validate the decoded image itself by format and exact dimensions below.
+encoded = re.sub(r"[^A-Za-z0-9+/=]", "", encoded)
 encoded += "=" * (-len(encoded) % 4)
-raw = base64.b64decode(encoded, validate=True)
+raw = base64.b64decode(encoded, validate=False)
 strip = Image.open(io.BytesIO(raw)).convert("RGBA")
 strip.load()
 print(f"SOURCE strip={strip.width}x{strip.height} mode={strip.mode} bytes={len(raw)}")
