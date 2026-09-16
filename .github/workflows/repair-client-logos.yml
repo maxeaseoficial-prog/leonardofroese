@@ -25,16 +25,20 @@ jobs:
       - name: Install image and browser tooling
         run: python -m pip install --disable-pip-version-check pillow selenium
 
-      - name: Normalize legacy migration source
+      - name: Normalize canonical legacy migration source
         run: |
           bun -e '
-            const modules = await Promise.all(
-              Array.from({ length: 8 }, (_, i) => import(`./src/assets/client-logo-strip/chunk${i}.ts`)),
-            );
-            const encoded = modules.map((mod) => mod.default).join("");
-            if (!encoded.startsWith("UklG")) throw new Error("Reconstructed payload is not WebP base64");
+            const mod = await import("./src/assets/client-logo-transparent-webp-base64.ts");
+            const encoded = mod.clientLogoTransparentWebpBase64;
+            if (typeof encoded !== "string" || !encoded.startsWith("UklG")) {
+              throw new Error("Canonical client-logo WebP base64 export is missing or invalid");
+            }
+            const bytes = Buffer.from(encoded, "base64");
+            if (bytes.length < 16 || bytes.toString("ascii", 0, 4) !== "RIFF" || bytes.toString("ascii", 8, 12) !== "WEBP") {
+              throw new Error("Canonical client-logo source is not a valid WebP container");
+            }
             await Bun.write("public/client-logos/clients-strip.b64.txt", encoded);
-            console.log(`Reconstructed WebP migration source from ${modules.length} chunks: ${encoded.length} base64 chars`);
+            console.log(`Canonical WebP migration source: ${encoded.length} base64 chars / ${bytes.length} bytes`);
           '
 
       - name: Extract individual transparent client logos
