@@ -27,6 +27,31 @@ jobs:
       - name: Install logo tooling
         run: python -m pip install --disable-pip-version-check pillow selenium
 
+      - name: Accept the recovered original JPEG strip
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/scripts/migrate_client_logos.py')
+          text = path.read_text(encoding='utf-8')
+          start_marker = '    raw = base64.b64decode(encoded, validate=True)\n'
+          image_marker = '    image = Image.open(io.BytesIO(raw)).convert("RGBA")\n'
+          start = text.find(start_marker)
+          image_pos = text.find(image_marker, start)
+          if start < 0 or image_pos < 0:
+              raise SystemExit('Historical source decoder block not found')
+          replacement = (
+              '    raw = base64.b64decode(encoded, validate=True)\n'
+              '    source = Image.open(io.BytesIO(raw))\n'
+              '    source_format = source.format\n'
+              '    image = source.convert("RGBA")\n'
+              '    print(f"RECOVERED SOURCE FORMAT: {source_format}")\n'
+          )
+          text = text[:start] + replacement + text[image_pos + len(image_marker):]
+          path.write_text(text, encoding='utf-8')
+          PY
+
       - name: Recover original logos and create transparent local assets
         run: python .github/scripts/migrate_client_logos.py
 
