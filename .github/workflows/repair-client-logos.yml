@@ -89,7 +89,7 @@ jobs:
               url, matched_alt = resolved
               entries.append((display, slug, url, matched_alt))
               print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')
-'''
+          '''
 
           script = script[:start_index] + replacement + script[end_index:]
           Path('/tmp/repair_client_logos.py').write_text(script, encoding='utf-8')
