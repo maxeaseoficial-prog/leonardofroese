@@ -27,6 +27,7 @@ jobs:
         run: |
           python - <<'PY'
           import base64
+          import re
           from pathlib import Path
 
           chunks_dir = Path("src/assets/client-logo-strip")
@@ -35,14 +36,14 @@ jobs:
           parts = []
           for path in paths:
               text = path.read_text(encoding="utf-8")
-              start = text.find('"')
-              end = text.rfind('"')
-              if start < 0 or end <= start:
+              quoted = re.findall(r'"([^\"]*)"', text, flags=re.S)
+              if not quoted:
                   raise SystemExit(f"Could not locate string payload in {path}")
-              part = text[start + 1:end]
-              if not part:
-                  raise SystemExit(f"Empty chunk in {path}")
+              part = max(quoted, key=len).replace("\n", "").replace("\r", "")
+              if not re.fullmatch(r"[A-Za-z0-9+/=]+", part):
+                  raise SystemExit(f"Chunk contains non-base64 data: {path}")
               parts.append(part)
+              print(f"Chunk {path.name}: {len(part)} chars")
           if not parts:
               raise SystemExit("No legacy WebP chunks found")
           encoded = "".join(parts)
