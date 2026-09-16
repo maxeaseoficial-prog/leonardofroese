@@ -27,6 +27,21 @@ jobs:
       - name: Install logo and browser tooling
         run: python -m pip install --disable-pip-version-check pillow selenium requests beautifulsoup4
 
+      - name: Prefer direct Cáliber asset URLs over Jetpack cache URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/scripts/migrate_client_logos.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''        url = sources[slug]\n        response = session.get(url, timeout=45)\n        response.raise_for_status()\n        if len(response.content) < 100:\n            raise RuntimeError(f"Downloaded image is unexpectedly small: {display_name}")\n'''
+          new = '''        url = sources[slug]\n        candidates = [url]\n        marker = "wp.com/calibergestao.com.br/"\n        if marker in url:\n            direct_path = url.split(marker, 1)[1].split("?", 1)[0]\n            candidates.insert(0, f"https://calibergestao.com.br/{direct_path}")\n\n        response = None\n        last_error = None\n        for candidate in candidates:\n            try:\n                attempt = session.get(candidate, timeout=45)\n                attempt.raise_for_status()\n                if len(attempt.content) < 100:\n                    raise RuntimeError(f"Downloaded image is unexpectedly small: {display_name}")\n                response = attempt\n                url = candidate\n                break\n            except Exception as exc:\n                last_error = exc\n                print(f"DOWNLOAD RETRY {display_name}: {candidate} -> {exc}")\n\n        if response is None:\n            raise RuntimeError(f"Could not download {display_name}: {last_error}")\n'''
+          if old not in text:
+              raise SystemExit('Download block not found')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+
       - name: Download real Cáliber logos and create local transparent assets
         run: python .github/scripts/migrate_client_logos.py
 
