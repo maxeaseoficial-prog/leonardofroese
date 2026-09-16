@@ -30,7 +30,6 @@ jobs:
           python - <<'PY'
           import base64
           import io
-          import json
           import re
           from pathlib import Path
           from PIL import Image
@@ -40,15 +39,12 @@ jobs:
           for i in range(8):
               path = chunks_dir / f"chunk{i}.ts"
               text = path.read_text(encoding="utf-8")
-              literals = re.findall(r'"(?:\\.|[^"\\])*"', text, flags=re.S)
               candidates = []
-              for literal in literals:
-                  try:
-                      value = json.loads(literal)
-                  except Exception:
-                      continue
-                  if len(value) >= 1000 and re.fullmatch(r"[A-Za-z0-9+/=]+", value):
-                      candidates.append(value)
+              for quote in ('"', "'", '`'):
+                  for value in re.findall(re.escape(quote) + r"(.*?)" + re.escape(quote), text, flags=re.S):
+                      clean = re.sub(r"\s+", "", value)
+                      if len(clean) >= 1000 and re.fullmatch(r"[A-Za-z0-9+/=]+", clean):
+                          candidates.append(clean)
               if not candidates:
                   raise SystemExit(f"Could not locate base64 payload in {path}")
               part = max(candidates, key=len)
@@ -56,11 +52,10 @@ jobs:
               print(f"{path.name}: {len(part)} base64 chars")
 
           encoded = "".join(parts)
+          print(f"Recovered {len(encoded)} concatenated base64 chars")
           if not encoded.startswith("UklG"):
               raise SystemExit("Reconstructed source does not begin with a WebP RIFF payload")
 
-          # Decode enough of the stream to read the RIFF size, then cut the
-          # concatenated legacy payload at the exact canonical WebP length.
           header = base64.b64decode(encoded[:32] + "===")
           if header[:4] != b"RIFF" or header[8:12] != b"WEBP":
               raise SystemExit("Reconstructed source is not a WebP container")
