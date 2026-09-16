@@ -5,141 +5,301 @@ import io
 import json
 import re
 import shutil
-import subprocess
-import tempfile
+import time
+import unicodedata
 from collections import deque
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
 
+import requests
 from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 ROOT = Path.cwd()
-SOURCE = ROOT / "src/assets/client-logo-transparent-webp-base64.ts"
+REFERENCE_URL = "https://calibergestao.com.br/"
 OUT = ROOT / "public/client-logos"
 OUT.mkdir(parents=True, exist_ok=True)
 
-SOURCE_NAMES = [
-    "Parceiro 01",
-    "Parceiro 02",
-    "Parceiro 03",
-    "Parceiro 04",
-    "Parceiro 05",
-    "Parceiro 06",
-    "Parceiro 07",
-    "Parceiro 08",
-    "Parceiro 09",
+TARGETS = [
+    ("Claro", "claro", ["claro"]),
+    ("NET", "net", ["net"]),
+    ("Megasom", "megasom", ["logo megasom sem fundo", "megasom"]),
+    ("Leo Madeiras", "leo-madeiras", ["leo madeiras"]),
+    ("Procria", "procria", ["procria"]),
+    ("LEGO", "lego", ["lego"]),
+    ("Maxvinil", "maxvinil", ["maxvinil"]),
+    ("Tupperware", "tupperware", ["tupperware"]),
+    ("Águas de Sorriso", "aguas-de-sorriso", ["aguas de sorriso", "águas de sorriso"]),
+    ("Aliança", "alianca", ["alianca", "aliança"]),
+    ("Campo Solar", "campo-solar", ["campo solar"]),
+    ("Cobertura Imasa", "cobertura-imasa", ["cobertura imasa"]),
+    ("Eletricidade Paraense", "eletricidade-paraense", ["eletricidade paraense"]),
+    ("Fatex", "fatex", ["fatex"]),
+    ("Frota", "frota", ["frota"]),
+    ("Octech", "octech", ["octech", "oc tech"]),
+    ("Pantanal", "pantanal", ["pantanal"]),
+    ("Tempermat", "tempermat", ["tempermat"]),
+    ("Prime Lente", "prime-lente", ["prime lente logo gradual", "prime lente"]),
+    ("Trevo", "trevo", ["trevo"]),
 ]
 
-text = SOURCE.read_text(encoding="utf-8")
-match = re.search(
-    r'clientLogoTransparentWebpBase64\s*=\s*"([^"]+)"',
-    text,
-    flags=re.DOTALL,
-)
-if not match:
-    raise RuntimeError("Could not extract the local WebP base64 source")
 
-encoded_source = re.sub(r"\s+", "", match.group(1))
+def normalize(value: str | None) -> str:
+    value = value or ""
+    value = unicodedata.normalize("NFKD", value)
+    value = "".join(ch for ch in value if not unicodedata.combining(ch))
+    value = value.lower()
+    return re.sub(r"[^a-z0-9]+", " ", value).strip()
 
 
-def decode_legacy_strip(payload: str) -> Image.Image:
-    # First try a normal decoder. Some historical copies have transport noise,
-    # so sanitize only characters that can never belong to standard base64.
-    sanitized = re.sub(r"[^A-Za-z0-9+/=]", "", payload)
-    sanitized += "=" * (-len(sanitized) % 4)
+def image_descriptor(element) -> tuple[str, dict[str, str]]:
+    attrs = {}
+    for key in (
+        "alt",
+        "title",
+        "aria-label",
+        "src",
+        "currentSrc",
+        "data-src",
+        "data-lazy-src",
+        "data-original",
+        "srcset",
+        "data-lazy-srcset",
+        "class",
+    ):
+        if key == "currentSrc":
+            value = element.get_property("currentSrc") or ""
+        else:
+            value = element.get_attribute(key) or ""
+        attrs[key] = value
+    descriptor = normalize(" ".join(attrs.values()))
+    return descriptor, attrs
+
+
+def score_candidate(descriptor: str, attrs: dict[str, str], aliases: list[str]) -> int:
+    alt = normalize(attrs.get("alt"))
+    title = normalize(attrs.get("title"))
+    best = 0
+    for alias in aliases:
+        needle = normalize(alias)
+        if not needle:
+            continue
+        if alt == needle:
+            best = max(best, 120)
+        elif needle in alt:
+            best = max(best, 105)
+        if title == needle:
+            best = max(best, 100)
+        elif needle in title:
+            best = max(best, 90)
+        if needle in descriptor:
+            best = max(best, 60)
+    return best
+
+
+def extract_candidate_urls(attrs: dict[str, str]) -> list[str]:
+    values: list[str] = []
+    for key in ("currentSrc", "data-lazy-src", "data-src", "data-original", "src"):
+        value = (attrs.get(key) or "").strip()
+        if value and not value.startswith("data:"):
+            values.append(urljoin(REFERENCE_URL, value))
+
+    for key in ("data-lazy-srcset", "srcset"):
+        value = attrs.get(key) or ""
+        for part in value.split(","):
+            part = part.strip()
+            if not part:
+                continue
+            values.append(urljoin(REFERENCE_URL, part.split()[0]))
+
+    expanded: list[str] = []
+    for url in values:
+        expanded.append(url)
+        clean = url.split("?", 1)[0]
+        if clean != url:
+            expanded.append(clean)
+        if "wp.com/calibergestao.com.br/" in url:
+            path = url.split("/calibergestao.com.br/", 1)[1].split("?", 1)[0]
+            expanded.append("https://calibergestao.com.br/" + path)
+
+    unique: list[str] = []
+    seen = set()
+    for url in expanded:
+        if url in seen:
+            continue
+        seen.add(url)
+        unique.append(url)
+    return unique
+
+
+def configure_browser():
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--hide-scrollbars")
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+    driver = webdriver.Chrome(options=options)
+    driver.execute_cdp_cmd("Network.enable", {"maxTotalBufferSize": 100_000_000, "maxResourceBufferSize": 10_000_000})
+    return driver
+
+
+def collect_loaded_response_bodies(driver) -> dict[str, bytes]:
+    responses: dict[str, tuple[str, int, str]] = {}
+    for entry in driver.get_log("performance"):
+        try:
+            message = json.loads(entry["message"])["message"]
+        except Exception:
+            continue
+        if message.get("method") != "Network.responseReceived":
+            continue
+        params = message.get("params", {})
+        response = params.get("response", {})
+        url = response.get("url") or ""
+        mime = response.get("mimeType") or ""
+        status = int(response.get("status") or 0)
+        request_id = params.get("requestId")
+        if request_id and status == 200 and (mime.startswith("image/") or "wp-content/uploads" in url):
+            responses[url] = (request_id, status, mime)
+
+    bodies: dict[str, bytes] = {}
+    for url, (request_id, _status, _mime) in responses.items():
+        try:
+            body = driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+            data = body.get("body", "")
+            if body.get("base64Encoded"):
+                raw = base64.b64decode(data)
+            else:
+                raw = data.encode("latin1", errors="ignore")
+            if raw:
+                bodies[url] = raw
+        except Exception:
+            pass
+    return bodies
+
+
+def browser_discover() -> tuple[dict[str, dict], dict[str, bytes], str, list[dict]]:
+    driver = configure_browser()
     try:
-        raw = base64.b64decode(sanitized, validate=False)
-        image = Image.open(io.BytesIO(raw)).convert("RGBA")
-        image.load()
-        print(f"SOURCE decoded with Pillow: {image.width}x{image.height}, bytes={len(raw)}")
-        return image
-    except Exception as exc:
-        print(f"Pillow could not decode historical WebP; using Chromium fallback: {exc}")
+        driver.get(REFERENCE_URL)
+        time.sleep(1.5)
+        height = int(driver.execute_script("return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"))
+        step = 700
+        for y in range(0, height + step, step):
+            driver.execute_script("window.scrollTo(0, arguments[0])", y)
+            time.sleep(0.12)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+        time.sleep(2.0)
 
-    chrome = (
-        shutil.which("google-chrome")
-        or shutil.which("google-chrome-stable")
-        or shutil.which("chromium")
-        or shutil.which("chromium-browser")
+        user_agent = driver.execute_script("return navigator.userAgent")
+        images = driver.find_elements(By.TAG_NAME, "img")
+        records: list[dict] = []
+        for element in images:
+            try:
+                descriptor, attrs = image_descriptor(element)
+                natural_width = int(element.get_property("naturalWidth") or 0)
+                natural_height = int(element.get_property("naturalHeight") or 0)
+                records.append(
+                    {
+                        "element": element,
+                        "descriptor": descriptor,
+                        "attrs": attrs,
+                        "natural_width": natural_width,
+                        "natural_height": natural_height,
+                    }
+                )
+            except Exception:
+                continue
+
+        chosen: dict[str, dict] = {}
+        for display, slug, aliases in TARGETS:
+            ranked = []
+            for record in records:
+                score = score_candidate(record["descriptor"], record["attrs"], aliases)
+                if score:
+                    ranked.append((score, record["natural_width"], record["natural_height"], record))
+            ranked.sort(key=lambda item: (item[0], item[1] * item[2]), reverse=True)
+            if not ranked:
+                raise RuntimeError(f"No <img> candidate found for {display}")
+            record = ranked[0][3]
+            chosen[slug] = record
+            print(
+                f"DISCOVER {display}: score={ranked[0][0]} natural={record['natural_width']}x{record['natural_height']} "
+                f"alt={record['attrs'].get('alt')!r} currentSrc={record['attrs'].get('currentSrc')!r}"
+            )
+
+        response_bodies = collect_loaded_response_bodies(driver)
+        cookies = driver.get_cookies()
+        return chosen, response_bodies, user_agent, cookies
+    finally:
+        driver.quit()
+
+
+def fetch_bytes(
+    display: str,
+    attrs: dict[str, str],
+    response_bodies: dict[str, bytes],
+    user_agent: str,
+    cookies: list[dict],
+) -> tuple[bytes, str]:
+    urls = extract_candidate_urls(attrs)
+    if not urls:
+        raise RuntimeError(f"No URL candidates found for {display}")
+
+    # Prefer the exact body already loaded successfully by Chromium. This is the
+    # original resource response, not a screenshot or recreated logo.
+    for url in urls:
+        if url in response_bodies:
+            print(f"RESOURCE {display}: using Chromium response body {url}")
+            return response_bodies[url], url
+        clean = url.split("?", 1)[0]
+        for loaded_url, raw in response_bodies.items():
+            if loaded_url.split("?", 1)[0] == clean:
+                print(f"RESOURCE {display}: using matching Chromium response body {loaded_url}")
+                return raw, loaded_url
+
+    session = requests.Session()
+    session.headers.update(
+        {
+            "User-Agent": user_agent,
+            "Referer": REFERENCE_URL,
+            "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        }
     )
-    if not chrome:
-        raise RuntimeError("Chromium/Chrome is unavailable for legacy WebP recovery")
+    for cookie in cookies:
+        try:
+            session.cookies.set(cookie["name"], cookie["value"], domain=cookie.get("domain"))
+        except Exception:
+            pass
 
-    data_url = "data:image/webp;base64," + payload
-    with tempfile.TemporaryDirectory() as temporary:
-        html_path = Path(temporary) / "decode.html"
-        html_path.write_text(
-            """<!doctype html><html><body><pre id=\"out\">LOADING</pre><script>
-const source = %s;
-const image = new Image();
-image.onload = () => {
-  const canvas = document.createElement('canvas');
-  canvas.width = image.naturalWidth;
-  canvas.height = image.naturalHeight;
-  const context = canvas.getContext('2d');
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(image, 0, 0);
-  document.getElementById('out').textContent = canvas.toDataURL('image/png');
-  document.documentElement.dataset.done = '1';
-};
-image.onerror = () => {
-  document.getElementById('out').textContent = 'DECODE_ERROR';
-  document.documentElement.dataset.done = 'error';
-};
-image.src = source;
-</script></body></html>""" % json.dumps(data_url),
-            encoding="utf-8",
-        )
+    errors = []
+    for url in urls:
+        try:
+            response = session.get(url, timeout=40)
+            response.raise_for_status()
+            content_type = response.headers.get("content-type", "")
+            if not content_type.startswith("image/") and not url.lower().endswith((".png", ".jpg", ".jpeg", ".webp", ".svg")):
+                raise RuntimeError(f"unexpected content-type {content_type}")
+            if len(response.content) < 100:
+                raise RuntimeError(f"response too small ({len(response.content)} bytes)")
+            print(f"RESOURCE {display}: downloaded {url}")
+            return response.content, url
+        except Exception as exc:
+            errors.append(f"{url}: {exc}")
 
-        command = [
-            chrome,
-            "--headless=new",
-            "--no-sandbox",
-            "--disable-gpu",
-            "--virtual-time-budget=5000",
-            "--dump-dom",
-            html_path.resolve().as_uri(),
-        ]
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            check=False,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"Chromium recovery failed with code {result.returncode}: {result.stderr[-2000:]}"
-            )
-        recovered = re.search(r"data:image/png;base64,([A-Za-z0-9+/=]+)", result.stdout)
-        if not recovered:
-            raise RuntimeError(
-                "Chromium could not decode the historical WebP; "
-                f"DOM tail={result.stdout[-500:]} stderr tail={result.stderr[-500:]}"
-            )
-        png_raw = base64.b64decode(recovered.group(1), validate=True)
-        image = Image.open(io.BytesIO(png_raw)).convert("RGBA")
-        image.load()
-        print(f"SOURCE recovered with Chromium: {image.width}x{image.height}, png_bytes={len(png_raw)}")
-        return image
-
-
-strip = decode_legacy_strip(encoded_source)
-
-LOGO_COUNT = len(SOURCE_NAMES)
-if strip.size != (2160, 120):
-    raise RuntimeError(f"Unexpected source dimensions {strip.size}; expected 2160x120")
-if strip.width % LOGO_COUNT:
-    raise RuntimeError("Source width is not evenly divisible into logo cells")
-
-CELL_WIDTH = strip.width // LOGO_COUNT
+    raise RuntimeError(f"Could not fetch {display}. Attempts: {' | '.join(errors[-10:])}")
 
 
 def color_distance(a, b) -> float:
     return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2) ** 0.5
 
 
-def clear_edge_background(image: Image.Image) -> Image.Image:
-    rgba = image.copy().convert("RGBA")
+def remove_edge_background(image: Image.Image) -> Image.Image:
+    rgba = image.convert("RGBA")
     width, height = rgba.size
     pixels = rgba.load()
 
@@ -152,32 +312,33 @@ def clear_edge_background(image: Image.Image) -> Image.Image:
         border.append(pixels[width - 1, y])
 
     transparent_share = sum(1 for pixel in border if pixel[3] <= 20) / max(1, len(border))
-    opaque_border = [pixel for pixel in border if pixel[3] >= 180]
-
-    if transparent_share >= 0.70 or len(opaque_border) < 12:
+    if transparent_share >= 0.65:
         return rgba
 
-    channels = list(zip(*[(p[0], p[1], p[2]) for p in opaque_border]))
-    background = tuple(sorted(channel)[len(channel) // 2] for channel in channels)
-    deviations = sorted(color_distance(pixel, background) for pixel in opaque_border)
-    p90 = deviations[min(len(deviations) - 1, int(len(deviations) * 0.90))]
-    neutral_light = max(background) - min(background) <= 28 and min(background) >= 185
-    uniform = p90 <= 38
+    opaque = [pixel for pixel in border if pixel[3] >= 180]
+    if len(opaque) < 12:
+        return rgba
 
+    channels = list(zip(*[(p[0], p[1], p[2]) for p in opaque]))
+    background = tuple(sorted(channel)[len(channel) // 2] for channel in channels)
+    deviations = sorted(color_distance(pixel, background) for pixel in opaque)
+    p90 = deviations[min(len(deviations) - 1, int(len(deviations) * 0.90))]
+    neutral_light = max(background) - min(background) <= 30 and min(background) >= 175
+    uniform = p90 <= 32
     if not (neutral_light or uniform):
         return rgba
 
-    threshold = 72 if neutral_light else 50
+    threshold = 68 if neutral_light else 44
     seen = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
 
     def add(x: int, y: int) -> None:
-        index = y * width + x
-        if seen[index]:
+        idx = y * width + x
+        if seen[idx]:
             return
-        seen[index] = 1
+        seen[idx] = 1
         pixel = pixels[x, y]
-        if pixel[3] <= 20 or color_distance(pixel, background) <= threshold:
+        if pixel[3] <= 25 or color_distance(pixel, background) <= threshold:
             queue.append((x, y))
 
     for x in range(width):
@@ -189,7 +350,7 @@ def clear_edge_background(image: Image.Image) -> Image.Image:
 
     while queue:
         x, y = queue.popleft()
-        r, g, b, _alpha = pixels[x, y]
+        r, g, b, _a = pixels[x, y]
         pixels[x, y] = (r, g, b, 0)
         if x > 0:
             add(x - 1, y)
@@ -199,100 +360,89 @@ def clear_edge_background(image: Image.Image) -> Image.Image:
             add(x, y - 1)
         if y + 1 < height:
             add(x, y + 1)
-
     return rgba
 
 
-def save_logo(index: int) -> Path:
-    left = index * CELL_WIDTH
-    cell = strip.crop((left, 0, left + CELL_WIDTH, strip.height))
-    cell = clear_edge_background(cell)
+def rasterize_and_save(raw: bytes, destination: Path) -> None:
+    try:
+        image = Image.open(io.BytesIO(raw)).convert("RGBA")
+        image.load()
+    except Exception as exc:
+        if raw.lstrip().startswith(b"<svg") or b"<svg" in raw[:1000].lower():
+            raise RuntimeError(
+                f"SVG received for {destination.name}; current pipeline expects raster source. {exc}"
+            ) from exc
+        raise
 
-    alpha = cell.getchannel("A")
-    bbox = alpha.getbbox()
+    if image.width > 1200 or image.height > 700:
+        image.thumbnail((1200, 700), Image.Resampling.LANCZOS)
+
+    image = remove_edge_background(image)
+    bbox = image.getchannel("A").getbbox()
     if not bbox:
-        raise RuntimeError(f"Logo cell {index + 1} has no visible pixels")
-    cell = cell.crop(bbox)
+        raise RuntimeError(f"No visible pixels for {destination.name}")
+    image = image.crop(bbox)
 
-    pad = max(10, round(max(cell.size) * 0.05))
-    canvas = Image.new("RGBA", (cell.width + pad * 2, cell.height + pad * 2), (0, 0, 0, 0))
-    canvas.alpha_composite(cell, (pad, pad))
-
-    destination = OUT / f"partner-{index + 1:02d}.png"
+    pad = max(10, round(max(image.size) * 0.045))
+    canvas = Image.new("RGBA", (image.width + pad * 2, image.height + pad * 2), (0, 0, 0, 0))
+    canvas.alpha_composite(image, (pad, pad))
     canvas.save(destination, "PNG", optimize=True)
 
     verify = Image.open(destination).convert("RGBA")
-    alpha_min, alpha_max = verify.getchannel("A").getextrema()
+    amin, amax = verify.getchannel("A").getextrema()
     corners = [
         verify.getpixel((0, 0))[3],
         verify.getpixel((verify.width - 1, 0))[3],
         verify.getpixel((0, verify.height - 1))[3],
         verify.getpixel((verify.width - 1, verify.height - 1))[3],
     ]
-    if alpha_min != 0 or alpha_max == 0 or any(corners):
+    if amin != 0 or amax == 0 or any(corners):
         raise RuntimeError(
-            f"Transparency validation failed for {destination.name}: "
-            f"alpha={alpha_min}-{alpha_max}, corners={corners}"
+            f"Transparency validation failed for {destination.name}: alpha={amin}-{amax}, corners={corners}"
         )
+    print(f"ASSET {destination.name}: {verify.width}x{verify.height} alpha={amin}-{amax} corners={corners}")
 
-    print(
-        f"ASSET {destination.name}: {verify.width}x{verify.height} "
-        f"alpha={alpha_min}-{alpha_max} corners={corners}"
+
+def generate_component() -> None:
+    items = "\n".join(
+        f'  {{ name: "{display}", src: "/client-logos/{slug}.png" }},'
+        for display, slug, _aliases in TARGETS
     )
-    return destination
-
-
-generated = [save_logo(index) for index in range(LOGO_COUNT)]
-
-keep = {path.name for path in generated}
-for path in OUT.iterdir():
-    if path.is_file() and path.name not in keep:
-        path.unlink()
-
-component = '''import "./client-logos.css";
+    component = f'''import "./client-logos.css";
 
 const clientLogos = [
-  { name: "Parceiro 01", src: "/client-logos/partner-01.png" },
-  { name: "Parceiro 02", src: "/client-logos/partner-02.png" },
-  { name: "Parceiro 03", src: "/client-logos/partner-03.png" },
-  { name: "Parceiro 04", src: "/client-logos/partner-04.png" },
-  { name: "Parceiro 05", src: "/client-logos/partner-05.png" },
-  { name: "Parceiro 06", src: "/client-logos/partner-06.png" },
-  { name: "Parceiro 07", src: "/client-logos/partner-07.png" },
-  { name: "Parceiro 08", src: "/client-logos/partner-08.png" },
-  { name: "Parceiro 09", src: "/client-logos/partner-09.png" },
+{items}
 ] as const;
 
-function LogoGroup({ clone = false }: { clone?: boolean }) {
+function LogoGroup({{ clone = false }}: {{ clone?: boolean }}) {{
   return (
     <div
       className="client-logos-group"
-      aria-hidden={clone || undefined}
-      data-clone={clone ? "true" : undefined}
+      aria-hidden={{clone || undefined}}
+      data-clone={{clone ? "true" : undefined}}
     >
-      {clientLogos.map((logo) => (
-        <div className="client-logo-item" key={`${clone ? "clone-" : ""}${logo.src}`}>
+      {{clientLogos.map((logo) => (
+        <div className="client-logo-item" key={{`${{clone ? "clone-" : ""}}${{logo.src}}`}}>
           <img
-            src={logo.src}
-            alt={clone ? "" : logo.name}
-            aria-hidden={clone || undefined}
+            src={{logo.src}}
+            alt={{clone ? "" : logo.name}}
+            aria-hidden={{clone || undefined}}
             decoding="async"
-            draggable={false}
+            draggable={{false}}
           />
         </div>
-      ))}
+      ))}}
     </div>
   );
-}
+}}
 
-export function ClientLogos({ className = "" }: { className?: string }) {
+export function ClientLogos({{ className = "" }}: {{ className?: string }}) {{
   return (
-    <section className={`client-logos ${className}`} aria-label="Parceiros e clientes">
+    <section className={{`client-logos ${{className}}`}} aria-label="Parceiros e clientes da Cáliber">
       <div className="client-logos-heading">
         <span>Algumas das empresas que confiam no nosso trabalho</span>
         <h3>Parceiros &amp; Clientes</h3>
       </div>
-
       <div className="client-logos-viewport">
         <div className="client-logos-track">
           <LogoGroup />
@@ -301,11 +451,11 @@ export function ClientLogos({ className = "" }: { className?: string }) {
       </div>
     </section>
   );
-}
+}}
 '''
-(ROOT / "src/components/site/client-logos.tsx").write_text(component, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.tsx").write_text(component, encoding="utf-8")
 
-css = r'''.client-logos {
+    css = r'''.client-logos {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -359,7 +509,7 @@ css = r'''.client-logos {
   width: max-content;
   max-width: none;
   align-items: center;
-  animation: client-logos-marquee 36s linear infinite;
+  animation: client-logos-marquee 58s linear infinite;
   will-change: transform;
 }
 
@@ -374,7 +524,7 @@ css = r'''.client-logos {
 .client-logo-item {
   display: flex;
   width: clamp(118px, 12vw, 176px);
-  height: 76px;
+  height: 78px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
@@ -386,7 +536,7 @@ css = r'''.client-logos {
   width: auto;
   max-width: 100%;
   height: auto;
-  max-height: 68px;
+  max-height: 70px;
   object-fit: contain;
   background: transparent;
   user-select: none;
@@ -398,9 +548,7 @@ css = r'''.client-logos {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .client-logos-viewport:hover .client-logos-track {
-    animation-play-state: paused;
-  }
+  .client-logos-viewport:hover .client-logos-track { animation-play-state: paused; }
 }
 
 @media (max-width: 720px) {
@@ -420,10 +568,10 @@ css = r'''.client-logos {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
   }
-  .client-logos-track { animation-duration: 31s; }
+  .client-logos-track { animation-duration: 50s; }
   .client-logos-group { gap: 30px; padding-right: 30px; }
-  .client-logo-item { width: 112px; height: 60px; }
-  .client-logo-item img { max-height: 52px; }
+  .client-logo-item { width: 112px; height: 62px; }
+  .client-logo-item img { max-height: 54px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -449,7 +597,29 @@ css = r'''.client-logos {
   .client-logos-group[data-clone="true"] { display: none; }
 }
 '''
-(ROOT / "src/components/site/client-logos.css").write_text(css, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.css").write_text(css, encoding="utf-8")
+
+
+chosen, response_bodies, user_agent, cookies = browser_discover()
+expected_files = set()
+for display, slug, _aliases in TARGETS:
+    raw, source_url = fetch_bytes(
+        display,
+        chosen[slug]["attrs"],
+        response_bodies,
+        user_agent,
+        cookies,
+    )
+    destination = OUT / f"{slug}.png"
+    rasterize_and_save(raw, destination)
+    expected_files.add(destination.name)
+    print(f"DONE {display}: {source_url} -> {destination.relative_to(ROOT)}")
+
+for path in OUT.iterdir():
+    if path.is_file() and path.name not in expected_files:
+        path.unlink()
+
+generate_component()
 
 obsolete = [
     ROOT / "src/assets/client-logo-transparent-webp-base64.ts",
@@ -464,4 +634,4 @@ chunks = ROOT / "src/assets/client-logo-strip"
 if chunks.exists():
     shutil.rmtree(chunks)
 
-print(f"Generated {len(generated)} independent transparent local logo assets.")
+print(f"Generated {len(TARGETS)} independent local PNG assets from the Cáliber reference page.")
