@@ -1,14 +1,7 @@
-import logoChunk0 from "@/assets/client-logo-strip/chunk0";
-import logoChunk1 from "@/assets/client-logo-strip/chunk1";
-import logoChunk2 from "@/assets/client-logo-strip/chunk2";
-import logoChunk3 from "@/assets/client-logo-strip/chunk3";
-import logoChunk4 from "@/assets/client-logo-strip/chunk4";
-import logoChunk5 from "@/assets/client-logo-strip/chunk5";
-import logoChunk6 from "@/assets/client-logo-strip/chunk6";
-import logoChunk7 from "@/assets/client-logo-strip/chunk7";
+import { clientLogoTransparentWebpBase64 } from "@/assets/client-logo-transparent-webp-base64";
 import "./client-logos.css";
 
-const clientLogoStrip = `data:image/jpeg;base64,${logoChunk0}${logoChunk1}${logoChunk2}${logoChunk3}${logoChunk4}${logoChunk5}${logoChunk6}${logoChunk7}`;
+const clientLogoStrip = `data:image/webp;base64,${clientLogoTransparentWebpBase64}`;
 
 export function ClientLogos({ className = "" }: { className?: string }) {
   return (
