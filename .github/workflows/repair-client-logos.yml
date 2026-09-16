@@ -23,6 +23,23 @@ jobs:
       - name: Install image and browser tooling
         run: python -m pip install --disable-pip-version-check pillow selenium
 
+      - name: Normalize legacy migration source
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          source = Path("src/assets/client-logo-transparent-webp-base64.ts")
+          target = Path("public/client-logos/clients-strip.b64.txt")
+          text = source.read_text(encoding="utf-8")
+          match = re.search(r'"(UklG[A-Za-z0-9+/=]+)"', text)
+          if not match:
+              raise SystemExit("Could not locate the embedded WebP migration source")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(match.group(1), encoding="utf-8")
+          print(f"Normalized embedded WebP source: {len(match.group(1))} base64 chars")
+          PY
+
       - name: Extract individual transparent client logos
         run: python .github/scripts/extract_client_logos.py
 
@@ -63,7 +80,7 @@ jobs:
           git diff --check
           git status --short
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898242+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
             echo "No generated changes"
