@@ -4,6 +4,7 @@ import base64
 import io
 import re
 import shutil
+import subprocess
 from collections import deque
 from pathlib import Path
 
@@ -12,6 +13,10 @@ from PIL import Image
 ROOT = Path.cwd()
 OUT = ROOT / "public/client-logos"
 OUT.mkdir(parents=True, exist_ok=True)
+
+HISTORICAL_REF = "fbf98698b74f4c6f10d6b415192a63b0cdb4f3f2"
+LEGACY_SOURCE = ROOT / "src/assets/client-logo-transparent-webp-base64.ts"
+CHUNKS_DIR = ROOT / "src/assets/client-logo-strip"
 
 LOGOS = [
     ("Frota", "frota"),
@@ -25,25 +30,82 @@ LOGOS = [
     ("Megasom", "megasom"),
 ]
 
-LEGACY_SOURCE = ROOT / "src/assets/client-logo-transparent-webp-base64.ts"
-CHUNKS_DIR = ROOT / "src/assets/client-logo-strip"
+
+def parse_historical_chunk(index: int) -> str:
+    path = f"src/assets/client-logo-strip/chunk{index}.ts"
+    text = subprocess.check_output(
+        ["git", "show", f"{HISTORICAL_REF}:{path}"],
+        cwd=ROOT,
+        text=True,
+    )
+    matches = re.findall(r'"([A-Za-z0-9+/=]+)"', text)
+    if not matches:
+        raise RuntimeError(f"Could not parse historical {path}")
+    payload = max(matches, key=len)
+    print(
+        f"HISTORICAL CHUNK {index}: chars={len(payload)} "
+        f"prefix={payload[:8]!r} suffix={payload[-8:]!r}"
+    )
+    return payload
+
+
+def load_consistent_legacy_strip() -> Image.Image:
+    parts = [parse_historical_chunk(i) for i in range(8)]
+    encoded = "".join(parts)
+
+    # The eight files are slices of one base64 stream. Only the final stream may
+    # contain padding; no intermediate padding is accepted because that would
+    # indicate mixed/corrupt revisions again.
+    first_padding = encoded.find("=")
+    if first_padding != -1 and any(ch != "=" for ch in encoded[first_padding:]):
+        raise RuntimeError("Historical source contains padding before the final base64 tail")
+
+    encoded += "=" * ((4 - len(encoded) % 4) % 4)
+    raw = base64.b64decode(encoded, validate=True)
+    if raw[:4] != b"RIFF" or raw[8:12] != b"WEBP":
+        raise RuntimeError(f"Historical source is not a WebP RIFF file: {raw[:12]!r}")
+
+    declared_size = int.from_bytes(raw[4:8], "little") + 8
+    if len(raw) < declared_size:
+        raise RuntimeError(
+            f"Historical WebP is incomplete: decoded={len(raw)} declared={declared_size}"
+        )
+    if len(raw) > declared_size:
+        raw = raw[:declared_size]
+
+    image = Image.open(io.BytesIO(raw)).convert("RGBA")
+    image.load()
+    if image.width % len(LOGOS) != 0:
+        raise RuntimeError(
+            f"Unexpected strip width {image.width} for {len(LOGOS)} logo cells"
+        )
+    if image.height < 20:
+        raise RuntimeError(f"Unexpected strip height: {image.height}")
+
+    print(
+        f"CONSISTENT LEGACY STRIP: {image.width}x{image.height}; "
+        f"bytes={len(raw)}; cell_width={image.width // len(LOGOS)}"
+    )
+    return image
 
 
 def color_distance(a, b) -> float:
-    return sum((a[i] - b[i]) ** 2 for i in range(3)) ** 0.5
+    return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2) ** 0.5
 
 
-def remove_edge_background(image: Image.Image) -> Image.Image:
-    """Remove only a solid/light background connected to a cell edge."""
-    rgba = image.convert("RGBA")
+def make_background_transparent(cell: Image.Image) -> Image.Image:
+    rgba = cell.convert("RGBA")
     width, height = rgba.size
     pixels = rgba.load()
 
-    border = [pixels[x, y] for x in range(width) for y in (0, height - 1)]
-    border += [pixels[x, y] for y in range(height) for x in (0, width - 1)]
+    border = []
+    for x in range(width):
+        border.extend((pixels[x, 0], pixels[x, height - 1]))
+    for y in range(height):
+        border.extend((pixels[0, y], pixels[width - 1, y]))
 
-    transparent_ratio = sum(p[3] <= 20 for p in border) / max(1, len(border))
-    if transparent_ratio >= 0.55:
+    transparent_share = sum(1 for p in border if p[3] <= 20) / max(1, len(border))
+    if transparent_share >= 0.60:
         return rgba
 
     opaque = [p for p in border if p[3] >= 180]
@@ -55,22 +117,24 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
     deviations = sorted(color_distance(p, background) for p in opaque)
     p90 = deviations[int((len(deviations) - 1) * 0.90)]
 
-    neutral_light = max(background) - min(background) <= 42 and min(background) >= 135
-    uniform = p90 <= 26
+    neutral_light = max(background) - min(background) <= 45 and min(background) >= 130
+    uniform = p90 <= 28
     if not (neutral_light or uniform):
-        return rgba
+        raise RuntimeError(
+            f"Could not safely identify edge background: bg={background}, p90={p90:.1f}"
+        )
 
-    tolerance = 72 if neutral_light else 42
-    visited = bytearray(width * height)
+    threshold = 74 if neutral_light else 44
+    seen = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
 
     def add(x: int, y: int) -> None:
         idx = y * width + x
-        if visited[idx]:
+        if seen[idx]:
             return
-        visited[idx] = 1
-        pixel = pixels[x, y]
-        if pixel[3] <= 25 or color_distance(pixel, background) <= tolerance:
+        seen[idx] = 1
+        r, g, b, a = pixels[x, y]
+        if a <= 25 or color_distance((r, g, b), background) <= threshold:
             queue.append((x, y))
 
     for x in range(width):
@@ -96,95 +160,35 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
     return rgba
 
 
-def reconstruct_legacy_strip() -> Image.Image:
-    """
-    Rebuild the original WebP from its historical base64 chunks.
-
-    The legacy one-file constant is truncated. The chunk directory still contains
-    the complete base64 stream, split across TypeScript strings. Padding that was
-    introduced at intermediate splits must not remain inside one base64 stream.
-    """
-    if not CHUNKS_DIR.exists():
-        raise RuntimeError("Legacy chunk directory is missing")
-
-    runs: list[str] = []
-    for index in range(8):
-        path = CHUNKS_DIR / f"chunk{index}.ts"
-        if not path.exists():
-            raise RuntimeError(f"Missing legacy chunk: {path}")
-        text = path.read_text(encoding="utf-8")
-        found = re.findall(r"[A-Za-z0-9+/=]{1000,}", text)
-        if not found:
-            raise RuntimeError(f"Could not find base64 payload in {path}")
-        print(f"CHUNK {index}: runs={[len(run) for run in found]}")
-        runs.extend(found)
-
-    # A real base64 stream can only contain padding at the very end. Historical
-    # chunk boundaries contain intermediate '=' characters, so remove those,
-    # then use the RIFF header to recover the exact canonical payload length.
-    joined = "".join(run.replace("=", "") for run in runs)
-    if len(joined) < 32:
-        raise RuntimeError("Recovered base64 payload is too short")
-
-    prefix = joined[:32]
-    prefix += "=" * ((4 - len(prefix) % 4) % 4)
-    header = base64.b64decode(prefix, validate=True)
-    if header[:4] != b"RIFF" or header[8:12] != b"WEBP":
-        raise RuntimeError(f"Recovered payload is not a WebP RIFF container: {header[:12]!r}")
-
-    declared_bytes = int.from_bytes(header[4:8], "little") + 8
-    # Number of non-padding base64 characters needed for exactly N bytes.
-    required_data_chars = (declared_bytes * 8 + 5) // 6
-    if len(joined) < required_data_chars:
-        raise RuntimeError(
-            f"Incomplete legacy WebP: need {required_data_chars} base64 data chars, got {len(joined)}"
-        )
-
-    canonical = joined[:required_data_chars]
-    canonical += "=" * ((4 - len(canonical) % 4) % 4)
-    raw = base64.b64decode(canonical, validate=True)
-    if len(raw) != declared_bytes:
-        raise RuntimeError(
-            f"Decoded WebP length mismatch: expected {declared_bytes}, got {len(raw)}"
-        )
-    if raw[:4] != b"RIFF" or raw[8:12] != b"WEBP":
-        raise RuntimeError("Canonical legacy payload lost its WebP signature")
-
-    image = Image.open(io.BytesIO(raw)).convert("RGBA")
-    image.load()
-    if image.width < len(LOGOS) * 40 or image.height < 20:
-        raise RuntimeError(f"Unexpected legacy strip size: {image.width}x{image.height}")
-
-    print(
-        f"LEGACY STRIP: {image.width}x{image.height}, bytes={declared_bytes}, "
-        f"base64_data_chars={required_data_chars}"
-    )
-    return image
-
-
 def validate_png(path: Path) -> None:
     image = Image.open(path).convert("RGBA")
     image.load()
-    alpha_min, alpha_max = image.getchannel("A").getextrema()
+    alpha = image.getchannel("A")
+    alpha_min, alpha_max = alpha.getextrema()
+    bbox = alpha.getbbox()
     corners = [
         image.getpixel((0, 0))[3],
         image.getpixel((image.width - 1, 0))[3],
         image.getpixel((0, image.height - 1))[3],
         image.getpixel((image.width - 1, image.height - 1))[3],
     ]
-    if image.width <= 0 or image.height <= 0:
-        raise RuntimeError(f"Invalid dimensions for {path.name}: {image.size}")
-    if alpha_min != 0 or alpha_max == 0 or any(corners):
+
+    if image.width < 8 or image.height < 8 or not bbox:
+        raise RuntimeError(f"Invalid logo asset dimensions/content: {path.name} {image.size}")
+    if alpha_min != 0 or alpha_max == 0:
         raise RuntimeError(
-            f"Invalid alpha for {path.name}: alpha={alpha_min}-{alpha_max}, corners={corners}"
+            f"Asset does not contain real alpha transparency: {path.name} alpha={alpha_min}-{alpha_max}"
         )
+    if any(corners):
+        raise RuntimeError(f"Asset corners are not transparent: {path.name} corners={corners}")
+
     print(
-        f"ASSET {path.name}: {image.width}x{image.height}, "
-        f"alpha={alpha_min}-{alpha_max}, corners={corners}"
+        f"VALID ASSET {path.name}: {image.width}x{image.height}; "
+        f"alpha={alpha_min}-{alpha_max}; corners={corners}; visible_bbox={bbox}"
     )
 
 
-def final_assets_are_valid() -> bool:
+def all_final_assets_valid() -> bool:
     try:
         for _name, slug in LOGOS:
             path = OUT / f"{slug}.png"
@@ -193,55 +197,49 @@ def final_assets_are_valid() -> bool:
             validate_png(path)
         return True
     except Exception as exc:
-        print(f"EXISTING ASSET VALIDATION FAILED: {exc}")
+        print(f"FINAL ASSET CHECK: {exc}")
         return False
 
 
-def extract_individual_logos() -> None:
-    strip = reconstruct_legacy_strip()
-    count = len(LOGOS)
-
-    # The legacy strip was laid out as nine equal logo slots. Split the source
-    # before trimming backgrounds so every final file is an independent asset.
-    edges = [round(i * strip.width / count) for i in range(count + 1)]
-    widths = [edges[i + 1] - edges[i] for i in range(count)]
-    if min(widths) < 40:
-        raise RuntimeError(f"Legacy logo cells are unexpectedly narrow: {widths}")
-    print(f"CELL WIDTHS: {widths}")
+def extract_individual_assets() -> None:
+    strip = load_consistent_legacy_strip()
+    cell_width = strip.width // len(LOGOS)
 
     for index, (name, slug) in enumerate(LOGOS):
-        cell = strip.crop((edges[index], 0, edges[index + 1], strip.height))
-        cell = remove_edge_background(cell)
+        left = index * cell_width
+        right = left + cell_width
+        cell = strip.crop((left, 0, right, strip.height))
+        cell = make_background_transparent(cell)
 
-        visible_alpha = cell.getchannel("A").point(lambda a: 255 if a >= 12 else 0)
-        bbox = visible_alpha.getbbox()
+        alpha = cell.getchannel("A")
+        bbox = alpha.point(lambda a: 255 if a >= 12 else 0).getbbox()
         if not bbox:
-            raise RuntimeError(f"No visible pixels found for {name}")
-        cell = cell.crop(bbox)
+            raise RuntimeError(f"No visible pixels found in source cell for {name}")
 
-        pad = max(10, round(max(cell.size) * 0.06))
-        final = Image.new(
+        logo = cell.crop(bbox)
+        pad = max(10, round(max(logo.size) * 0.06))
+        canvas = Image.new(
             "RGBA",
-            (cell.width + pad * 2, cell.height + pad * 2),
+            (logo.width + pad * 2, logo.height + pad * 2),
             (0, 0, 0, 0),
         )
-        final.alpha_composite(cell, (pad, pad))
+        canvas.alpha_composite(logo, (pad, pad))
 
         destination = OUT / f"{slug}.png"
-        final.save(destination, "PNG", optimize=True)
+        canvas.save(destination, "PNG", optimize=True)
         validate_png(destination)
-        print(f"EXTRACTED {name} -> {destination.relative_to(ROOT)}")
+        print(f"EXTRACTED {index + 1:02d}/09 {name} -> {destination.relative_to(ROOT)}")
 
 
 def write_component() -> None:
-    items = "\n".join(
+    rows = "\n".join(
         f'  {{ name: "{name}", src: "/client-logos/{slug}.png" }},'
         for name, slug in LOGOS
     )
-    component = f'''import "./client-logos.css";
+    content = f'''import "./client-logos.css";
 
 const clientLogos = [
-{items}
+{rows}
 ] as const;
 
 function LogoGroup({{ clone = false }}: {{ clone?: boolean }}) {{
@@ -252,7 +250,7 @@ function LogoGroup({{ clone = false }}: {{ clone?: boolean }}) {{
       data-clone={{clone ? "true" : undefined}}
     >
       {{clientLogos.map((logo) => (
-        <div className="client-logo-item" key={{`${{clone ? "clone-" : ""}}${{logo.src}}`}}>
+        <div className="client-logo-item" key={{`${{clone ? "clone-" : ""}}${{logo.name}}`}}>
           <img
             src={{logo.src}}
             alt={{clone ? "" : logo.name}}
@@ -284,11 +282,11 @@ export function ClientLogos({{ className = "" }}: {{ className?: string }}) {{
   );
 }}
 '''
-    (ROOT / "src/components/site/client-logos.tsx").write_text(component, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.tsx").write_text(content, encoding="utf-8")
 
 
 def write_css() -> None:
-    css = '''.client-logos {
+    content = '''.client-logos {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -340,6 +338,7 @@ def write_css() -> None:
 .client-logos-track {
   display: flex;
   width: max-content;
+  max-width: none;
   align-items: center;
   animation: client-logos-marquee 42s linear infinite;
   will-change: transform;
@@ -435,6 +434,7 @@ def write_css() -> None:
 
   .client-logos-track {
     width: 100%;
+    max-width: 100%;
     animation: none;
     transform: none;
     will-change: auto;
@@ -453,36 +453,35 @@ def write_css() -> None:
   }
 }
 '''
-    (ROOT / "src/components/site/client-logos.css").write_text(css, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.css").write_text(content, encoding="utf-8")
 
 
-if CHUNKS_DIR.exists():
-    extract_individual_logos()
-elif not final_assets_are_valid():
-    raise RuntimeError(
-        "Legacy chunks are gone and the nine final transparent logo assets are incomplete"
-    )
+def cleanup_legacy_assets() -> None:
+    expected = {f"{slug}.png" for _name, slug in LOGOS}
+    for path in OUT.iterdir():
+        if path.is_file() and path.name not in expected:
+            path.unlink()
+
+    for path in [
+        LEGACY_SOURCE,
+        ROOT / "src/components/site/client-logos-local.ts",
+        ROOT / "src/components/site/client-logos-strip-placeholder.txt",
+    ]:
+        if path.exists():
+            path.unlink()
+
+    if CHUNKS_DIR.exists():
+        shutil.rmtree(CHUNKS_DIR)
+
+
+if not all_final_assets_valid():
+    extract_individual_assets()
 else:
-    print("Existing nine independent transparent logo assets validated.")
+    print("Nine final local PNG assets already exist and pass alpha validation.")
 
 write_component()
 write_css()
-
-expected = {f"{slug}.png" for _name, slug in LOGOS}
-for path in OUT.iterdir():
-    if path.is_file() and path.name not in expected:
-        path.unlink()
-
-for legacy_path in [
-    LEGACY_SOURCE,
-    ROOT / "src/components/site/client-logos-local.ts",
-    ROOT / "src/components/site/client-logos-strip-placeholder.txt",
-]:
-    if legacy_path.exists():
-        legacy_path.unlink()
-
-if CHUNKS_DIR.exists():
-    shutil.rmtree(CHUNKS_DIR)
+cleanup_legacy_assets()
 
 for _name, slug in LOGOS:
     validate_png(OUT / f"{slug}.png")
