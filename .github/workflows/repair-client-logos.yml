@@ -38,12 +38,12 @@ jobs:
 
       - name: Validate desktop, tablet, mobile and Raio-X in browser
         run: |
-          bun run preview --host 127.0.0.1 --port 4173 > /tmp/vite-preview.log 2>&1 &
-          PREVIEW_PID=$!
-          trap 'kill "$PREVIEW_PID" 2>/dev/null || true' EXIT
+          bunx vite dev --host 127.0.0.1 --port 4173 > /tmp/vite-browser.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
-            if [ "$i" = 30 ]; then cat /tmp/vite-preview.log; exit 1; fi
+            if [ "$i" = 30 ]; then cat /tmp/vite-browser.log; exit 1; fi
             sleep 1
           done
           PREVIEW_URL=http://127.0.0.1:4173 python .github/scripts/validate_client_logos.py
