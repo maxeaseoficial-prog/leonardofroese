@@ -13,120 +13,44 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Install image tooling
         run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
-
-      - name: Add resilient fallbacks for stale reference assets
+      - name: Patch fallback sources for stale reference files
         run: |
           python - <<'PY'
           from pathlib import Path
           path = Path('.github/scripts/repair_client_logos.py')
           text = path.read_text(encoding='utf-8')
-
           needle = '    candidates = candidate_urls(aliases)\n'
-          replacement = needle + '''    fallback_sources = {
+          fallback = '''    fallback_sources = {
               "Claro": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Claro_logo.png",
               "NET": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Logomarca_NET_nova.png",
           }
               if display in fallback_sources:
                   candidates.append(fallback_sources[display])
           '''
-          # Normalize indentation added by the YAML-friendly multiline literal.
-          replacement = replacement.replace('          }\n              if', '          }\n    if').replace('\n                  candidates.append', '\n        candidates.append')
+          fallback = fallback.replace('          }\n              if', '          }\n    if').replace('\n                  candidates.append', '\n        candidates.append')
           if needle not in text:
-              raise SystemExit('Could not patch source fallbacks')
-          text = text.replace(needle, replacement, 1)
-
-          old_raise = '''    raise RuntimeError(
-              f"Could not download {display}. Attempts: " + " | ".join(errors[-15:])
-          )
-          '''
-          old_raise = old_raise.replace('              f', '        f').replace('\n          )', '\n    )')
-          archive_block = '''    # If Cáliber's live WordPress/CDN asset is stale, recover the same historical
-              # file from the Internet Archive once, then commit it locally. Runtime never hotlinks it.
-              archive_candidates = []
-              for candidate in candidates:
-                  parsed = urlparse(candidate)
-                  original = candidate.split("?", 1)[0]
-                  if parsed.hostname and parsed.hostname.endswith("wp.com") and "calibergestao.com.br/" in parsed.path:
-                      marker = parsed.path.find("calibergestao.com.br/")
-                      origin_path = "/" + parsed.path[marker + len("calibergestao.com.br/") :].split("?", 1)[0]
-                      original = urlunparse(("https", "calibergestao.com.br", origin_path, "", "", ""))
-                  if "calibergestao.com.br/" in original and original not in archive_candidates:
-                      archive_candidates.append(original)
-
-              for original in archive_candidates:
-                  try:
-                      cdx = session.get(
-                          "https://web.archive.org/cdx/search/cdx",
-                          params={
-                              "url": original,
-                              "output": "json",
-                              "fl": "timestamp,original,statuscode,mimetype",
-                              "filter": "statuscode:200",
-                              "limit": 10,
-                              "from": 2021,
-                              "to": 2026,
-                          },
-                          timeout=45,
-                      )
-                      cdx.raise_for_status()
-                      rows = cdx.json()
-                      for row in reversed(rows[1:] if len(rows) > 1 else []):
-                          timestamp = row[0]
-                          archived = f"https://web.archive.org/web/{timestamp}id_/{original}"
-                          try:
-                              response = session.get(archived, timeout=60)
-                              response.raise_for_status()
-                              if len(response.content) < 100:
-                                  continue
-                              probe = Image.open(io.BytesIO(response.content))
-                              probe.verify()
-                              print(f"ARCHIVE {display}: {archived}")
-                              return response.content, archived
-                          except Exception as exc:
-                              errors.append(f"{archived}: {exc}")
-                  except Exception as exc:
-                      errors.append(f"Wayback {original}: {exc}")
-
-              raise RuntimeError(
-                  f"Could not download {display}. Attempts: " + " | ".join(errors[-20:])
-              )
-          '''
-          archive_block = '\n'.join(line[4:] if line.startswith('    ') else line for line in archive_block.splitlines()) + '\n'
-          if old_raise not in text:
-              raise SystemExit('Could not patch archive fallback')
-          text = text.replace(old_raise, archive_block, 1)
-          path.write_text(text, encoding='utf-8')
+              raise SystemExit('Could not patch fallbacks')
+          path.write_text(text.replace(needle, needle + fallback, 1), encoding='utf-8')
           PY
-
       - name: Generate individual local logos
         run: python .github/scripts/repair_client_logos.py
-
       - name: Restore temporary generator patch
         if: always()
         run: git checkout -- .github/scripts/repair_client_logos.py
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-
+      - uses: oven-sh/setup-bun@v2
       - name: Install dependencies and build
         run: |
           bun install --frozen-lockfile
           bun run build
-
       - name: Commit repaired section
         run: |
           git diff --check
-          git status --short
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
