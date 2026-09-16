@@ -22,7 +22,6 @@ jobs:
         shell: bash
         run: |
           python - <<'PYEXTRACT'
-          import re
           import subprocess
           from pathlib import Path
 
@@ -35,19 +34,10 @@ jobs:
           body = historic.split(start, 1)[1].split(end, 1)[0]
           script = '\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines()) + '\n'
 
-          pattern = re.compile(
-              r"              matches\.sort\(reverse=True\)\n"
-              r"              _, url, matched_alt = matches\[0\]\n"
-              r"              response = session\.get\(url, timeout=45, headers=\{'Referer': page\.url\}\)\n"
-              r"              response\.raise_for_status\(\)\n"
-              r"              dest = OUT / f'\{slug\}\.png'\n"
-              r"              try:\n"
-              r"                  make_transparent_png\(response\.content, dest\)\n"
-              r"              except Exception as exc:\n"
-              r"                  raise RuntimeError\(f'Could not process \{display\} from \{url\}: \{exc\}'\) from exc\n"
-              r"              entries\.append\(\(display, slug, url, matched_alt\)\)\n"
-              r"              print\(f'OK \{display\}: \{url\} -> \{dest\.relative_to\(ROOT\)\}'\)"
-          )
+          block_start = "              matches.sort(reverse=True)\n"
+          block_end = "              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')\n"
+          start_index = script.index(block_start)
+          end_index = script.index(block_end, start_index) + len(block_end)
 
           replacement = '''              matches.sort(reverse=True)
               dest = OUT / f'{slug}.png'
@@ -64,7 +54,6 @@ jobs:
                   elif url.startswith('https://calibergestao.com.br/') and '?' in url:
                       candidate_records.append((score - 1, url.split('?', 1)[0], matched_alt))
 
-              # WordPress media API fallback when a proxy/CDN URL is stale.
               for alias in aliases:
                   try:
                       api = session.get(
@@ -99,14 +88,12 @@ jobs:
 
               url, matched_alt = resolved
               entries.append((display, slug, url, matched_alt))
-              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')'''
+              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')
+'''
 
-          script, count = pattern.subn(replacement, script, count=1)
-          if count != 1:
-              raise SystemExit(f'Could not patch downloader block; replacements={count}')
-
+          script = script[:start_index] + replacement + script[end_index:]
           Path('/tmp/repair_client_logos.py').write_text(script, encoding='utf-8')
-          print('Restored 20-logo generator with local-origin and WordPress media fallbacks.')
+          print('Restored 20-logo generator with resilient official-source fallbacks.')
           PYEXTRACT
       - name: Install image tooling
         run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
