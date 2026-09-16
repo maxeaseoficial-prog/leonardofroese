@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import base64
 import io
+import json
 import re
 import shutil
+import subprocess
+import tempfile
 from collections import deque
 from pathlib import Path
 
@@ -35,16 +38,92 @@ match = re.search(
 if not match:
     raise RuntimeError("Could not extract the local WebP base64 source")
 
-encoded = re.sub(r"\s+", "", match.group(1))
-# The historical source contains a few non-base64 characters introduced during
-# earlier copy/chunk operations. Ignore only those transport artifacts, then
-# validate the decoded image itself by format and exact dimensions below.
-encoded = re.sub(r"[^A-Za-z0-9+/=]", "", encoded)
-encoded += "=" * (-len(encoded) % 4)
-raw = base64.b64decode(encoded, validate=False)
-strip = Image.open(io.BytesIO(raw)).convert("RGBA")
-strip.load()
-print(f"SOURCE strip={strip.width}x{strip.height} mode={strip.mode} bytes={len(raw)}")
+encoded_source = re.sub(r"\s+", "", match.group(1))
+
+
+def decode_legacy_strip(payload: str) -> Image.Image:
+    # First try a normal decoder. Some historical copies have transport noise,
+    # so sanitize only characters that can never belong to standard base64.
+    sanitized = re.sub(r"[^A-Za-z0-9+/=]", "", payload)
+    sanitized += "=" * (-len(sanitized) % 4)
+    try:
+        raw = base64.b64decode(sanitized, validate=False)
+        image = Image.open(io.BytesIO(raw)).convert("RGBA")
+        image.load()
+        print(f"SOURCE decoded with Pillow: {image.width}x{image.height}, bytes={len(raw)}")
+        return image
+    except Exception as exc:
+        print(f"Pillow could not decode historical WebP; using Chromium fallback: {exc}")
+
+    chrome = (
+        shutil.which("google-chrome")
+        or shutil.which("google-chrome-stable")
+        or shutil.which("chromium")
+        or shutil.which("chromium-browser")
+    )
+    if not chrome:
+        raise RuntimeError("Chromium/Chrome is unavailable for legacy WebP recovery")
+
+    data_url = "data:image/webp;base64," + payload
+    with tempfile.TemporaryDirectory() as temporary:
+        html_path = Path(temporary) / "decode.html"
+        html_path.write_text(
+            """<!doctype html><html><body><pre id=\"out\">LOADING</pre><script>
+const source = %s;
+const image = new Image();
+image.onload = () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0);
+  document.getElementById('out').textContent = canvas.toDataURL('image/png');
+  document.documentElement.dataset.done = '1';
+};
+image.onerror = () => {
+  document.getElementById('out').textContent = 'DECODE_ERROR';
+  document.documentElement.dataset.done = 'error';
+};
+image.src = source;
+</script></body></html>""" % json.dumps(data_url),
+            encoding="utf-8",
+        )
+
+        command = [
+            chrome,
+            "--headless=new",
+            "--no-sandbox",
+            "--disable-gpu",
+            "--virtual-time-budget=5000",
+            "--dump-dom",
+            html_path.resolve().as_uri(),
+        ]
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Chromium recovery failed with code {result.returncode}: {result.stderr[-2000:]}"
+            )
+        recovered = re.search(r"data:image/png;base64,([A-Za-z0-9+/=]+)", result.stdout)
+        if not recovered:
+            raise RuntimeError(
+                "Chromium could not decode the historical WebP; "
+                f"DOM tail={result.stdout[-500:]} stderr tail={result.stderr[-500:]}"
+            )
+        png_raw = base64.b64decode(recovered.group(1), validate=True)
+        image = Image.open(io.BytesIO(png_raw)).convert("RGBA")
+        image.load()
+        print(f"SOURCE recovered with Chromium: {image.width}x{image.height}, png_bytes={len(png_raw)}")
+        return image
+
+
+strip = decode_legacy_strip(encoded_source)
 
 LOGO_COUNT = len(SOURCE_NAMES)
 if strip.size != (2160, 120):
@@ -75,7 +154,6 @@ def clear_edge_background(image: Image.Image) -> Image.Image:
     transparent_share = sum(1 for pixel in border if pixel[3] <= 20) / max(1, len(border))
     opaque_border = [pixel for pixel in border if pixel[3] >= 180]
 
-    # Preserve cells that already have a genuinely transparent perimeter.
     if transparent_share >= 0.70 or len(opaque_border) < 12:
         return rgba
 
@@ -166,7 +244,6 @@ def save_logo(index: int) -> Path:
 
 generated = [save_logo(index) for index in range(LOGO_COUNT)]
 
-# Keep only the new independent PNG assets in this directory.
 keep = {path.name for path in generated}
 for path in OUT.iterdir():
     if path.is_file() and path.name not in keep:
