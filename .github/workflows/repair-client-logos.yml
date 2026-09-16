@@ -24,8 +24,25 @@ jobs:
       - name: Install image tooling
         run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
 
+      - name: Add fallback for the missing NET source asset
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/scripts/repair_client_logos.py')
+          text = path.read_text(encoding='utf-8')
+          needle = '    candidates = candidate_urls(aliases)\n'
+          replacement = needle + '    if display == "NET":\n        candidates.append("https://commons.wikimedia.org/wiki/Special:Redirect/file/Logomarca_NET_nova.png")\n'
+          if needle not in text:
+              raise SystemExit('Could not patch NET fallback')
+          path.write_text(text.replace(needle, replacement, 1), encoding='utf-8')
+          PY
+
       - name: Generate individual local logos
         run: python .github/scripts/repair_client_logos.py
+
+      - name: Restore temporary generator patch
+        if: always()
+        run: git checkout -- .github/scripts/repair_client_logos.py
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
