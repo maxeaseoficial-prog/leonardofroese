@@ -14,37 +14,327 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Restore repair script from previous revision
+      - name: Install image tooling
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Split approved source strip into individual transparent assets
         shell: bash
         run: |
-          python - <<'PYEXTRACT'
-          import subprocess
+          cat > /tmp/split_client_logos.py <<'PY'
+          import base64
+          import io
+          import shutil
+          from collections import deque
           from pathlib import Path
+          from PIL import Image
 
-          text = subprocess.check_output(
-              ['git', 'show', 'HEAD^:.github/workflows/repair-client-logos.yml'],
-              text=True,
-          )
-          start = "          cat > /tmp/repair_client_logos.py <<'PY'\n"
-          end = "\n          PY\n"
-          if start not in text:
-              raise SystemExit('Embedded repair script start marker not found')
-          body = text.split(start, 1)[1]
-          if end not in body:
-              raise SystemExit('Embedded repair script end marker not found')
-          body = body.split(end, 1)[0]
-          lines = [line[10:] if line.startswith('          ') else line for line in body.splitlines()]
-          Path('/tmp/repair_client_logos.py').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-          print('Restored repair script:', len(lines), 'lines')
-          PYEXTRACT
-      - name: Install image tooling
-        run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
-      - name: Fetch real logos and generate transparent local assets
-        run: python /tmp/repair_client_logos.py
+          root = Path.cwd()
+          out = root / 'public' / 'client-logos'
+          out.mkdir(parents=True, exist_ok=True)
+
+          logos = [
+              ('Frota', 'frota'),
+              ('Octech', 'octech'),
+              ('Pantanal', 'pantanal'),
+              ('Tempermat', 'tempermat'),
+              ('Prime Lente', 'prime-lente'),
+              ('Trevo', 'trevo'),
+              ('Claro', 'claro'),
+              ('NET', 'net'),
+              ('Megasom', 'megasom'),
+          ]
+
+          raw_b64 = (out / 'clients-strip.b64.txt').read_text(encoding='utf-8').strip()
+          source = Image.open(io.BytesIO(base64.b64decode(raw_b64))).convert('RGB')
+          width, height = source.size
+          if width % len(logos) != 0:
+              raise RuntimeError(f'Unexpected source strip size {source.size} for {len(logos)} logos')
+          cell_width = width // len(logos)
+          print(f'Source strip: {width}x{height}; {len(logos)} cells of {cell_width}px')
+
+          def transparent_cell(cell: Image.Image, dest: Path) -> None:
+              rgba = cell.convert('RGBA')
+              w, h = rgba.size
+              px = rgba.load()
+              border = []
+              for x in range(w):
+                  border.append(px[x, 0][:3]); border.append(px[x, h - 1][:3])
+              for y in range(h):
+                  border.append(px[0, y][:3]); border.append(px[w - 1, y][:3])
+              bg = tuple(sorted(c[i] for c in border)[len(border) // 2] for i in range(3))
+
+              seen = bytearray(w * h)
+              queue = deque()
+              threshold = 62
+
+              def add(x: int, y: int) -> None:
+                  idx = y * w + x
+                  if seen[idx]:
+                      return
+                  r, g, b, _ = px[x, y]
+                  distance = ((r - bg[0]) ** 2 + (g - bg[1]) ** 2 + (b - bg[2]) ** 2) ** 0.5
+                  if distance <= threshold or min(r, g, b) >= 242:
+                      seen[idx] = 1
+                      queue.append((x, y))
+
+              for x in range(w):
+                  add(x, 0); add(x, h - 1)
+              for y in range(h):
+                  add(0, y); add(w - 1, y)
+
+              while queue:
+                  x, y = queue.popleft()
+                  r, g, b, _ = px[x, y]
+                  px[x, y] = (r, g, b, 0)
+                  if x > 0: add(x - 1, y)
+                  if x + 1 < w: add(x + 1, y)
+                  if y > 0: add(x, y - 1)
+                  if y + 1 < h: add(x, y + 1)
+
+              alpha = rgba.getchannel('A')
+              bbox = alpha.getbbox()
+              if not bbox:
+                  raise RuntimeError(f'No visible logo pixels in {dest.name}')
+              rgba = rgba.crop(bbox)
+              pad = max(8, round(max(rgba.size) * 0.05))
+              canvas = Image.new('RGBA', (rgba.width + 2 * pad, rgba.height + 2 * pad), (0, 0, 0, 0))
+              canvas.alpha_composite(rgba, (pad, pad))
+              canvas.save(dest, 'PNG', optimize=True)
+
+              verify = Image.open(dest).convert('RGBA')
+              amin, amax = verify.getchannel('A').getextrema()
+              if amin != 0 or amax == 0 or verify.width < 8 or verify.height < 8:
+                  raise RuntimeError(f'Alpha validation failed for {dest.name}: alpha={amin, amax}, size={verify.size}')
+              corners = [verify.getpixel((0, 0))[3], verify.getpixel((verify.width - 1, 0))[3], verify.getpixel((0, verify.height - 1))[3], verify.getpixel((verify.width - 1, verify.height - 1))[3]]
+              if any(corners):
+                  raise RuntimeError(f'Corner transparency validation failed for {dest.name}: {corners}')
+
+          for index, (name, slug) in enumerate(logos):
+              left = index * cell_width
+              right = left + cell_width
+              cell = source.crop((left, 0, right, height))
+              dest = out / f'{slug}.png'
+              transparent_cell(cell, dest)
+              print(f'OK {index + 1:02d}/{len(logos)} {name}: {dest}')
+
+          tsx_lines = [
+              'import "./client-logos.css";',
+              '',
+              'const clientLogos = [',
+          ]
+          for name, slug in logos:
+              tsx_lines.append(f'  {{ name: "{name}", src: "/client-logos/{slug}.png" }},')
+          tsx_lines.extend([
+              '] as const;',
+              '',
+              'function LogoGroup({ clone = false }: { clone?: boolean }) {',
+              '  return (',
+              '    <div className="client-logos-group" aria-hidden={clone || undefined} data-clone={clone || undefined}>',
+              '      {clientLogos.map((logo) => (',
+              '        <div className="client-logo-item" key={`${clone ? "clone-" : ""}${logo.name}`}>',
+              '          <img',
+              '            src={logo.src}',
+              '            alt={clone ? "" : logo.name}',
+              '            aria-hidden={clone || undefined}',
+              '            decoding="async"',
+              '            draggable={false}',
+              '          />',
+              '        </div>',
+              '      ))}',
+              '    </div>',
+              '  );',
+              '}',
+              '',
+              'export function ClientLogos({ className = "" }: { className?: string }) {',
+              '  return (',
+              '    <section className={`client-logos ${className}`} aria-label="Parceiros e clientes da Cáliber">',
+              '      <div className="client-logos-heading">',
+              '        <span>Algumas das empresas que confiam no nosso trabalho</span>',
+              '        <h3>Parceiros &amp; Clientes</h3>',
+              '      </div>',
+              '',
+              '      <div className="client-logos-viewport">',
+              '        <div className="client-logos-track">',
+              '          <LogoGroup />',
+              '          <LogoGroup clone />',
+              '        </div>',
+              '      </div>',
+              '    </section>',
+              '  );',
+              '}',
+              '',
+          ])
+          (root / 'src/components/site/client-logos.tsx').write_text('\n'.join(tsx_lines), encoding='utf-8')
+
+          css = '''.client-logos {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+          }
+
+          .client-logos-heading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+          }
+
+          .client-logos-heading > span {
+            color: hsl(var(--primary));
+            font-size: 11px;
+            font-weight: 650;
+            letter-spacing: 0.24em;
+            line-height: 1.55;
+          }
+
+          .client-logos-heading h3 {
+            max-width: 760px;
+            margin: 14px 0 0;
+            color: hsl(var(--foreground));
+            font-size: clamp(34px, 4vw, 56px);
+            line-height: 1;
+            font-weight: 750;
+            letter-spacing: -0.035em;
+            text-wrap: balance;
+          }
+
+          .client-logos-viewport {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 38px;
+            overflow: hidden;
+            background: transparent;
+            mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+          }
+
+          .client-logos-track {
+            display: flex;
+            width: max-content;
+            max-width: none;
+            align-items: center;
+            animation: client-logos-marquee 34s linear infinite;
+            will-change: transform;
+          }
+
+          .client-logos-group {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: clamp(42px, 4.5vw, 76px);
+            padding-right: clamp(42px, 4.5vw, 76px);
+          }
+
+          .client-logo-item {
+            display: flex;
+            width: clamp(118px, 12vw, 176px);
+            height: 76px;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+          }
+
+          .client-logo-item img {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 68px;
+            object-fit: contain;
+            background: transparent;
+            user-select: none;
+          }
+
+          @media (hover: hover) and (pointer: fine) {
+            .client-logos-viewport:hover .client-logos-track {
+              animation-play-state: paused;
+            }
+          }
+
+          @keyframes client-logos-marquee {
+            from { transform: translate3d(-50%, 0, 0); }
+            to { transform: translate3d(0, 0, 0); }
+          }
+
+          @media (max-width: 720px) {
+            .client-logos-heading { padding-inline: 14px; }
+            .client-logos-heading > span {
+              max-width: 330px;
+              font-size: 9px;
+              letter-spacing: 0.17em;
+            }
+            .client-logos-heading h3 {
+              max-width: 340px;
+              margin-top: 12px;
+              font-size: clamp(32px, 10vw, 42px);
+            }
+            .client-logos-viewport {
+              margin-top: 28px;
+              mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+              -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+            }
+            .client-logos-track { animation-duration: 30s; }
+            .client-logos-group {
+              gap: 30px;
+              padding-right: 30px;
+            }
+            .client-logo-item {
+              width: 112px;
+              height: 60px;
+            }
+            .client-logo-item img { max-height: 52px; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .client-logos-viewport {
+              overflow: hidden;
+              mask-image: none;
+              -webkit-mask-image: none;
+            }
+            .client-logos-track {
+              width: 100%;
+              max-width: 100%;
+              animation: none;
+              transform: none;
+              will-change: auto;
+            }
+            .client-logos-group {
+              width: 100%;
+              flex-wrap: wrap;
+              justify-content: center;
+              gap: 28px 38px;
+              padding-right: 0;
+            }
+            .client-logos-group[data-clone="true"] { display: none; }
+          }
+          '''
+          css = '\n'.join(line[10:] if line.startswith('          ') else line for line in css.splitlines()).strip() + '\n'
+          (root / 'src/components/site/client-logos.css').write_text(css, encoding='utf-8')
+
+          obsolete = [
+              root / 'src/assets/client-logo-transparent-webp-base64.ts',
+              root / 'src/components/site/client-logos-local.ts',
+              root / 'src/components/site/client-logos-strip-placeholder.txt',
+              out / 'clients-strip.b64.txt',
+              out / 'README.txt',
+          ]
+          for path in obsolete:
+              if path.exists():
+                  path.unlink()
+          chunks = root / 'src/assets/client-logo-strip'
+          if chunks.exists():
+              shutil.rmtree(chunks)
+
+          print('Generated 9 independent transparent PNG assets and removed legacy strip assets.')
+          PY
+          python /tmp/split_client_logos.py
       - uses: oven-sh/setup-bun@v2
       - name: Build project
         run: |
