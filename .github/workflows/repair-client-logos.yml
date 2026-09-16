@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,8 +20,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install image tooling
-        run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
+      - name: Install image and browser tooling
+        run: python -m pip install --disable-pip-version-check pillow requests selenium
 
       - name: Generate individual transparent client logos
         run: python .github/scripts/repair_client_logos.py
