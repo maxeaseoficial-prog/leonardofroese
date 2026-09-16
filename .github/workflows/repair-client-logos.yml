@@ -27,21 +27,26 @@ jobs:
         run: |
           python - <<'PY'
           import base64
-          import re
           from pathlib import Path
 
           chunks_dir = Path("src/assets/client-logo-strip")
           target = Path("public/client-logos/clients-strip.b64.txt")
+          paths = sorted(chunks_dir.glob("chunk*.ts"), key=lambda p: int(p.stem.replace("chunk", "")))
           parts = []
-          for path in sorted(
-              chunks_dir.glob("chunk*.ts"),
-              key=lambda p: int(re.search(r"(\d+)", p.stem).group(1)),
-          ):
+          prefix = 'const chunk = "'
+          for path in paths:
               text = path.read_text(encoding="utf-8")
-              match = re.search(r'const\s+chunk\s*=\s*"([A-Za-z0-9+/=]+)"', text)
-              if not match:
-                  raise SystemExit(f"Could not parse {path}")
-              parts.append(match.group(1))
+              start = text.find(prefix)
+              if start < 0:
+                  raise SystemExit(f"Could not find chunk prefix in {path}")
+              start += len(prefix)
+              end = text.find('"', start)
+              if end < 0:
+                  raise SystemExit(f"Could not find chunk suffix in {path}")
+              part = text[start:end]
+              if not part:
+                  raise SystemExit(f"Empty chunk in {path}")
+              parts.append(part)
           if not parts:
               raise SystemExit("No legacy WebP chunks found")
           encoded = "".join(parts)
