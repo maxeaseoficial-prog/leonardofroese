@@ -13,61 +13,37 @@ ROOT = Path.cwd()
 OUT = ROOT / "public/client-logos"
 OUT.mkdir(parents=True, exist_ok=True)
 
+# Order matches the legacy strip currently used by the Leonardo site.
 TARGETS = [
-    ("Claro", "claro"),
-    ("NET", "net"),
-    ("Megasom", "megasom"),
-    ("Leo Madeiras", "leo-madeiras"),
-    ("Procria", "procria"),
-    ("LEGO", "lego"),
-    ("Maxvinil", "maxvinil"),
-    ("Tupperware", "tupperware"),
-    ("Águas de Sorriso", "aguas-de-sorriso"),
-    ("Aliança", "alianca"),
-    ("Campo Solar", "campo-solar"),
-    ("Cobertura Imasa", "cobertura-imasa"),
-    ("Eletricidade Paraense", "eletricidade-paraense"),
-    ("Fatex", "fatex"),
     ("Frota", "frota"),
     ("Octech", "octech"),
     ("Pantanal", "pantanal"),
     ("Tempermat", "tempermat"),
     ("Prime Lente", "prime-lente"),
     ("Trevo", "trevo"),
+    ("Claro", "claro"),
+    ("NET", "net"),
+    ("Megasom", "megasom"),
 ]
 
 
 def load_strip() -> Image.Image:
-    # Prefer the larger WebP that was embedded by the previous implementation.
-    # It is used only as a migration source and is deleted after extraction.
-    ts_path = ROOT / "src/assets/client-logo-transparent-webp-base64.ts"
-    if ts_path.exists():
-        text = ts_path.read_text(encoding="utf-8")
-        match = re.search(r'Base64\s*=\s*"([A-Za-z0-9+/=]+)"', text)
-        if match:
-            raw = base64.b64decode(match.group(1))
-            image = Image.open(io.BytesIO(raw)).convert("RGBA")
-            image.load()
-            print(f"SOURCE {ts_path}: {image.width}x{image.height} mode={image.mode}")
-            return image
-
-    b64_path = OUT / "clients-strip.b64.txt"
-    if b64_path.exists():
-        encoded = re.sub(r"\s+", "", b64_path.read_text(encoding="utf-8"))
-        raw = base64.b64decode(encoded)
-        image = Image.open(io.BytesIO(raw)).convert("RGBA")
-        image.load()
-        print(f"SOURCE {b64_path}: {image.width}x{image.height} mode={image.mode}")
-        return image
-
-    raise RuntimeError("No legacy client-logo strip source found")
+    source = OUT / "clients-strip.b64.txt"
+    if not source.exists():
+        raise RuntimeError("Missing temporary legacy logo strip source")
+    encoded = re.sub(r"\s+", "", source.read_text(encoding="utf-8"))
+    raw = base64.b64decode(encoded, validate=True)
+    image = Image.open(io.BytesIO(raw)).convert("RGBA")
+    image.load()
+    print(f"SOURCE {source}: {image.width}x{image.height} mode={image.mode}")
+    return image
 
 
-def color_distance(a, b) -> float:
-    return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2) ** 0.5
+def distance(pixel, background) -> float:
+    return sum((pixel[i] - background[i]) ** 2 for i in range(3)) ** 0.5
 
 
-def remove_edge_background(image: Image.Image) -> Image.Image:
+def transparentize_edge_background(image: Image.Image) -> Image.Image:
     rgba = image.convert("RGBA")
     width, height = rgba.size
     pixels = rgba.load()
@@ -78,111 +54,98 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
     for y in range(height):
         border.extend((pixels[0, y], pixels[width - 1, y]))
 
-    transparent_share = sum(1 for pixel in border if pixel[3] <= 20) / max(1, len(border))
-    if transparent_share >= 0.65:
+    if sum(1 for p in border if p[3] <= 20) / max(1, len(border)) >= 0.60:
         return rgba
 
-    opaque = [pixel for pixel in border if pixel[3] >= 180]
-    if len(opaque) < 12:
+    opaque = [p for p in border if p[3] >= 180]
+    if not opaque:
         return rgba
 
     channels = list(zip(*[(p[0], p[1], p[2]) for p in opaque]))
     background = tuple(sorted(channel)[len(channel) // 2] for channel in channels)
-    deviations = sorted(color_distance(pixel, background) for pixel in opaque)
+    deviations = sorted(distance(p, background) for p in opaque)
     p90 = deviations[min(len(deviations) - 1, int(len(deviations) * 0.90))]
-
-    # The old strip used either transparent pixels or a neutral white/gray field.
-    neutral = max(background) - min(background) <= 38
-    light = min(background) >= 150
+    neutral_light = max(background) - min(background) <= 42 and min(background) >= 145
     uniform = p90 <= 34
-    if not ((neutral and light) or uniform):
+
+    if not (neutral_light or uniform):
         raise RuntimeError(
-            f"Could not identify a removable edge background: bg={background} p90={p90:.1f}"
+            f"Logo slot has no safe removable edge background: bg={background}, p90={p90:.1f}"
         )
 
-    threshold = 78 if neutral and light else 46
+    threshold = 80 if neutral_light else 46
     seen = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
 
-    def add(x: int, y: int) -> None:
-        idx = y * width + x
-        if seen[idx]:
+    def enqueue(x: int, y: int) -> None:
+        index = y * width + x
+        if seen[index]:
             return
-        seen[idx] = 1
-        pixel = pixels[x, y]
-        if pixel[3] <= 30 or color_distance(pixel, background) <= threshold:
+        seen[index] = 1
+        p = pixels[x, y]
+        if p[3] <= 25 or distance(p, background) <= threshold:
             queue.append((x, y))
 
     for x in range(width):
-        add(x, 0)
-        add(x, height - 1)
+        enqueue(x, 0)
+        enqueue(x, height - 1)
     for y in range(height):
-        add(0, y)
-        add(width - 1, y)
+        enqueue(0, y)
+        enqueue(width - 1, y)
 
     while queue:
         x, y = queue.popleft()
         r, g, b, _ = pixels[x, y]
         pixels[x, y] = (r, g, b, 0)
-        if x > 0:
-            add(x - 1, y)
+        if x:
+            enqueue(x - 1, y)
         if x + 1 < width:
-            add(x + 1, y)
-        if y > 0:
-            add(x, y - 1)
+            enqueue(x + 1, y)
+        if y:
+            enqueue(x, y - 1)
         if y + 1 < height:
-            add(x, y + 1)
+            enqueue(x, y + 1)
 
     return rgba
 
 
-def finish_asset(slot: Image.Image, destination: Path) -> None:
-    slot = remove_edge_background(slot)
-    bbox = slot.getchannel("A").getbbox()
+def save_logo(slot: Image.Image, destination: Path) -> None:
+    logo = transparentize_edge_background(slot)
+    bbox = logo.getchannel("A").getbbox()
     if not bbox:
-        raise RuntimeError(f"No visible logo pixels in {destination.name}")
-    logo = slot.crop(bbox)
+        raise RuntimeError(f"No visible pixels found in {destination.name}")
+    logo = logo.crop(bbox)
 
-    # Resize only with standard Lanczos so the browser never has to enlarge the
-    # small source aggressively. This does not redraw or alter the brand.
-    if logo.width < 220 and logo.height < 160:
-        scale = min(3.0, 240 / max(1, logo.width), 180 / max(1, logo.height))
-        if scale > 1.05:
-            logo = logo.resize(
-                (max(1, round(logo.width * scale)), max(1, round(logo.height * scale))),
-                Image.Resampling.LANCZOS,
-            )
-
-    pad = max(12, round(max(logo.size) * 0.06))
-    canvas = Image.new("RGBA", (logo.width + pad * 2, logo.height + pad * 2), (0, 0, 0, 0))
+    pad = max(10, round(max(logo.size) * 0.05))
+    canvas = Image.new("RGBA", (logo.width + 2 * pad, logo.height + 2 * pad), (0, 0, 0, 0))
     canvas.alpha_composite(logo, (pad, pad))
     canvas.save(destination, "PNG", optimize=True)
 
     verify = Image.open(destination).convert("RGBA")
-    amin, amax = verify.getchannel("A").getextrema()
+    alpha_min, alpha_max = verify.getchannel("A").getextrema()
     corners = [
         verify.getpixel((0, 0))[3],
         verify.getpixel((verify.width - 1, 0))[3],
         verify.getpixel((0, verify.height - 1))[3],
         verify.getpixel((verify.width - 1, verify.height - 1))[3],
     ]
-    bbox2 = verify.getchannel("A").getbbox()
-    if amin != 0 or amax == 0 or any(corners) or not bbox2:
+    if alpha_min != 0 or alpha_max == 0 or any(corners):
         raise RuntimeError(
-            f"Transparency validation failed for {destination.name}: alpha={amin}-{amax}, corners={corners}"
+            f"Transparency validation failed for {destination.name}: "
+            f"alpha={alpha_min}-{alpha_max}, corners={corners}"
         )
     print(
-        f"ASSET {destination.name}: {verify.width}x{verify.height} alpha={amin}-{amax} "
-        f"corners={corners} visible_bbox={bbox2}"
+        f"ASSET {destination.name}: {verify.width}x{verify.height} "
+        f"alpha={alpha_min}-{alpha_max} corners={corners}"
     )
 
 
-def generate_component() -> None:
+def write_component() -> None:
     items = "\n".join(
-        f'  {{ name: "{display}", src: "/client-logos/{slug}.png" }},'
-        for display, slug in TARGETS
+        f'  {{ name: "{name}", src: "/client-logos/{slug}.png" }},'
+        for name, slug in TARGETS
     )
-    component = f'''import "./client-logos.css";
+    content = f'''import "./client-logos.css";
 
 const clientLogos = [
 {items}
@@ -227,11 +190,11 @@ export function ClientLogos({{ className = "" }}: {{ className?: string }}) {{
   );
 }}
 '''
-    (ROOT / "src/components/site/client-logos.tsx").write_text(component, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.tsx").write_text(content, encoding="utf-8")
 
 
-def generate_css() -> None:
-    css = '''.client-logos {
+def write_css() -> None:
+    content = r'''.client-logos {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -244,7 +207,7 @@ def generate_css() -> None:
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 20px;
+  padding-inline: 20px;
   text-align: center;
 }
 
@@ -283,9 +246,8 @@ def generate_css() -> None:
 .client-logos-track {
   display: flex;
   width: max-content;
-  max-width: none;
   align-items: center;
-  animation: client-logos-marquee 58s linear infinite;
+  animation: client-logos-marquee 42s linear infinite;
   will-change: transform;
 }
 
@@ -299,7 +261,7 @@ def generate_css() -> None:
 
 .client-logo-item {
   display: flex;
-  width: clamp(118px, 12vw, 176px);
+  width: clamp(120px, 12vw, 176px);
   height: 78px;
   flex: 0 0 auto;
   align-items: center;
@@ -336,47 +298,45 @@ def generate_css() -> None:
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
   }
-  .client-logos-track { animation-duration: 50s; }
+  .client-logos-track { animation-duration: 36s; }
   .client-logos-group { gap: 30px; padding-right: 30px; }
   .client-logo-item { width: 112px; height: 62px; }
   .client-logo-item img { max-height: 54px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .client-logos-viewport { overflow: hidden; -webkit-mask-image: none; mask-image: none; }
-  .client-logos-track { width: 100%; max-width: 100%; animation: none; transform: none; will-change: auto; }
+  .client-logos-viewport { -webkit-mask-image: none; mask-image: none; }
+  .client-logos-track { width: 100%; animation: none; transform: none; will-change: auto; }
   .client-logos-group { width: 100%; flex-wrap: wrap; justify-content: center; gap: 28px 38px; padding-right: 0; }
   .client-logos-group[data-clone="true"] { display: none; }
 }
 '''
-    (ROOT / "src/components/site/client-logos.css").write_text(css, encoding="utf-8")
+    (ROOT / "src/components/site/client-logos.css").write_text(content, encoding="utf-8")
 
 
 strip = load_strip()
 count = len(TARGETS)
 if strip.width % count != 0:
-    raise RuntimeError(
-        f"Legacy strip width {strip.width} is not divisible by the expected {count} logos"
-    )
+    raise RuntimeError(f"Strip width {strip.width} is not divisible by {count} logos")
 slot_width = strip.width // count
+if slot_width < 80 or strip.height < 40:
+    raise RuntimeError(f"Unexpected strip dimensions: {strip.width}x{strip.height}")
 print(f"SPLIT {strip.width}x{strip.height}: {count} slots of {slot_width}x{strip.height}")
 
-expected: set[str] = set()
-for index, (display, slug) in enumerate(TARGETS):
-    left = index * slot_width
-    slot = strip.crop((left, 0, left + slot_width, strip.height))
+expected = set()
+for index, (name, slug) in enumerate(TARGETS):
+    slot = strip.crop((index * slot_width, 0, (index + 1) * slot_width, strip.height))
     destination = OUT / f"{slug}.png"
-    finish_asset(slot, destination)
+    save_logo(slot, destination)
     expected.add(destination.name)
-    print(f"DONE {index + 1:02d}/{count}: {display} -> {destination.relative_to(ROOT)}")
+    print(f"DONE {index + 1:02d}/{count}: {name} -> {destination.relative_to(ROOT)}")
 
-# Remove the old strip and every obsolete generated file from the public folder.
 for path in OUT.iterdir():
     if path.is_file() and path.name not in expected:
         path.unlink()
 
-generate_component()
-generate_css()
+write_component()
+write_css()
 
 for obsolete in (
     ROOT / "src/assets/client-logo-transparent-webp-base64.ts",
@@ -389,4 +349,4 @@ chunks = ROOT / "src/assets/client-logo-strip"
 if chunks.exists():
     shutil.rmtree(chunks)
 
-print(f"Generated {count} independent transparent PNG assets and removed all strip-based runtime assets.")
+print(f"Generated {count} independent local PNG logo assets with real alpha transparency.")
