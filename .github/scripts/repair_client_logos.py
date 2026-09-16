@@ -27,11 +27,17 @@ SOURCE_NAMES = [
 ]
 
 text = SOURCE.read_text(encoding="utf-8")
-match = re.search(r'=\s*"([A-Za-z0-9+/=]+)"\s*;?', text)
+match = re.search(
+    r'clientLogoTransparentWebpBase64\s*=\s*"([^"]+)"',
+    text,
+    flags=re.DOTALL,
+)
 if not match:
     raise RuntimeError("Could not extract the local WebP base64 source")
 
-raw = base64.b64decode(match.group(1), validate=True)
+encoded = re.sub(r"\s+", "", match.group(1))
+encoded += "=" * (-len(encoded) % 4)
+raw = base64.b64decode(encoded, validate=True)
 strip = Image.open(io.BytesIO(raw)).convert("RGBA")
 strip.load()
 print(f"SOURCE strip={strip.width}x{strip.height} mode={strip.mode} bytes={len(raw)}")
@@ -65,7 +71,7 @@ def clear_edge_background(image: Image.Image) -> Image.Image:
     transparent_share = sum(1 for pixel in border if pixel[3] <= 20) / max(1, len(border))
     opaque_border = [pixel for pixel in border if pixel[3] >= 180]
 
-    # Most of the source already has real alpha. Preserve it when the perimeter is transparent.
+    # Preserve cells that already have a genuinely transparent perimeter.
     if transparent_share >= 0.70 or len(opaque_border) < 12:
         return rgba
 
