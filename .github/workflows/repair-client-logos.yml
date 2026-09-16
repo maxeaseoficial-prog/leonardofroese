@@ -18,38 +18,113 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Restore generator with correct binary reconstruction
+      - name: Restore official-logo generator with resilient downloads
         shell: bash
         run: |
           python - <<'PYEXTRACT'
+          import re
           import subprocess
           from pathlib import Path
 
-          text = subprocess.check_output(['git','show','03a1c3c28e1c5165b2a94316b3eb9a31b18a5cd7:.github/workflows/repair-client-logos.yml'], text=True)
-          body = text.split("          cat > /tmp/split_client_logos.py <<'PY'\n",1)[1].split("\n          PY\n",1)[0]
+          historic = subprocess.check_output(
+              ['git', 'show', '445866bc95876c2b1367087a613c7a0ff6bcc0b3:.github/workflows/repair-client-logos.yml'],
+              text=True,
+          )
+          start = "          cat > /tmp/repair_client_logos.py <<'PY'\n"
+          end = "\n          PY\n"
+          body = historic.split(start, 1)[1].split(end, 1)[0]
           script = '\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines()) + '\n'
-          script = script.replace('import io\n','import io\nimport re\n')
-          old = "raw_b64 = (out / 'clients-strip.b64.txt').read_text(encoding='utf-8').strip()\nsource = Image.open(io.BytesIO(base64.b64decode(raw_b64))).convert('RGB')"
-          new = "parts=[]\nfor i in range(8):\n    s=(root/'src/assets/client-logo-strip'/f'chunk{i}.ts').read_text(encoding='utf-8')\n    m=re.search(r'\\\"([^\\\"]+)\\\"',s)\n    if not m: raise RuntimeError(f'Could not parse chunk{i}')\n    parts.append(base64.b64decode(m.group(1)))\nsource_bytes=b''.join(parts)\nprint(f'Reconstructed {len(source_bytes)} binary bytes from {len(parts)} independently encoded chunks')\nsource=Image.open(io.BytesIO(source_bytes)).convert('RGB')"
-          if old not in script: raise SystemExit('generator source block not found')
-          Path('/tmp/split_client_logos.py').write_text(script.replace(old,new),encoding='utf-8')
+
+          pattern = re.compile(
+              r"              matches\.sort\(reverse=True\)\n"
+              r"              _, url, matched_alt = matches\[0\]\n"
+              r"              response = session\.get\(url, timeout=45, headers=\{'Referer': page\.url\}\)\n"
+              r"              response\.raise_for_status\(\)\n"
+              r"              dest = OUT / f'\{slug\}\.png'\n"
+              r"              try:\n"
+              r"                  make_transparent_png\(response\.content, dest\)\n"
+              r"              except Exception as exc:\n"
+              r"                  raise RuntimeError\(f'Could not process \{display\} from \{url\}: \{exc\}'\) from exc\n"
+              r"              entries\.append\(\(display, slug, url, matched_alt\)\)\n"
+              r"              print\(f'OK \{display\}: \{url\} -> \{dest\.relative_to\(ROOT\)\}'\)"
+          )
+
+          replacement = '''              matches.sort(reverse=True)
+              dest = OUT / f'{slug}.png'
+              resolved = None
+              errors = []
+
+              candidate_records = []
+              for score, url, matched_alt in matches:
+                  candidate_records.append((score, url, matched_alt))
+                  if 'wp.com/calibergestao.com.br/' in url:
+                      path = url.split('/calibergestao.com.br/', 1)[1].split('?', 1)[0]
+                      candidate_records.append((score - 1, 'https://calibergestao.com.br/' + path, matched_alt))
+                      candidate_records.append((score - 2, url.split('?', 1)[0], matched_alt))
+                  elif url.startswith('https://calibergestao.com.br/') and '?' in url:
+                      candidate_records.append((score - 1, url.split('?', 1)[0], matched_alt))
+
+              # WordPress media API fallback when a proxy/CDN URL is stale.
+              for alias in aliases:
+                  try:
+                      api = session.get(
+                          'https://calibergestao.com.br/wp-json/wp/v2/media',
+                          params={'search': alias, 'per_page': 20},
+                          timeout=45,
+                      )
+                      if api.ok:
+                          for media in api.json():
+                              source_url = media.get('source_url')
+                              if source_url:
+                                  candidate_records.append((40, source_url, media.get('alt_text') or alias))
+                  except Exception as exc:
+                      errors.append(f'WP API {alias}: {exc}')
+
+              seen_urls = set()
+              for _, candidate_url, matched_alt in candidate_records:
+                  if candidate_url in seen_urls:
+                      continue
+                  seen_urls.add(candidate_url)
+                  try:
+                      response = session.get(candidate_url, timeout=45, headers={'Referer': page.url})
+                      response.raise_for_status()
+                      make_transparent_png(response.content, dest)
+                      resolved = (candidate_url, matched_alt)
+                      break
+                  except Exception as exc:
+                      errors.append(f'{candidate_url}: {exc}')
+
+              if resolved is None:
+                  raise RuntimeError(f'Could not download/process {display}. Attempts: ' + ' | '.join(errors[-12:]))
+
+              url, matched_alt = resolved
+              entries.append((display, slug, url, matched_alt))
+              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')'''
+
+          script, count = pattern.subn(replacement, script, count=1)
+          if count != 1:
+              raise SystemExit(f'Could not patch downloader block; replacements={count}')
+
+          Path('/tmp/repair_client_logos.py').write_text(script, encoding='utf-8')
+          print('Restored 20-logo generator with local-origin and WordPress media fallbacks.')
           PYEXTRACT
-      - name: Install Pillow
-        run: python -m pip install --disable-pip-version-check pillow
-      - name: Generate individual transparent assets
-        run: python /tmp/split_client_logos.py
+      - name: Install image tooling
+        run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
+      - name: Fetch and normalize official client logos
+        run: python /tmp/repair_client_logos.py
       - uses: oven-sh/setup-bun@v2
       - name: Build project
         run: |
           bun install --frozen-lockfile
           bun run build
-      - name: Commit repair
+      - name: Commit repaired assets and component
         shell: bash
         run: |
           git diff --check
+          git status --short
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet && exit 1
+          git diff --cached --quiet && { echo "No generated changes"; exit 1; }
           git commit -m "fix: use individual transparent client logos"
           git push origin main
