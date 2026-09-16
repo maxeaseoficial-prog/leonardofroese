@@ -39,14 +39,15 @@ jobs:
           for i in range(8):
               path = chunks_dir / f"chunk{i}.ts"
               text = path.read_text(encoding="utf-8")
-              candidates = []
-              for quote in ('"', "'", '`'):
-                  for value in re.findall(re.escape(quote) + r"(.*?)" + re.escape(quote), text, flags=re.S):
-                      clean = re.sub(r"\s+", "", value)
-                      if len(clean) >= 1000 and re.fullmatch(r"[A-Za-z0-9+/=]+", clean):
-                          candidates.append(clean)
+              # Each legacy TS file contains one very large uninterrupted
+              # base64 payload. Matching the payload itself avoids depending
+              # on the different export wrappers used across the chunks.
+              candidates = re.findall(r"[A-Za-z0-9+/=]{1000,}", text)
               if not candidates:
-                  raise SystemExit(f"Could not locate base64 payload in {path}")
+                  raise SystemExit(
+                      f"Could not locate base64 payload in {path}; "
+                      f"file length={len(text)}, double_quotes={text.count(chr(34))}"
+                  )
               part = max(candidates, key=len)
               parts.append(part)
               print(f"{path.name}: {len(part)} base64 chars")
