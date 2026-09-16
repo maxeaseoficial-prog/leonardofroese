@@ -34,12 +34,12 @@ jobs:
           body = historic.split(start, 1)[1].split(end, 1)[0]
           script = '\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines()) + '\n'
 
-          block_start = "              matches.sort(reverse=True)\n"
-          block_end = "              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')\n"
+          block_start = "    matches.sort(reverse=True)\n"
+          block_end = "    print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')\n"
           start_index = script.index(block_start)
           end_index = script.index(block_end, start_index) + len(block_end)
 
-          replacement = '''              matches.sort(reverse=True)
+          replacement = '''    matches.sort(reverse=True)
               dest = OUT / f'{slug}.png'
               resolved = None
               errors = []
