@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 3
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Restore generator and use the valid WebP source currently rendered by the site
+      - name: Restore generator and reconstruct the complete source from all chunks
         shell: bash
         run: |
           python - <<'PYEXTRACT'
@@ -26,7 +26,7 @@ jobs:
           from pathlib import Path
 
           text = subprocess.check_output(
-              ['git', 'show', 'HEAD^:.github/workflows/repair-client-logos.yml'],
+              ['git', 'show', 'HEAD^^:.github/workflows/repair-client-logos.yml'],
               text=True,
           )
           start = "          cat > /tmp/split_client_logos.py <<'PY'\n"
@@ -36,12 +36,12 @@ jobs:
           script = '\n'.join(lines) + '\n'
           script = script.replace('import io\n', 'import io\nimport re\n')
           old = "raw_b64 = (out / 'clients-strip.b64.txt').read_text(encoding='utf-8').strip()"
-          new = "source_ts = (root / 'src/assets/client-logo-transparent-webp-base64.ts').read_text(encoding='utf-8')\nmatch = re.search(r'clientLogoTransparentWebpBase64\\s*=\\s*[\\\"\\\']([^\\\"\\\']+)[\\\"\\\']', source_ts)\nif not match:\n    raise RuntimeError('Could not locate the current valid logo WebP base64 source')\nraw_b64 = match.group(1)"
+          new = "chunk_dir = root / 'src/assets/client-logo-strip'\nchunk_files = sorted(chunk_dir.glob('chunk*.ts'), key=lambda p: int(re.search(r'chunk(\\d+)', p.name).group(1)))\nif not chunk_files:\n    raise RuntimeError('No source chunks found')\nparts = []\nfor chunk_file in chunk_files:\n    chunk_text = chunk_file.read_text(encoding='utf-8')\n    match = re.search(r'[\\\"\\\']([A-Za-z0-9+/=]+)[\\\"\\\']', chunk_text)\n    if not match:\n        raise RuntimeError(f'Could not parse {chunk_file.name}')\n    parts.append(match.group(1))\nraw_b64 = ''.join(parts)\nprint(f'Reconstructed source from {len(parts)} chunks; base64 chars={len(raw_b64)}')"
           if old not in script:
               raise SystemExit('Source line to patch was not found')
           script = script.replace(old, new)
           Path('/tmp/split_client_logos.py').write_text(script, encoding='utf-8')
-          print('Generator restored and patched to use the current valid WebP base64 source.')
+          print('Generator restored and patched to concatenate chunk0..chunk7.')
           PYEXTRACT
       - name: Install image tooling
         run: python -m pip install --disable-pip-version-check pillow
