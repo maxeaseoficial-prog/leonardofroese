@@ -33,12 +33,13 @@ jobs:
             );
             const parts = modules.map((mod, i) => {
               const value = String(mod.default ?? "").replace(/\s+/g, "");
-              const pads = [...value].filter((char) => char === "=").length;
-              console.log(`chunk${i}: ${value.length} chars, padding=${pads}`);
+              const padPositions = [...value].flatMap((char, index) => char === "=" ? [index] : []);
+              const invalid = [...value].filter((char) => !/[A-Za-z0-9+/=]/.test(char)).length;
+              console.log(`chunk${i}: ${value.length} chars, padding=${JSON.stringify(padPositions)}, invalid=${invalid}, start=${value.slice(0, 8)}, end=${value.slice(-8)}`);
               return value;
             });
             const joined = parts.join("");
-            const dataChars = joined.replace(/=/g, "");
+            const dataChars = joined.replace(/[^A-Za-z0-9+/]/g, "");
             if (!dataChars.startsWith("UklG")) throw new Error("Recovered payload does not start with RIFF/WebP base64");
 
             const header = Buffer.from(dataChars.slice(0, 32), "base64");
