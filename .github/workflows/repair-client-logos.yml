@@ -23,47 +23,62 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install image and browser tooling
-        run: python -m pip install --disable-pip-version-check pillow selenium
+        run: python -m pip install --disable-pip-version-check pillow requests selenium
 
-      - name: Recover the complete legacy WebP migration source
+      - name: Prepare scoped logo migration
         run: |
-          bun -e '
-            const modules = await Promise.all(
-              Array.from({ length: 8 }, (_, i) => import(`./src/assets/client-logo-strip/chunk${i}.ts`)),
-            );
-            const parts = modules.map((mod, i) => {
-              const value = String(mod.default ?? "").replace(/\s+/g, "");
-              const padPositions = [...value].flatMap((char, index) => char === "=" ? [index] : []);
-              const invalid = [...value].filter((char) => !/[A-Za-z0-9+/=]/.test(char)).length;
-              console.log(`chunk${i}: ${value.length} chars, padding=${JSON.stringify(padPositions)}, invalid=${invalid}, start=${value.slice(0, 8)}, end=${value.slice(-8)}`);
-              return value;
-            });
-            const joined = parts.join("");
-            const dataChars = joined.replace(/[^A-Za-z0-9+/]/g, "");
-            if (!dataChars.startsWith("UklG")) throw new Error("Recovered payload does not start with RIFF/WebP base64");
+          cp .github/scripts/repair_client_logos.py /tmp/repair_client_logos.py
+          python - <<'PY'
+          import re
+          from pathlib import Path
 
-            const header = Buffer.from(dataChars.slice(0, 32), "base64");
-            if (header.toString("ascii", 0, 4) !== "RIFF" || header.toString("ascii", 8, 12) !== "WEBP") {
-              throw new Error("Recovered payload is not a WebP container");
-            }
-            const byteLength = header.readUInt32LE(4) + 8;
-            const nonPaddingChars = Math.ceil((byteLength * 8) / 6);
-            if (dataChars.length < nonPaddingChars) {
-              throw new Error(`WebP requires ${nonPaddingChars} data chars but only ${dataChars.length} were recovered`);
-            }
-            const payload = dataChars.slice(0, nonPaddingChars);
-            const padding = "=".repeat((4 - (payload.length % 4)) % 4);
-            const canonical = payload + padding;
-            const bytes = Buffer.from(canonical, "base64");
-            if (bytes.length !== byteLength) {
-              throw new Error(`Decoded WebP length mismatch: expected ${byteLength}, got ${bytes.length}`);
-            }
-            await Bun.write("public/client-logos/clients-strip.b64.txt", canonical);
-            console.log(`Recovered canonical WebP: ${byteLength} bytes / ${canonical.length} base64 chars`);
-          '
+          path = Path('/tmp/repair_client_logos.py')
+          text = path.read_text(encoding='utf-8')
 
-      - name: Extract individual transparent client logos
-        run: python .github/scripts/extract_client_logos.py
+          targets = '''TARGETS = [
+    ("Frota", "frota", ["frota"]),
+    ("Octech", "octech", ["octech", "oc tech"]),
+    ("Pantanal", "pantanal", ["pantanal"]),
+    ("Tempermat", "tempermat", ["tempermat"]),
+    ("Prime Lente", "prime-lente", ["prime lente logo gradual", "prime lente", "prime-lente"]),
+    ("Trevo", "trevo", ["trevo"]),
+    ("Claro", "claro", ["claro"]),
+    ("NET", "net", ["net", "net-1"]),
+    ("Megasom", "megasom", ["logo megasom sem fundo", "megasom"]),
+]'''
+          text, count = re.subn(r'TARGETS = \[.*?\n\]', targets, text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit('Could not scope TARGETS in migration script')
+
+          fallbacks = '''FALLBACK_URLS = {
+    "net": ["https://logospng.org/download/net/logo-net-2048.png"],
+}'''
+          text, count = re.subn(r'FALLBACK_URLS = \{.*?\n\}', fallbacks, text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit('Could not scope FALLBACK_URLS in migration script')
+
+          text = text.replace(
+              'REFERENCE_PAGES = [\n    "https://calibergestao.com.br/",\n    "https://calibergestao.com.br/clientes/",\n]',
+              'REFERENCE_PAGES = [\n    "https://calibergestao.com.br/clientes/",\n    "https://calibergestao.com.br/",\n]',
+          )
+
+          # Prefer a loaded image from the legacy clients page when the current
+          # homepage still contains a stale/mismatched WordPress element.
+          text = text.replace(
+              'area = record["natural_width"] * record["natural_height"]\n                ranked.append((loaded, score, area, record))\n        ranked.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)',
+              'source_priority = 1 if "/clientes/" in record["page_url"] else 0\n                area = record["natural_width"] * record["natural_height"]\n                ranked.append((loaded, score, source_priority, area, record))\n        ranked.sort(key=lambda item: (item[0], item[1], item[2], item[3]), reverse=True)',
+          )
+          text = text.replace("best[3]['natural_width']", "best[4]['natural_width']")
+          text = text.replace("best[3]['natural_height']", "best[4]['natural_height']")
+          text = text.replace("best[3]['attrs']", "best[4]['attrs']")
+          text = text.replace("best[3]['page_url']", "best[4]['page_url']")
+          text = text.replace('matches[slug] = [item[3] for item in ranked]', 'matches[slug] = [item[4] for item in ranked]')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Download and convert real client logos to local transparent assets
+        run: python /tmp/repair_client_logos.py
 
       - name: Install dependencies and build
         run: |
