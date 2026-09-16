@@ -2,188 +2,49 @@ name: Repair client logos
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   repair:
-    if: ${{ github.actor != 'github-actions[bot]' }}
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Restore official-logo generator with resilient downloads
-        shell: bash
-        run: |
-          python - <<'PYEXTRACT'
-          import subprocess
-          from pathlib import Path
 
-          historic = subprocess.check_output(
-              ['git', 'show', '445866bc95876c2b1367087a613c7a0ff6bcc0b3:.github/workflows/repair-client-logos.yml'],
-              text=True,
-          )
-          start = "          cat > /tmp/repair_client_logos.py <<'PY'\n"
-          end = "\n          PY\n"
-          body = historic.split(start, 1)[1].split(end, 1)[0]
-          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in body.splitlines()) + '\n'
-
-          block_start = "    matches.sort(reverse=True)\n"
-          block_end = "    print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')\n"
-          start_index = script.index(block_start)
-          end_index = script.index(block_end, start_index) + len(block_end)
-
-          replacement = '''    matches.sort(reverse=True)
-              dest = OUT / f'{slug}.png'
-              resolved = None
-              errors = []
-
-              candidate_records = []
-              original_urls = []
-              for score, url, matched_alt in matches:
-                  candidate_records.append((score, url, matched_alt))
-                  if 'wp.com/calibergestao.com.br/' in url:
-                      path = url.split('/calibergestao.com.br/', 1)[1].split('?', 1)[0]
-                      original_url = 'https://calibergestao.com.br/' + path
-                      original_urls.append((original_url, matched_alt))
-                      candidate_records.append((score - 1, original_url, matched_alt))
-                      candidate_records.append((score - 2, url.split('?', 1)[0], matched_alt))
-                  elif url.startswith('https://calibergestao.com.br/'):
-                      original_url = url.split('?', 1)[0]
-                      original_urls.append((original_url, matched_alt))
-                      if '?' in url:
-                          candidate_records.append((score - 1, original_url, matched_alt))
-
-              # Include every URL variant present on matching image tags, not just the preferred lazy-src.
-              for img, _, descriptor in candidates:
-                  if not any(alias and alias in descriptor for alias in aliases_n):
-                      continue
-                  matched_alt = img.get('alt') or ''
-                  for attr in ('data-lazy-src', 'data-src', 'data-original', 'src'):
-                      value = img.get(attr)
-                      if value and not value.startswith('data:'):
-                          candidate_url = urljoin(page.url, value)
-                          candidate_records.append((45, candidate_url, matched_alt))
-                  for attr in ('data-lazy-srcset', 'srcset'):
-                      value = img.get(attr)
-                      if value:
-                          for part in value.split(','):
-                              part = part.strip()
-                              if not part:
-                                  continue
-                              candidate_url = urljoin(page.url, part.split()[0])
-                              candidate_records.append((44, candidate_url, matched_alt))
-
-              for alias in aliases:
-                  try:
-                      api = session.get(
-                          'https://calibergestao.com.br/wp-json/wp/v2/media',
-                          params={'search': alias, 'per_page': 20},
-                          timeout=45,
-                      )
-                      if api.ok:
-                          for media in api.json():
-                              source_url = media.get('source_url')
-                              if source_url:
-                                  candidate_records.append((40, source_url, media.get('alt_text') or alias))
-                                  original_urls.append((source_url.split('?', 1)[0], media.get('alt_text') or alias))
-                  except Exception as exc:
-                      errors.append(f'WP API {alias}: {exc}')
-
-              seen_urls = set()
-              for _, candidate_url, matched_alt in sorted(candidate_records, reverse=True):
-                  if candidate_url in seen_urls:
-                      continue
-                  seen_urls.add(candidate_url)
-                  try:
-                      response = session.get(candidate_url, timeout=45, headers={'Referer': page.url})
-                      response.raise_for_status()
-                      make_transparent_png(response.content, dest)
-                      resolved = (candidate_url, matched_alt)
-                      break
-                  except Exception as exc:
-                      errors.append(f'{candidate_url}: {exc}')
-
-              # The reference page still points at some deleted WordPress files. Recover the exact
-              # historical asset from the archived original URL, then store it locally in this repo.
-              if resolved is None:
-                  archive_seen = set()
-                  for original_url, matched_alt in original_urls:
-                      if original_url in archive_seen:
-                          continue
-                      archive_seen.add(original_url)
-                      try:
-                          cdx = session.get(
-                              'https://web.archive.org/cdx/search/cdx',
-                              params={
-                                  'url': original_url,
-                                  'output': 'json',
-                                  'fl': 'timestamp,original,statuscode,mimetype',
-                                  'filter': ['statuscode:200', 'mimetype:image/.*'],
-                                  'limit': '10',
-                                  'from': '2021',
-                                  'to': '2026',
-                                  'collapse': 'digest',
-                              },
-                              timeout=45,
-                          )
-                          cdx.raise_for_status()
-                          rows = cdx.json()
-                          if len(rows) <= 1:
-                              errors.append(f'Wayback no snapshot: {original_url}')
-                              continue
-                          for row in reversed(rows[1:]):
-                              timestamp = row[0]
-                              archived_url = f'https://web.archive.org/web/{timestamp}id_/{original_url}'
-                              try:
-                                  response = session.get(archived_url, timeout=60)
-                                  response.raise_for_status()
-                                  make_transparent_png(response.content, dest)
-                                  resolved = (archived_url, matched_alt)
-                                  print(f'ARCHIVE {display}: {original_url} @ {timestamp}')
-                                  break
-                              except Exception as exc:
-                                  errors.append(f'{archived_url}: {exc}')
-                          if resolved is not None:
-                              break
-                      except Exception as exc:
-                          errors.append(f'Wayback lookup {original_url}: {exc}')
-
-              if resolved is None:
-                  raise RuntimeError(f'Could not download/process {display}. Attempts: ' + ' | '.join(errors[-20:]))
-
-              url, matched_alt = resolved
-              entries.append((display, slug, url, matched_alt))
-              print(f'OK {display}: {url} -> {dest.relative_to(ROOT)}')
-          '''
-
-          script = script[:start_index] + replacement + script[end_index:]
-          Path('/tmp/repair_client_logos.py').write_text(script, encoding='utf-8')
-          print('Restored 20-logo generator with current-source and archive fallbacks.')
-          PYEXTRACT
       - name: Install image tooling
         run: python -m pip install --disable-pip-version-check pillow requests beautifulsoup4
-      - name: Fetch and normalize official client logos
-        run: python /tmp/repair_client_logos.py
-      - uses: oven-sh/setup-bun@v2
-      - name: Build project
+
+      - name: Generate individual local logos
+        run: python .github/scripts/repair_client_logos.py
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies and build
         run: |
           bun install --frozen-lockfile
           bun run build
-      - name: Commit repaired assets and component
-        shell: bash
+
+      - name: Commit repaired section
         run: |
           git diff --check
           git status --short
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet && { echo "No generated changes"; exit 1; }
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
           git commit -m "fix: use individual transparent client logos"
           git push origin main
