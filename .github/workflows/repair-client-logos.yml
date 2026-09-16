@@ -22,63 +22,11 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install image and browser tooling
+      - name: Install logo tooling
         run: python -m pip install --disable-pip-version-check pillow requests selenium
 
-      - name: Prepare scoped logo migration
-        run: |
-          cp .github/scripts/repair_client_logos.py /tmp/repair_client_logos.py
-          python - <<'PY'
-          import re
-          from pathlib import Path
-
-          path = Path('/tmp/repair_client_logos.py')
-          text = path.read_text(encoding='utf-8')
-
-          targets = '''TARGETS = [
-    ("Frota", "frota", ["frota"]),
-    ("Octech", "octech", ["octech", "oc tech"]),
-    ("Pantanal", "pantanal", ["pantanal"]),
-    ("Tempermat", "tempermat", ["tempermat"]),
-    ("Prime Lente", "prime-lente", ["prime lente logo gradual", "prime lente", "prime-lente"]),
-    ("Trevo", "trevo", ["trevo"]),
-    ("Claro", "claro", ["claro"]),
-    ("NET", "net", ["net", "net-1"]),
-    ("Megasom", "megasom", ["logo megasom sem fundo", "megasom"]),
-]'''
-          text, count = re.subn(r'TARGETS = \[.*?\n\]', targets, text, count=1, flags=re.S)
-          if count != 1:
-              raise SystemExit('Could not scope TARGETS in migration script')
-
-          fallbacks = '''FALLBACK_URLS = {
-    "net": ["https://logospng.org/download/net/logo-net-2048.png"],
-}'''
-          text, count = re.subn(r'FALLBACK_URLS = \{.*?\n\}', fallbacks, text, count=1, flags=re.S)
-          if count != 1:
-              raise SystemExit('Could not scope FALLBACK_URLS in migration script')
-
-          text = text.replace(
-              'REFERENCE_PAGES = [\n    "https://calibergestao.com.br/",\n    "https://calibergestao.com.br/clientes/",\n]',
-              'REFERENCE_PAGES = [\n    "https://calibergestao.com.br/clientes/",\n    "https://calibergestao.com.br/",\n]',
-          )
-
-          # Prefer a loaded image from the legacy clients page when the current
-          # homepage still contains a stale/mismatched WordPress element.
-          text = text.replace(
-              'area = record["natural_width"] * record["natural_height"]\n                ranked.append((loaded, score, area, record))\n        ranked.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)',
-              'source_priority = 1 if "/clientes/" in record["page_url"] else 0\n                area = record["natural_width"] * record["natural_height"]\n                ranked.append((loaded, score, source_priority, area, record))\n        ranked.sort(key=lambda item: (item[0], item[1], item[2], item[3]), reverse=True)',
-          )
-          text = text.replace("best[3]['natural_width']", "best[4]['natural_width']")
-          text = text.replace("best[3]['natural_height']", "best[4]['natural_height']")
-          text = text.replace("best[3]['attrs']", "best[4]['attrs']")
-          text = text.replace("best[3]['page_url']", "best[4]['page_url']")
-          text = text.replace('matches[slug] = [item[3] for item in ranked]', 'matches[slug] = [item[4] for item in ranked]')
-
-          path.write_text(text, encoding='utf-8')
-          PY
-
-      - name: Download and convert real client logos to local transparent assets
-        run: python /tmp/repair_client_logos.py
+      - name: Download real logos and create transparent local assets
+        run: python .github/scripts/repair_client_logos.py
 
       - name: Install dependencies and build
         run: |
