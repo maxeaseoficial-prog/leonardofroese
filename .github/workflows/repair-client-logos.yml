@@ -27,7 +27,7 @@ jobs:
       - name: Install logo tooling
         run: python -m pip install --disable-pip-version-check pillow selenium
 
-      - name: Accept the recovered original JPEG strip
+      - name: Restore the complete approved source strip
         shell: bash
         run: |
           python - <<'PY'
@@ -35,20 +35,45 @@ jobs:
 
           path = Path('.github/scripts/migrate_client_logos.py')
           text = path.read_text(encoding='utf-8')
-          start_marker = '    raw = base64.b64decode(encoded, validate=True)\n'
-          image_marker = '    image = Image.open(io.BytesIO(raw)).convert("RGBA")\n'
-          start = text.find(start_marker)
-          image_pos = text.find(image_marker, start)
-          if start < 0 or image_pos < 0:
-              raise SystemExit('Historical source decoder block not found')
-          replacement = (
-              '    raw = base64.b64decode(encoded, validate=True)\n'
-              '    source = Image.open(io.BytesIO(raw))\n'
-              '    source_format = source.format\n'
-              '    image = source.convert("RGBA")\n'
-              '    print(f"RECOVERED SOURCE FORMAT: {source_format}")\n'
-          )
-          text = text[:start] + replacement + text[image_pos + len(image_marker):]
+          start = text.find('def load_consistent_legacy_strip() -> Image.Image:\n')
+          end = text.find('\ndef color_distance', start)
+          if start < 0 or end < 0:
+              raise SystemExit('Source loader function not found')
+
+          replacement = '''def load_consistent_legacy_strip() -> Image.Image:
+              encoded = subprocess.check_output(
+                  [
+                      "git",
+                      "show",
+                      "907f0978d04602a1a03ad4da4f44396f4901ecb9:public/client-logos/clients-strip.b64.txt",
+                  ],
+                  cwd=ROOT,
+                  text=True,
+              )
+              encoded = "".join(encoded.split())
+              raw = base64.b64decode(encoded, validate=True)
+              source = Image.open(io.BytesIO(raw))
+              source_format = source.format
+              source.load()
+              image = source.convert("RGBA")
+              if image.width % len(LOGOS) != 0:
+                  raise RuntimeError(
+                      f"Unexpected source width {image.width} for {len(LOGOS)} logo cells"
+                  )
+              if image.height < 20:
+                  raise RuntimeError(f"Unexpected source height: {image.height}")
+              print(
+                  f"COMPLETE APPROVED SOURCE: format={source_format}; "
+                  f"size={image.width}x{image.height}; bytes={len(raw)}; "
+                  f"cell_width={image.width // len(LOGOS)}"
+              )
+              return image
+          '''
+          replacement = '\n'.join(
+              line[12:] if line.startswith('            ') else line
+              for line in replacement.splitlines()
+          ).strip() + '\n\n'
+          text = text[:start] + replacement + text[end + 1:]
           path.write_text(text, encoding='utf-8')
           PY
 
