@@ -21,54 +21,39 @@ ROOT = Path.cwd()
 OUT = ROOT / "public/client-logos"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# The homepage was redesigned and still contains a few stale WordPress image
-# elements. The legacy clients page is kept as a second source because it has
-# the original client-logo media library. We only persist the image bytes that
-# actually load successfully; the final site never hotlinks either page.
 REFERENCE_PAGES = [
-    "https://calibergestao.com.br/",
     "https://calibergestao.com.br/clientes/",
+    "https://calibergestao.com.br/",
 ]
 
+# This is the exact set that existed in Leonardo's broken strip implementation.
 TARGETS = [
-    ("Claro", "claro", ["claro"]),
-    ("NET", "net", ["net", "net-1"]),
-    ("Megasom", "megasom", ["logo megasom sem fundo", "megasom"]),
-    ("Leo Madeiras", "leo-madeiras", ["leo madeiras", "leo-madeiras"]),
-    ("Procria", "procria", ["procria"]),
-    ("LEGO", "lego", ["lego"]),
-    ("Maxvinil", "maxvinil", ["maxvinil"]),
-    ("Tupperware", "tupperware", ["tupperware"]),
-    ("Águas de Sorriso", "aguas-de-sorriso", ["aguas de sorriso", "aguas-de-sorriso"]),
-    ("Aliança", "alianca", ["alianca", "aliança"]),
-    ("Campo Solar", "campo-solar", ["campo solar", "campo-solar"]),
-    ("Cobertura Imasa", "cobertura-imasa", ["cobertura imasa", "cobertura-imasa"]),
-    ("Eletricidade Paraense", "eletricidade-paraense", ["eletricidade paraense", "eletricidade-paraense"]),
-    ("Fatex", "fatex", ["fatex"]),
     ("Frota", "frota", ["frota"]),
     ("Octech", "octech", ["octech", "oc tech"]),
     ("Pantanal", "pantanal", ["pantanal"]),
     ("Tempermat", "tempermat", ["tempermat"]),
     ("Prime Lente", "prime-lente", ["prime lente logo gradual", "prime lente", "prime-lente"]),
     ("Trevo", "trevo", ["trevo"]),
+    ("Claro", "claro", ["claro"]),
+    ("NET", "net", ["net", "net-1"]),
+    ("Megasom", "megasom", ["logo megasom sem fundo", "megasom"]),
 ]
 
-# Used only when the Cáliber copy of the same brand is currently unavailable.
-# These are still real brand assets and are downloaded once into the repo.
+# Only used if the specific Cáliber copy is dead. The file is downloaded once
+# and stored locally; the Leonardo site never hotlinks it at runtime.
 FALLBACK_URLS = {
     "net": ["https://logospng.org/download/net/logo-net-2048.png"],
-    "prime-lente": ["https://www.reachoptic.com/assets/images/products/1680522731prime_lenses.jpg"],
 }
 
 
 def normalize(value: str | None) -> str:
-    value = unicodedata.normalize("NFKD", value or "")
-    value = "".join(ch for ch in value if not unicodedata.combining(ch))
-    return re.sub(r"[^a-z0-9]+", " ", value.lower()).strip()
+    text = unicodedata.normalize("NFKD", value or "")
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
 
 
 def describe_image(element, page_url: str) -> dict:
-    attrs: dict[str, str] = {}
+    attrs = {}
     for key in (
         "alt",
         "title",
@@ -83,20 +68,18 @@ def describe_image(element, page_url: str) -> dict:
     ):
         attrs[key] = element.get_attribute(key) or ""
     attrs["currentSrc"] = element.get_property("currentSrc") or ""
-    descriptor = normalize(" ".join(attrs.values()))
     return {
         "page_url": page_url,
         "attrs": attrs,
-        "descriptor": descriptor,
+        "descriptor": normalize(" ".join(attrs.values())),
         "natural_width": int(element.get_property("naturalWidth") or 0),
         "natural_height": int(element.get_property("naturalHeight") or 0),
     }
 
 
-def candidate_score(record: dict, aliases: list[str]) -> int:
-    attrs = record["attrs"]
-    alt = normalize(attrs.get("alt"))
-    title = normalize(attrs.get("title"))
+def score_record(record: dict, aliases: list[str]) -> int:
+    alt = normalize(record["attrs"].get("alt"))
+    title = normalize(record["attrs"].get("title"))
     descriptor = record["descriptor"]
     best = 0
     for alias in aliases:
@@ -117,39 +100,41 @@ def candidate_score(record: dict, aliases: list[str]) -> int:
 
 
 def candidate_urls(record: dict) -> list[str]:
-    attrs = record["attrs"]
     page_url = record["page_url"]
-    values: list[str] = []
+    attrs = record["attrs"]
+    raw_values: list[str] = []
+
     for key in ("currentSrc", "data-lazy-src", "data-src", "data-original", "src"):
         value = (attrs.get(key) or "").strip()
         if value and not value.startswith("data:"):
-            values.append(urljoin(page_url, value))
+            raw_values.append(urljoin(page_url, value))
+
     for key in ("data-lazy-srcset", "srcset"):
-        for part in (attrs.get(key) or "").split(","):
-            part = part.strip()
-            if part:
-                values.append(urljoin(page_url, part.split()[0]))
+        for entry in (attrs.get(key) or "").split(","):
+            entry = entry.strip()
+            if entry:
+                raw_values.append(urljoin(page_url, entry.split()[0]))
 
     expanded: list[str] = []
-    for url in values:
-        expanded.append(url)
-        clean = url.split("?", 1)[0]
-        if clean != url:
+    for value in raw_values:
+        expanded.append(value)
+        clean = value.split("?", 1)[0]
+        if clean != value:
             expanded.append(clean)
-        if "wp.com/calibergestao.com.br/" in url:
-            path = url.split("/calibergestao.com.br/", 1)[1].split("?", 1)[0]
-            expanded.append("https://calibergestao.com.br/" + path)
+        if "wp.com/calibergestao.com.br/" in value:
+            media_path = value.split("/calibergestao.com.br/", 1)[1].split("?", 1)[0]
+            expanded.append("https://calibergestao.com.br/" + media_path)
 
     result: list[str] = []
     seen: set[str] = set()
-    for url in expanded:
-        if url not in seen:
-            seen.add(url)
-            result.append(url)
+    for value in expanded:
+        if value not in seen:
+            seen.add(value)
+            result.append(value)
     return result
 
 
-def browser() -> webdriver.Chrome:
+def make_browser() -> webdriver.Chrome:
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
@@ -161,13 +146,13 @@ def browser() -> webdriver.Chrome:
     driver = webdriver.Chrome(options=options)
     driver.execute_cdp_cmd(
         "Network.enable",
-        {"maxTotalBufferSize": 120_000_000, "maxResourceBufferSize": 12_000_000},
+        {"maxTotalBufferSize": 160_000_000, "maxResourceBufferSize": 16_000_000},
     )
     return driver
 
 
-def collect_response_bodies(driver) -> dict[str, bytes]:
-    responses: dict[str, tuple[str, str]] = {}
+def collect_image_bodies(driver: webdriver.Chrome) -> dict[str, bytes]:
+    responses: dict[str, str] = {}
     for entry in driver.get_log("performance"):
         try:
             message = json.loads(entry["message"])["message"]
@@ -182,80 +167,92 @@ def collect_response_bodies(driver) -> dict[str, bytes]:
         mime = response.get("mimeType") or ""
         status = int(response.get("status") or 0)
         if request_id and status == 200 and (mime.startswith("image/") or "wp-content/uploads" in url or "assets-v1" in url):
-            responses[url] = (request_id, mime)
+            responses[url] = request_id
 
     bodies: dict[str, bytes] = {}
-    for url, (request_id, _mime) in responses.items():
+    for url, request_id in responses.items():
         try:
-            body = driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
-            data = body.get("body", "")
-            raw = base64.b64decode(data) if body.get("base64Encoded") else data.encode("latin1", errors="ignore")
-            if raw:
-                bodies[url] = raw
+            payload = driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})
+            body = payload.get("body", "")
+            data = base64.b64decode(body) if payload.get("base64Encoded") else body.encode("latin1", errors="ignore")
+            if data:
+                bodies[url] = data
         except Exception:
             pass
     return bodies
 
 
 def discover() -> tuple[dict[str, list[dict]], dict[str, bytes], str, list[dict]]:
-    driver = browser()
-    all_records: list[dict] = []
+    driver = make_browser()
+    records: list[dict] = []
     response_bodies: dict[str, bytes] = {}
-    cookies_by_name: dict[tuple[str, str], dict] = {}
+    cookies: dict[tuple[str, str], dict] = {}
     user_agent = "Mozilla/5.0"
+
     try:
         for page_url in REFERENCE_PAGES:
+            print(f"PAGE {page_url}")
             driver.get(page_url)
-            time.sleep(1.5)
+            time.sleep(2.0)
             height = int(driver.execute_script("return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"))
-            for y in range(0, height + 800, 600):
+            for y in range(0, height + 1000, 450):
                 driver.execute_script("window.scrollTo(0, arguments[0])", y)
-                time.sleep(0.14)
+                time.sleep(0.18)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-            time.sleep(1.8)
+            time.sleep(2.0)
 
             user_agent = driver.execute_script("return navigator.userAgent") or user_agent
             for element in driver.find_elements(By.TAG_NAME, "img"):
                 try:
-                    all_records.append(describe_image(element, page_url))
+                    records.append(describe_image(element, page_url))
                 except Exception:
                     continue
-            response_bodies.update(collect_response_bodies(driver))
+            response_bodies.update(collect_image_bodies(driver))
             for cookie in driver.get_cookies():
-                cookies_by_name[(cookie.get("domain") or "", cookie.get("name") or "")] = cookie
+                cookies[(cookie.get("domain") or "", cookie.get("name") or "")] = cookie
     finally:
         driver.quit()
 
     matches: dict[str, list[dict]] = {}
     for display, slug, aliases in TARGETS:
-        ranked: list[tuple[int, int, int, dict]] = []
-        for record in all_records:
-            score = candidate_score(record, aliases)
-            if score:
-                loaded = 1 if record["natural_width"] > 0 and record["natural_height"] > 0 else 0
-                area = record["natural_width"] * record["natural_height"]
-                ranked.append((loaded, score, area, record))
-        ranked.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+        ranked = []
+        for record in records:
+            score = score_record(record, aliases)
+            if not score:
+                continue
+            loaded = int(record["natural_width"] > 0 and record["natural_height"] > 0)
+            legacy = int("/clientes/" in record["page_url"])
+            area = record["natural_width"] * record["natural_height"]
+            ranked.append((loaded, score, legacy, area, record))
+        ranked.sort(key=lambda item: item[:4], reverse=True)
+        matches[slug] = [item[4] for item in ranked]
+
         if not ranked:
-            matches[slug] = []
-            print(f"DISCOVER {display}: no DOM candidate")
+            print(f"DISCOVER {display}: no matching DOM image")
             continue
-        matches[slug] = [item[3] for item in ranked]
+
         best = ranked[0]
+        record = best[4]
         print(
-            f"DISCOVER {display}: loaded={best[0]} score={best[1]} natural="
-            f"{best[3]['natural_width']}x{best[3]['natural_height']} "
-            f"src={best[3]['attrs'].get('currentSrc')!r} page={best[3]['page_url']}"
+            f"DISCOVER {display}: loaded={best[0]} score={best[1]} legacy={best[2]} "
+            f"natural={record['natural_width']}x{record['natural_height']} "
+            f"page={record['page_url']} src={record['attrs'].get('currentSrc')!r}"
         )
-    return matches, response_bodies, user_agent, list(cookies_by_name.values())
+        for index, candidate in enumerate(matches[slug][:6], 1):
+            print(
+                f"  CANDIDATE {index}: natural={candidate['natural_width']}x{candidate['natural_height']} "
+                f"page={candidate['page_url']} urls={candidate_urls(candidate)}"
+            )
+
+    return matches, response_bodies, user_agent, list(cookies.values())
 
 
-def build_session(user_agent: str, cookies: list[dict]) -> requests.Session:
+def make_session(user_agent: str, cookies: list[dict]) -> requests.Session:
     session = requests.Session()
     session.headers.update(
         {
             "User-Agent": user_agent,
-            "Referer": REFERENCE_PAGES[0],
+            "Referer": "https://calibergestao.com.br/",
             "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
         }
     )
@@ -286,26 +283,32 @@ def fetch_logo(
             seen.add(url)
             urls.append(url)
 
-    # Prefer original bytes already loaded successfully by Chromium.
     for url in urls:
         if url in response_bodies:
+            print(f"RESOURCE {display}: Chromium body {url}")
             return response_bodies[url], url
         clean = url.split("?", 1)[0]
-        for loaded_url, raw in response_bodies.items():
+        for loaded_url, data in response_bodies.items():
             if loaded_url.split("?", 1)[0] == clean:
-                return raw, loaded_url
+                print(f"RESOURCE {display}: Chromium equivalent {loaded_url}")
+                return data, loaded_url
 
-    errors: list[str] = []
+    errors = []
     for url in urls:
         try:
-            response = session.get(url, timeout=30)
+            response = session.get(url, timeout=25)
             response.raise_for_status()
             if len(response.content) < 100:
-                raise RuntimeError(f"response too small ({len(response.content)} bytes)")
+                raise RuntimeError(f"response too small: {len(response.content)} bytes")
+            print(f"RESOURCE {display}: HTTP {url}")
             return response.content, url
         except Exception as exc:
             errors.append(f"{url}: {exc}")
-    raise RuntimeError(f"Could not fetch {display}. Attempts: {' | '.join(errors[-12:])}")
+
+    raise RuntimeError(
+        f"Could not fetch a real asset for {display}. "
+        + ("Attempts: " + " | ".join(errors[-14:]) if errors else "No candidate URLs found.")
+    )
 
 
 def color_distance(a, b) -> float:
@@ -322,30 +325,30 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
     for y in range(height):
         border.extend((pixels[0, y], pixels[width - 1, y]))
 
-    if sum(1 for p in border if p[3] <= 20) / max(1, len(border)) >= 0.65:
-        return rgba
-    opaque = [p for p in border if p[3] >= 180]
-    if len(opaque) < 12:
+    if sum(1 for pixel in border if pixel[3] <= 20) / max(1, len(border)) >= 0.60:
         return rgba
 
-    channels = list(zip(*[(p[0], p[1], p[2]) for p in opaque]))
+    opaque = [pixel for pixel in border if pixel[3] >= 180]
+    if not opaque:
+        return rgba
+    channels = list(zip(*[(pixel[0], pixel[1], pixel[2]) for pixel in opaque]))
     background = tuple(sorted(channel)[len(channel) // 2] for channel in channels)
     deviations = sorted(color_distance(pixel, background) for pixel in opaque)
     p90 = deviations[min(len(deviations) - 1, int(len(deviations) * 0.90))]
-    neutral_light = max(background) - min(background) <= 32 and min(background) >= 170
+    neutral_light = max(background) - min(background) <= 36 and min(background) >= 160
     uniform = p90 <= 30
     if not (neutral_light or uniform):
         return rgba
 
-    threshold = 70 if neutral_light else 42
-    seen = bytearray(width * height)
+    threshold = 76 if neutral_light else 42
+    visited = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
 
     def add(x: int, y: int) -> None:
-        idx = y * width + x
-        if seen[idx]:
+        index = y * width + x
+        if visited[index]:
             return
-        seen[idx] = 1
+        visited[index] = 1
         pixel = pixels[x, y]
         if pixel[3] <= 25 or color_distance(pixel, background) <= threshold:
             queue.append((x, y))
@@ -356,6 +359,7 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
     for y in range(height):
         add(0, y)
         add(width - 1, y)
+
     while queue:
         x, y = queue.popleft()
         r, g, b, _ = pixels[x, y]
@@ -372,19 +376,14 @@ def remove_edge_background(image: Image.Image) -> Image.Image:
 
 
 def save_png(raw: bytes, destination: Path) -> None:
-    try:
-        image = Image.open(io.BytesIO(raw)).convert("RGBA")
-        image.load()
-    except Exception as exc:
-        if b"<svg" in raw[:1500].lower():
-            raise RuntimeError(f"SVG source is not supported for {destination.name}: {exc}") from exc
-        raise
-    if image.width > 1400 or image.height > 900:
-        image.thumbnail((1400, 900), Image.Resampling.LANCZOS)
+    image = Image.open(io.BytesIO(raw)).convert("RGBA")
+    image.load()
+    if image.width > 1800 or image.height > 1200:
+        image.thumbnail((1800, 1200), Image.Resampling.LANCZOS)
     image = remove_edge_background(image)
     bbox = image.getchannel("A").getbbox()
     if not bbox:
-        raise RuntimeError(f"No visible pixels for {destination.name}")
+        raise RuntimeError(f"No visible logo pixels for {destination.name}")
     image = image.crop(bbox)
     pad = max(10, round(max(image.size) * 0.045))
     canvas = Image.new("RGBA", (image.width + 2 * pad, image.height + 2 * pad), (0, 0, 0, 0))
@@ -392,22 +391,28 @@ def save_png(raw: bytes, destination: Path) -> None:
     canvas.save(destination, "PNG", optimize=True)
 
     verify = Image.open(destination).convert("RGBA")
-    amin, amax = verify.getchannel("A").getextrema()
+    alpha_min, alpha_max = verify.getchannel("A").getextrema()
     corners = [
         verify.getpixel((0, 0))[3],
         verify.getpixel((verify.width - 1, 0))[3],
         verify.getpixel((0, verify.height - 1))[3],
         verify.getpixel((verify.width - 1, verify.height - 1))[3],
     ]
-    if amin != 0 or amax == 0 or any(corners):
-        raise RuntimeError(f"Transparency validation failed for {destination.name}: alpha={amin}-{amax}, corners={corners}")
-    print(f"ASSET {destination.name}: {verify.width}x{verify.height} alpha={amin}-{amax} corners={corners}")
+    if alpha_min != 0 or alpha_max == 0 or any(corners):
+        raise RuntimeError(
+            f"Transparency validation failed for {destination.name}: "
+            f"alpha={alpha_min}-{alpha_max}, corners={corners}"
+        )
+    print(
+        f"ASSET {destination.name}: {verify.width}x{verify.height} "
+        f"alpha={alpha_min}-{alpha_max} corners={corners}"
+    )
 
 
-def generate_component() -> None:
+def write_component() -> None:
     items = "\n".join(
-        f'  {{ name: "{display}", src: "/client-logos/{slug}.png" }},'
-        for display, slug, _aliases in TARGETS
+        f'  {{ name: "{name}", src: "/client-logos/{slug}.png" }},'
+        for name, slug, _aliases in TARGETS
     )
     component = f'''import "./client-logos.css";
 
@@ -446,6 +451,8 @@ export function ClientLogos({{ className = "" }}: {{ className?: string }}) {{
 '''
     (ROOT / "src/components/site/client-logos.tsx").write_text(component, encoding="utf-8")
 
+
+def write_css() -> None:
     css = '''.client-logos {
   position: relative;
   width: 100%;
@@ -454,41 +461,53 @@ export function ClientLogos({{ className = "" }}: {{ className?: string }}) {{
   overflow: hidden;
   background: transparent;
 }
-.client-logos-heading { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px; }
-.client-logos-heading > span { color: hsl(var(--primary)); font-size: 11px; font-weight: 650; letter-spacing: .22em; line-height: 1.55; text-transform: uppercase; }
-.client-logos-heading h3 { max-width: 760px; margin: 14px 0 0; color: hsl(var(--foreground)); font-size: clamp(34px,4vw,56px); line-height: 1; font-weight: 750; letter-spacing: -.035em; text-wrap: balance; }
-.client-logos-viewport { position: relative; width: 100%; max-width: 100%; min-width: 0; margin-top: 38px; overflow: hidden; background: transparent; -webkit-mask-image: linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); mask-image: linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); }
-.client-logos-track { display: flex; width: max-content; max-width: none; align-items: center; animation: client-logos-marquee 58s linear infinite; will-change: transform; }
-.client-logos-group { display: flex; flex: 0 0 auto; align-items: center; gap: clamp(42px,4.5vw,76px); padding-right: clamp(42px,4.5vw,76px); }
-.client-logo-item { display: flex; width: clamp(118px,12vw,176px); height: 78px; flex: 0 0 auto; align-items: center; justify-content: center; background: transparent; }
-.client-logo-item img { display: block; width: auto; max-width: 100%; height: auto; max-height: 70px; object-fit: contain; background: transparent; user-select: none; }
-@keyframes client-logos-marquee { from { transform: translate3d(-50%,0,0); } to { transform: translate3d(0,0,0); } }
-@media (hover:hover) and (pointer:fine) { .client-logos-viewport:hover .client-logos-track { animation-play-state: paused; } }
+.client-logos-heading { display:flex; flex-direction:column; align-items:center; padding:0 20px; text-align:center; }
+.client-logos-heading > span { color:hsl(var(--primary)); font-size:11px; font-weight:650; letter-spacing:.22em; line-height:1.55; text-transform:uppercase; }
+.client-logos-heading h3 { max-width:760px; margin:14px 0 0; color:hsl(var(--foreground)); font-size:clamp(34px,4vw,56px); font-weight:750; letter-spacing:-.035em; line-height:1; text-wrap:balance; }
+.client-logos-viewport { position:relative; width:100%; max-width:100%; min-width:0; margin-top:38px; overflow:hidden; background:transparent; -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); }
+.client-logos-track { display:flex; width:max-content; align-items:center; animation:client-logos-marquee 42s linear infinite; will-change:transform; }
+.client-logos-group { display:flex; flex:0 0 auto; align-items:center; gap:clamp(42px,4.5vw,76px); padding-right:clamp(42px,4.5vw,76px); }
+.client-logo-item { display:flex; width:clamp(120px,12vw,176px); height:78px; flex:0 0 auto; align-items:center; justify-content:center; background:transparent; }
+.client-logo-item img { display:block; width:auto; max-width:100%; height:auto; max-height:70px; object-fit:contain; background:transparent; user-select:none; }
+@keyframes client-logos-marquee { from { transform:translate3d(-50%,0,0); } to { transform:translate3d(0,0,0); } }
+@media (hover:hover) and (pointer:fine) { .client-logos-viewport:hover .client-logos-track { animation-play-state:paused; } }
 @media (max-width:720px) {
-  .client-logos-heading { padding-inline: 14px; }
-  .client-logos-heading > span { max-width: 330px; font-size: 9px; letter-spacing: .16em; }
-  .client-logos-heading h3 { max-width: 340px; margin-top: 12px; font-size: clamp(32px,10vw,42px); }
-  .client-logos-viewport { margin-top: 28px; -webkit-mask-image: linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); mask-image: linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); }
-  .client-logos-track { animation-duration: 50s; }
-  .client-logos-group { gap: 30px; padding-right: 30px; }
-  .client-logo-item { width: 112px; height: 62px; }
-  .client-logo-item img { max-height: 54px; }
+  .client-logos-heading { padding-inline:14px; }
+  .client-logos-heading > span { max-width:330px; font-size:9px; letter-spacing:.16em; }
+  .client-logos-heading h3 { max-width:340px; margin-top:12px; font-size:clamp(32px,10vw,42px); }
+  .client-logos-viewport { margin-top:28px; -webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); }
+  .client-logos-track { animation-duration:36s; }
+  .client-logos-group { gap:30px; padding-right:30px; }
+  .client-logo-item { width:112px; height:62px; }
+  .client-logo-item img { max-height:54px; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .client-logos-viewport { overflow: hidden; -webkit-mask-image: none; mask-image: none; }
-  .client-logos-track { width: 100%; max-width: 100%; animation: none; transform: none; will-change: auto; }
-  .client-logos-group { width: 100%; flex-wrap: wrap; justify-content: center; gap: 28px 38px; padding-right: 0; }
-  .client-logos-group[data-clone="true"] { display: none; }
+  .client-logos-viewport { -webkit-mask-image:none; mask-image:none; }
+  .client-logos-track { width:100%; animation:none; transform:none; will-change:auto; }
+  .client-logos-group { width:100%; flex-wrap:wrap; justify-content:center; gap:28px 38px; padding-right:0; }
+  .client-logos-group[data-clone="true"] { display:none; }
 }
 '''
     (ROOT / "src/components/site/client-logos.css").write_text(css, encoding="utf-8")
 
 
 matches, response_bodies, user_agent, cookies = discover()
-session = build_session(user_agent, cookies)
+session = make_session(user_agent, cookies)
+collected: dict[str, tuple[bytes, str]] = {}
+errors: list[str] = []
+
+for display, slug, _aliases in TARGETS:
+    try:
+        collected[slug] = fetch_logo(display, slug, matches.get(slug, []), response_bodies, session)
+    except Exception as exc:
+        errors.append(str(exc))
+
+if errors:
+    raise RuntimeError("\n".join(errors))
+
 expected: set[str] = set()
 for display, slug, _aliases in TARGETS:
-    raw, source_url = fetch_logo(display, slug, matches.get(slug, []), response_bodies, session)
+    raw, source_url = collected[slug]
     destination = OUT / f"{slug}.png"
     save_png(raw, destination)
     expected.add(destination.name)
@@ -498,7 +517,8 @@ for path in OUT.iterdir():
     if path.is_file() and path.name not in expected:
         path.unlink()
 
-generate_component()
+write_component()
+write_css()
 
 for obsolete in (
     ROOT / "src/assets/client-logo-transparent-webp-base64.ts",
