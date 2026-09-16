@@ -27,23 +27,69 @@ jobs:
 
       - name: Recover complete legacy WebP migration source
         run: |
-          bun -e '
-            const modules = await Promise.all(
-              Array.from({ length: 8 }, (_, i) => import(`./src/assets/client-logo-strip/chunk${i}.ts`)),
-            );
-            const encoded = modules.map((mod) => mod.default).join("");
-            const bytes = Buffer.from(encoded, "base64");
-            if (bytes.length < 16 || bytes.toString("ascii", 0, 4) !== "RIFF" || bytes.toString("ascii", 8, 12) !== "WEBP") {
-              throw new Error("Reconstructed client-logo source is not a WebP container");
-            }
-            const declaredLength = bytes.readUInt32LE(4) + 8;
-            if (declaredLength < 16 || declaredLength > bytes.length) {
-              throw new Error(`WebP declares ${declaredLength} bytes but only ${bytes.length} were reconstructed`);
-            }
-            const canonical = bytes.subarray(0, declaredLength);
-            await Bun.write("public/client-logos/clients-strip.b64.txt", canonical.toString("base64"));
-            console.log(`Recovered WebP: ${bytes.length} reconstructed bytes; RIFF payload ${declaredLength} bytes`);
-          '
+          python - <<'PY'
+          import base64
+          import io
+          import json
+          import re
+          from pathlib import Path
+          from PIL import Image
+
+          chunks_dir = Path("src/assets/client-logo-strip")
+          parts = []
+          for i in range(8):
+              path = chunks_dir / f"chunk{i}.ts"
+              text = path.read_text(encoding="utf-8")
+              literals = re.findall(r'"(?:\\.|[^"\\])*"', text, flags=re.S)
+              candidates = []
+              for literal in literals:
+                  try:
+                      value = json.loads(literal)
+                  except Exception:
+                      continue
+                  if len(value) >= 1000 and re.fullmatch(r"[A-Za-z0-9+/=]+", value):
+                      candidates.append(value)
+              if not candidates:
+                  raise SystemExit(f"Could not locate base64 payload in {path}")
+              part = max(candidates, key=len)
+              parts.append(part)
+              print(f"{path.name}: {len(part)} base64 chars")
+
+          encoded = "".join(parts)
+          if not encoded.startswith("UklG"):
+              raise SystemExit("Reconstructed source does not begin with a WebP RIFF payload")
+
+          # Decode enough of the stream to read the RIFF size, then cut the
+          # concatenated legacy payload at the exact canonical WebP length.
+          header = base64.b64decode(encoded[:32] + "===")
+          if header[:4] != b"RIFF" or header[8:12] != b"WEBP":
+              raise SystemExit("Reconstructed source is not a WebP container")
+          declared_length = int.from_bytes(header[4:8], "little") + 8
+          encoded_length = ((declared_length + 2) // 3) * 4
+          if len(encoded) < encoded_length:
+              raise SystemExit(
+                  f"WebP requires {encoded_length} base64 chars ({declared_length} bytes), "
+                  f"but only {len(encoded)} were recovered"
+              )
+
+          canonical_encoded = encoded[:encoded_length]
+          raw = base64.b64decode(canonical_encoded, validate=True)
+          if len(raw) != declared_length:
+              raise SystemExit(
+                  f"Decoded WebP length mismatch: expected {declared_length}, got {len(raw)}"
+              )
+
+          image = Image.open(io.BytesIO(raw))
+          image.load()
+          print(
+              f"Recovered canonical WebP: {image.width}x{image.height}, "
+              f"{declared_length} bytes / {encoded_length} base64 chars"
+          )
+
+          target = Path("public/client-logos/clients-strip.b64.txt")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(canonical_encoded, encoding="utf-8")
+          PY
           rm -f src/assets/client-logo-transparent-webp-base64.ts
 
       - name: Extract individual transparent client logos
