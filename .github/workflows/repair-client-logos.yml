@@ -50,7 +50,12 @@ jobs:
                   cwd=ROOT,
                   text=True,
               )
-              encoded = "".join(encoded.split())
+              original_length = len(encoded)
+              encoded = re.sub(r"[^A-Za-z0-9+/=]", "", encoded)
+              print(
+                  f"SOURCE BASE64: raw_chars={original_length}; "
+                  f"sanitized_chars={len(encoded)}; dropped={original_length - len(encoded)}"
+              )
               raw = base64.b64decode(encoded, validate=True)
               source = Image.open(io.BytesIO(raw))
               source_format = source.format
