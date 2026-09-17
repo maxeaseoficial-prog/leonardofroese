@@ -1,0 +1,220 @@
+name: Clean client logo edges
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install image and browser tooling
+        run: python -m pip install --disable-pip-version-check pillow selenium
+
+      - name: Clean halos and upscale problem logos
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from collections import deque
+          from PIL import Image, ImageDraw
+
+          root = Path('public/client-logos')
+          targets = {
+              'octech.png': {'passes': 5, 'soft': 210},
+              'pantanal.png': {'passes': 3, 'soft': 228},
+              'tempermat.png': {'passes': 4, 'soft': 218},
+          }
+
+          def boundary_cleanup(img: Image.Image, passes: int, soft: int) -> tuple[Image.Image, int]:
+              im = img.convert('RGBA')
+              w, h = im.size
+              px = im.load()
+              removed = 0
+              for _ in range(passes):
+                  alpha = [[px[x, y][3] for x in range(w)] for y in range(h)]
+                  changes = []
+                  for y in range(h):
+                      for x in range(w):
+                          r, g, b, a = px[x, y]
+                          if a <= 8:
+                              continue
+                          transparent_neighbors = 0
+                          for yy in range(max(0, y - 1), min(h, y + 2)):
+                              for xx in range(max(0, x - 1), min(w, x + 2)):
+                                  if xx == x and yy == y:
+                                      continue
+                                  if alpha[yy][xx] <= 12:
+                                      transparent_neighbors += 1
+                          if not transparent_neighbors:
+                              continue
+                          hi, lo = max(r, g, b), min(r, g, b)
+                          chroma = hi - lo
+                          lum = (r + g + b) / 3
+
+                          new_a = a
+                          # Hard white fringe/background residue.
+                          if lum >= 246 and chroma <= 34:
+                              new_a = 0
+                          # Softer neutral halo directly touching transparency.
+                          elif lum >= soft and chroma <= 24 and transparent_neighbors >= 2:
+                              factor = max(0.0, min(1.0, (246 - lum) / max(1.0, 246 - soft)))
+                              new_a = int(a * factor * 0.72)
+                          # Tiny pale antialias residue at the very outside edge.
+                          elif lum >= soft - 18 and chroma <= 13 and transparent_neighbors >= 5:
+                              new_a = int(a * 0.25)
+
+                          if new_a < a:
+                              changes.append((x, y, new_a))
+                  if not changes:
+                      break
+                  for x, y, new_a in changes:
+                      r, g, b, a = px[x, y]
+                      px[x, y] = (r, g, b, new_a)
+                      if new_a <= 8:
+                          removed += 1
+
+              # Remove only tiny pale neutral islands; preserve colored/logo detail.
+              visible = [[px[x, y][3] > 18 for x in range(w)] for y in range(h)]
+              seen = [[False] * w for _ in range(h)]
+              for y0 in range(h):
+                  for x0 in range(w):
+                      if not visible[y0][x0] or seen[y0][x0]:
+                          continue
+                      q = deque([(x0, y0)])
+                      seen[y0][x0] = True
+                      comp = []
+                      while q:
+                          x, y = q.popleft(); comp.append((x, y))
+                          for nx, ny in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):
+                              if 0 <= nx < w and 0 <= ny < h and visible[ny][nx] and not seen[ny][nx]:
+                                  seen[ny][nx] = True; q.append((nx, ny))
+                      if len(comp) <= 5:
+                          neutral_pale = True
+                          for x, y in comp:
+                              r, g, b, a = px[x, y]
+                              if (r + g + b) / 3 < 185 or max(r,g,b) - min(r,g,b) > 28:
+                                  neutral_pale = False; break
+                          if neutral_pale:
+                              for x, y in comp:
+                                  r, g, b, a = px[x, y]
+                                  px[x, y] = (r, g, b, 0)
+                                  removed += 1
+              return im, removed
+
+          report = []
+          thumbs = []
+          for name, cfg in targets.items():
+              path = root / name
+              img = Image.open(path).convert('RGBA')
+              before = img.size
+              cleaned, removed = boundary_cleanup(img, cfg['passes'], cfg['soft'])
+              alpha = cleaned.getchannel('A')
+              bbox = alpha.point(lambda a: 255 if a > 8 else 0).getbbox()
+              if not bbox:
+                  raise RuntimeError(f'{name}: cleanup removed all visible pixels')
+              # Keep existing canvas proportions, but upscale small raster sources so browser
+              # interpolation on Retina/high-DPI screens looks smoother.
+              scale = 4 if max(cleaned.size) < 260 else 2
+              cleaned = cleaned.resize((cleaned.width * scale, cleaned.height * scale), Image.Resampling.LANCZOS)
+              cleaned.save(path, 'PNG', optimize=True)
+              verify = Image.open(path).convert('RGBA')
+              amin, amax = verify.getchannel('A').getextrema()
+              if amin != 0 or amax == 0:
+                  raise RuntimeError(f'{name}: invalid transparency after cleanup {amin}-{amax}')
+              report.append((name, before, verify.size, removed, amin, amax))
+
+              preview = Image.new('RGB', (560, 180), '#080808')
+              logo = verify.copy()
+              logo.thumbnail((480, 115), Image.Resampling.LANCZOS)
+              preview.paste(logo, ((560-logo.width)//2, (180-logo.height)//2), logo)
+              thumbs.append((name, preview))
+
+          sheet = Image.new('RGB', (560, 180 * len(thumbs)), '#080808')
+          draw = ImageDraw.Draw(sheet)
+          for i, (name, preview) in enumerate(thumbs):
+              y = i * 180
+              sheet.paste(preview, (0, y))
+              draw.text((12, y + 10), name, fill='white')
+          Path('/tmp/logo-cleanup').mkdir(parents=True, exist_ok=True)
+          sheet.save('/tmp/logo-cleanup/cleaned-logos-dark-bg.png', 'PNG')
+          for row in report:
+              print('CLEANED', row)
+          PY
+
+      - name: Build
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Validate marquee visually on desktop and mobile
+        run: |
+          bunx vite dev --host 127.0.0.1 --port 4173 > /tmp/vite-logo-clean.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            if [ "$i" = 30 ]; then cat /tmp/vite-logo-clean.log; exit 1; fi
+            sleep 1
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import time
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
+
+          out = Path('/tmp/logo-cleanup'); out.mkdir(parents=True, exist_ok=True)
+          for name, width, height in [('desktop',1440,900),('mobile',390,844)]:
+              opts = Options(); opts.add_argument('--headless=new'); opts.add_argument('--no-sandbox'); opts.add_argument('--disable-gpu'); opts.add_argument('--disable-dev-shm-usage'); opts.add_argument(f'--window-size={width},{height}')
+              driver = webdriver.Chrome(options=opts)
+              try:
+                  driver.set_window_size(width,height)
+                  driver.get('http://127.0.0.1:4173/')
+                  section = WebDriverWait(driver,30).until(EC.presence_of_element_located((By.CSS_SELECTOR,'.client-logos')))
+                  WebDriverWait(driver,30).until(lambda d: d.execute_script("return [...document.querySelectorAll('.client-logos img')].every(i=>i.complete&&i.naturalWidth>0)"))
+                  overflow = driver.execute_script('return document.documentElement.scrollWidth > document.documentElement.clientWidth')
+                  if overflow: raise RuntimeError(f'{name}: horizontal overflow')
+                  track = driver.find_element(By.CSS_SELECTOR,'.client-logos-track')
+                  driver.execute_script("arguments[0].scrollIntoView({block:'center'}); arguments[1].style.animationPlayState='paused';", section, track)
+                  time.sleep(.3)
+                  driver.save_screenshot(str(out / f'marquee-{name}.png'))
+                  print(f'VALID {name}: loaded=true overflow=false')
+              finally:
+                  driver.quit()
+          PY
+
+      - name: Upload visual checks
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleaned-client-logo-checks
+          path: /tmp/logo-cleanup
+
+      - name: Commit cleaned assets
+        run: |
+          rm -f .github/workflows/clean-client-logo-edges.yml
+          git diff --check
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: clean client logo edge artifacts"
+          git push origin main
