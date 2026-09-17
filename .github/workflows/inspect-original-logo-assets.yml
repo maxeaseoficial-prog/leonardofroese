@@ -1,0 +1,57 @@
+name: Inspect original client logo artwork
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Build original colored logo contact sheet
+        run: |
+          mkdir -p /tmp/original-client-logos /tmp/original-logo-inspection
+          for f in public/client-logos/*.png; do
+            n=$(basename "$f")
+            git show 8c487e5e0b13deb3f21e60e2ebd5735922abbb09:public/client-logos/$n > /tmp/original-client-logos/$n
+          done
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          root=Path('/tmp/original-client-logos')
+          files=sorted(root.glob('*.png'))
+          cols=3; cellw=460; cellh=150; rows=(len(files)+cols-1)//cols
+          sheet=Image.new('RGB',(cellw*cols,cellh*rows),'#090909')
+          draw=ImageDraw.Draw(sheet)
+          for i,p in enumerate(files):
+              img=Image.open(p).convert('RGBA')
+              img.thumbnail((380,95),Image.Resampling.LANCZOS)
+              x=(i%cols)*cellw; y=(i//cols)*cellh
+              sheet.paste(img,(x+(cellw-img.width)//2,y+(cellh-img.height)//2),img)
+              draw.text((x+10,y+8),p.stem,fill='white')
+          sheet.save('/tmp/original-logo-inspection/original-colored-logos-dark-bg.png')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-logo-inspection
+          path: /tmp/original-logo-inspection
+      - name: Remove inspector workflow
+        run: |
+          rm -f .github/workflows/inspect-original-logo-assets.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "ci: remove one-off logo inspector"
+          git push origin main
