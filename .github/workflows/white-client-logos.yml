@@ -1,0 +1,161 @@
+name: White client logos
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  whiten:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install image and browser tooling
+        run: python -m pip install --disable-pip-version-check pillow selenium
+
+      - name: Convert every client logo to white with real transparency
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+
+          root = Path('public/client-logos')
+          paths = sorted(root.glob('*.png'))
+          if not paths:
+              raise RuntimeError('No client logo PNG assets found')
+
+          report = []
+          previews = []
+          for path in paths:
+              img = Image.open(path).convert('RGBA')
+              alpha = img.getchannel('A')
+              # Remove only imperceptible alpha noise; preserve the actual silhouette and antialiasing.
+              alpha = alpha.point(lambda a: 0 if a <= 6 else a)
+              # Preserve geometry and alpha exactly; replace every visible RGB value with pure white.
+              white = Image.new('RGBA', img.size, (255, 255, 255, 0))
+              white.putalpha(alpha)
+              white.save(path, 'PNG', optimize=True)
+
+              verify = Image.open(path).convert('RGBA')
+              amin, amax = verify.getchannel('A').getextrema()
+              if amin != 0 or amax == 0:
+                  raise RuntimeError(f'{path.name}: transparency invalid ({amin}-{amax})')
+              visible = [(r,g,b,a) for r,g,b,a in verify.getdata() if a > 0]
+              if not visible:
+                  raise RuntimeError(f'{path.name}: no visible pixels')
+              if any((r,g,b) != (255,255,255) for r,g,b,a in visible):
+                  raise RuntimeError(f'{path.name}: contains non-white visible pixels')
+              report.append((path.name, verify.size, len(visible), amin, amax))
+
+              panel = Image.new('RGB', (420, 130), '#090909')
+              logo = verify.copy()
+              logo.thumbnail((350, 80), Image.Resampling.LANCZOS)
+              panel.paste(logo, ((420-logo.width)//2, (130-logo.height)//2), logo)
+              previews.append((path.stem, panel))
+
+          out = Path('/tmp/white-logo-validation')
+          out.mkdir(parents=True, exist_ok=True)
+          cols = 3
+          rows = (len(previews) + cols - 1) // cols
+          sheet = Image.new('RGB', (420*cols, 130*rows), '#090909')
+          draw = ImageDraw.Draw(sheet)
+          for i,(name,panel) in enumerate(previews):
+              x=(i%cols)*420; y=(i//cols)*130
+              sheet.paste(panel,(x,y))
+              draw.text((x+10,y+8),name,fill='white')
+          sheet.save(out/'all-white-logos-dark-bg.png','PNG')
+          for row in report:
+              print('WHITE_LOGO', row)
+          print(f'Converted {len(paths)} logos to pure white transparent PNG assets')
+          PY
+
+      - name: Build
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Validate white logos in browser on desktop, mobile and Raio-X
+        run: |
+          bunx vite dev --host 127.0.0.1 --port 4173 > /tmp/vite-white-logos.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            if [ "$i" = 30 ]; then cat /tmp/vite-white-logos.log; exit 1; fi
+            sleep 1
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import time
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
+
+          out=Path('/tmp/white-logo-validation'); out.mkdir(parents=True,exist_ok=True)
+          tests=[('home-desktop','/',1440,900),('home-mobile','/',390,844)]
+          for name,path,width,height in tests:
+              opts=Options(); opts.add_argument('--headless=new'); opts.add_argument('--no-sandbox'); opts.add_argument('--disable-gpu'); opts.add_argument('--disable-dev-shm-usage'); opts.add_argument(f'--window-size={width},{height}')
+              d=webdriver.Chrome(options=opts)
+              try:
+                  d.set_window_size(width,height)
+                  d.get('http://127.0.0.1:4173'+path)
+                  section=WebDriverWait(d,30).until(EC.presence_of_element_located((By.CSS_SELECTOR,'.client-logos')))
+                  WebDriverWait(d,30).until(lambda x:x.execute_script("return [...document.querySelectorAll('.client-logos img')].every(i=>i.complete&&i.naturalWidth>0)"))
+                  values=d.execute_script('''
+                    const imgs=[...document.querySelectorAll('.client-logos-group:not([data-clone="true"]) img')];
+                    const results=imgs.map(img=>{
+                      const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+                      const ctx=c.getContext('2d',{willReadFrequently:true}); ctx.drawImage(img,0,0);
+                      const data=ctx.getImageData(0,0,c.width,c.height).data;
+                      let visible=0, transparent=0, nonWhite=0;
+                      for(let i=0;i<data.length;i+=4){ const a=data[i+3]; if(a===0){transparent++; continue;} visible++; if(data[i]<252||data[i+1]<252||data[i+2]<252) nonWhite++; }
+                      return {src:img.getAttribute('src'),visible,transparent,nonWhite};
+                    });
+                    return {count:imgs.length,results,overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth};
+                  ''')
+                  if values['count'] < 17: raise RuntimeError(f'{name}: expected 17 logos, got {values["count"]}')
+                  if values['overflow']: raise RuntimeError(f'{name}: horizontal overflow')
+                  bad=[r for r in values['results'] if r['visible']<=0 or r['transparent']<=0 or r['nonWhite']>0]
+                  if bad: raise RuntimeError(f'{name}: invalid white/transparent assets: {bad}')
+                  track=d.find_element(By.CSS_SELECTOR,'.client-logos-track')
+                  d.execute_script("arguments[0].scrollIntoView({block:'center'});arguments[1].style.animationPlayState='paused';",section,track)
+                  time.sleep(.3)
+                  d.save_screenshot(str(out/f'{name}.png'))
+                  print(f'VALID {name}: 17 white logos loaded, transparent=true, overflow=false')
+              finally:
+                  d.quit()
+          PY
+
+      - name: Upload visual validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: white-client-logo-validation
+          path: /tmp/white-logo-validation
+
+      - name: Commit final white logo assets
+        run: |
+          rm -f .github/workflows/white-client-logos.yml
+          git diff --check
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: make all client logos white"
+          git push origin main
