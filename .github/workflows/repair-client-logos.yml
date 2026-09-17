@@ -29,7 +29,17 @@ jobs:
         run: python -m pip install --disable-pip-version-check pillow selenium requests beautifulsoup4
 
       - name: Build independent transparent local logo assets
-        run: python .github/scripts/repair_client_logos.py
+        run: |
+          for attempt in 1 2 3 4; do
+            echo "Logo extraction attempt $attempt/4"
+            if python .github/scripts/migrate_client_logos.py; then
+              exit 0
+            fi
+            if [ "$attempt" = "4" ]; then
+              exit 1
+            fi
+            sleep 6
+          done
 
       - name: Install dependencies and build
         run: |
