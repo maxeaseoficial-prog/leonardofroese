@@ -12,7 +12,6 @@ import {
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
 import { LiveExperience } from "@/features/lucro-2x/live-experience";
-import { ClientLogos } from "@/components/site/client-logos";
 
 export const Route = createFileRoute("/raiox/resultado")({
   head: () => funnelHead,
@@ -120,7 +119,6 @@ function Result() {
         </section>
       </article>
 
-      <ClientLogos className="pb-20 pt-10" />
       <LiveExperience />
     </FunnelShell>
   );
