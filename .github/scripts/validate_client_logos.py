@@ -31,6 +31,8 @@ def make_driver(width: int, height: int) -> webdriver.Chrome:
     options.add_argument(f"--window-size={width},{height}")
     options.add_argument("--force-device-scale-factor=1")
     driver = webdriver.Chrome(options=options)
+    driver.set_page_load_timeout(60)
+    driver.set_script_timeout(30)
     driver.set_window_size(width, height)
     return driver
 
@@ -109,9 +111,21 @@ def validate_direction(driver: webdriver.Chrome, label: str) -> None:
 
 def screenshot_section(driver: webdriver.Chrome, name: str) -> None:
     section = driver.find_element(By.CSS_SELECTOR, ".client-logos")
-    driver.execute_script("arguments[0].scrollIntoView({block:'center'})", section)
-    time.sleep(0.25)
-    section.screenshot(str(OUT / f"{name}.png"))
+    track = driver.find_element(By.CSS_SELECTOR, ".client-logos-track")
+    driver.execute_script("arguments[0].scrollIntoView({block:'center'}); arguments[1].style.animationPlayState='paused';", section, track)
+    time.sleep(0.2)
+    destination = OUT / f"{name}.png"
+    try:
+        # Capture only the current viewport after centering the section. This is much
+        # more stable in headless Chrome than WebElement.screenshot() on an animated,
+        # very wide marquee element and still provides a real visual validation artifact.
+        if not driver.save_screenshot(str(destination)):
+            raise RuntimeError(f"Could not capture visual validation screenshot: {name}")
+    finally:
+        driver.execute_script("arguments[0].style.animationPlayState='';", track)
+    if not destination.exists() or destination.stat().st_size <= 0:
+        raise RuntimeError(f"Empty visual validation screenshot: {name}")
+    print(f"SCREENSHOT {name}: {destination} ({destination.stat().st_size} bytes)")
 
 
 def validate_home(name: str, width: int, height: int) -> None:
