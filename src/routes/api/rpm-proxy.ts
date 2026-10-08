@@ -72,8 +72,22 @@ export const Route = createFileRoute('/api/rpm-proxy')({
     const entry = Object.entries(testimonialVideos).find(([name]) => label.includes(name));
     if (!entry) return false;
 
-    const videoUrl = 'https://www.youtube.com/watch?v=' + entry[1];
-    window.open(videoUrl, '_blank', 'noopener,noreferrer');
+    const mediaContainer = button.closest('div.relative.aspect-video');
+    if (!(mediaContainer instanceof HTMLElement)) return false;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + entry[1] + '?controls=1&playsinline=1&autoplay=1';
+    iframe.title = label.replace(/^reproduzir\s+/, '') + ' do RPM Summit';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.allowFullscreen = true;
+    iframe.style.position = 'absolute';
+    iframe.style.inset = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = '0';
+
+    mediaContainer.replaceChildren(iframe);
     return true;
   };
 
