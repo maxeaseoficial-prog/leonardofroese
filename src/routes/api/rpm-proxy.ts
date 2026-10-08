@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 const RPM_SOURCE_URL = 'https://caliber-summit-forge.lovable.app/'
+const RPM_SOURCE_ORIGIN = 'https://caliber-summit-forge.lovable.app'
 
 export const Route = createFileRoute('/api/rpm-proxy')({
   server: {
@@ -22,21 +23,23 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
         let html = await upstream.text()
 
-        const fallbackStyles = `
-<style>
-  [class~="opacity-0"] { opacity: 1 !important; }
-  [class~="translate-y-8"],
-  [class~="translate-y-6"],
-  [class~="translate-y-4"] { transform: translateY(0) !important; }
-  [class~="blur-[3px]"],
-  [class~="blur-[2px]"],
-  [class~="blur-[1px]"] { filter: none !important; }
-</style>`
+        // Keep the original app assets on the RPM Summit origin. The proxied
+        // document lives under leonardofroese.com.br, so root-relative Vite
+        // assets would otherwise be requested from the wrong host and React
+        // would never hydrate correctly.
+        html = html
+          .replaceAll('src="/', `src="${RPM_SOURCE_ORIGIN}/`)
+          .replaceAll("src='/", `src='${RPM_SOURCE_ORIGIN}/`)
+          .replaceAll('href="/', `href="${RPM_SOURCE_ORIGIN}/`)
+          .replaceAll("href='/", `href='${RPM_SOURCE_ORIGIN}/`)
+          .replaceAll('srcset="/', `srcset="${RPM_SOURCE_ORIGIN}/`)
+          .replaceAll("srcset='/", `srcset='${RPM_SOURCE_ORIGIN}/`)
 
         const bridgeScript = `
 <script>
 (() => {
   const checkoutHost = 'pay.kiwify.com.br';
+
   const openCheckout = (href) => {
     try {
       const url = new URL(href, document.baseURI);
@@ -61,7 +64,7 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 })();
 </script>`
 
-        const headInjection = `<base href="${RPM_SOURCE_URL}">${fallbackStyles}${bridgeScript}`
+        const headInjection = `<base href="${RPM_SOURCE_URL}">${bridgeScript}`
 
         if (html.includes('<head>')) {
           html = html.replace('<head>', `<head>${headInjection}`)
@@ -73,7 +76,7 @@ export const Route = createFileRoute('/api/rpm-proxy')({
           status: 200,
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'public, max-age=60, s-maxage=300',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
           },
         })
       },
