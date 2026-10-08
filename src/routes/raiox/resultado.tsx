@@ -11,7 +11,6 @@ import {
 } from "@/features/lucro-2x/live-session";
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
-import { LiveExperience } from "@/features/lucro-2x/live-experience";
 
 export const Route = createFileRoute("/raiox/resultado")({
   head: () => funnelHead,
@@ -48,6 +47,7 @@ function Result() {
     <FunnelShell>
       <article className="result-shell">
         <div className="funnel-kicker">Raio-x da gestão. {session.contact.empresa}</div>
+
         <section className="result-score">
           <div className="score-number">
             <strong>{result.score}</strong>
@@ -117,9 +117,17 @@ function Result() {
             substitui auditoria.
           </p>
         </section>
-      </article>
 
-      <LiveExperience />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
+          <a
+            href="/rpm"
+            className="funnel-secondary funnel-checkout-padrao"
+            style={{ width: "100%", maxWidth: 420 }}
+          >
+            Mude sua jornada
+          </a>
+        </div>
+      </article>
     </FunnelShell>
   );
 }
