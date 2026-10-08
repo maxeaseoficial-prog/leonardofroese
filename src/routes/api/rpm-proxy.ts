@@ -25,8 +25,7 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
         // Keep the original app assets on the RPM Summit origin. The proxied
         // document lives under leonardofroese.com.br, so root-relative Vite
-        // assets would otherwise be requested from the wrong host and React
-        // would never hydrate correctly.
+        // assets would otherwise be requested from the wrong host.
         html = html
           .replaceAll('src="/', `src="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("src='/", `src='${RPM_SOURCE_ORIGIN}/`)
@@ -34,6 +33,13 @@ export const Route = createFileRoute('/api/rpm-proxy')({
           .replaceAll("href='/", `href='${RPM_SOURCE_ORIGIN}/`)
           .replaceAll('srcset="/', `srcset="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("srcset='/", `srcset='${RPM_SOURCE_ORIGIN}/`)
+
+        // Fallback only for visibility. Do not touch transform/position/blur,
+        // because those are part of the original layout/animation behavior.
+        const visibilityFallback = `
+<style>
+  [class~="opacity-0"] { opacity: 1 !important; }
+</style>`
 
         const bridgeScript = `
 <script>
@@ -64,7 +70,7 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 })();
 </script>`
 
-        const headInjection = `<base href="${RPM_SOURCE_URL}">${bridgeScript}`
+        const headInjection = `<base href="${RPM_SOURCE_URL}">${visibilityFallback}${bridgeScript}`
 
         if (html.includes('<head>')) {
           html = html.replace('<head>', `<head>${headInjection}`)
