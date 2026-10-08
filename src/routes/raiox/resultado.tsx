@@ -118,15 +118,40 @@ function Result() {
           </p>
         </section>
 
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
-          <a
-            href="/rpm"
-            className="funnel-secondary funnel-checkout-padrao"
-            style={{ width: "100%", maxWidth: 420 }}
+        <section style={{ marginTop: 36, textAlign: "center" }}>
+          <p
+            style={{
+              margin: "0 auto 18px",
+              maxWidth: 720,
+              fontSize: "clamp(1rem, 1.8vw, 1.2rem)",
+              lineHeight: 1.55,
+              color: "rgba(245,243,238,.82)",
+            }}
           >
-            Mude sua jornada
-          </a>
-        </div>
+            Seu diagnóstico mostrou onde está o gargalo. Agora é hora de transformar isso em decisão.
+          </p>
+
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <a
+              href="/rpm"
+              className="funnel-secondary funnel-checkout-padrao"
+              style={{ width: "100%", maxWidth: 420 }}
+            >
+              Quero estruturar minha empresa
+            </a>
+          </div>
+
+          <p
+            style={{
+              margin: "14px auto 0",
+              fontSize: ".86rem",
+              letterSpacing: ".04em",
+              color: "rgba(245,243,238,.58)",
+            }}
+          >
+            Encontro presencial em Cuiabá • 10 de Dezembro • 19:30 às 22:30
+          </p>
+        </section>
       </article>
     </FunnelShell>
   );
