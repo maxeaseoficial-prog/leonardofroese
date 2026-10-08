@@ -22,6 +22,17 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
         let html = await upstream.text()
 
+        const fallbackStyles = `
+<style>
+  [class~="opacity-0"] { opacity: 1 !important; }
+  [class~="translate-y-8"],
+  [class~="translate-y-6"],
+  [class~="translate-y-4"] { transform: translateY(0) !important; }
+  [class~="blur-[3px]"],
+  [class~="blur-[2px]"],
+  [class~="blur-[1px]"] { filter: none !important; }
+</style>`
+
         const bridgeScript = `
 <script>
 (() => {
@@ -50,7 +61,7 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 })();
 </script>`
 
-        const headInjection = `<base href="${RPM_SOURCE_URL}">${bridgeScript}`
+        const headInjection = `<base href="${RPM_SOURCE_URL}">${fallbackStyles}${bridgeScript}`
 
         if (html.includes('<head>')) {
           html = html.replace('<head>', `<head>${headInjection}`)
