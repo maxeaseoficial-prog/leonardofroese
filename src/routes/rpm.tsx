@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-const RPM_SOURCE_URL = "https://caliber-summit-forge.lovable.app/";
+const RPM_PROXY_URL = "/api/rpm-proxy";
 
 export const Route = createFileRoute("/rpm")({
   head: () => ({
@@ -34,7 +34,7 @@ function RpmPage() {
   return (
     <main className="fixed inset-0 z-[9999] bg-black">
       <iframe
-        src={RPM_SOURCE_URL}
+        src={RPM_PROXY_URL}
         title="RPM Summit"
         className="h-[100dvh] w-full border-0 bg-black"
         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
