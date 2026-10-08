@@ -23,9 +23,8 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
         let html = await upstream.text()
 
-        // Keep the original app assets on the RPM Summit origin. The proxied
-        // document lives under leonardofroese.com.br, so root-relative Vite
-        // assets would otherwise be requested from the wrong host.
+        // Keep root-relative assets on the original RPM Summit origin.
+        // This avoids loading the Summit bundle/images from leonardofroese.com.br.
         html = html
           .replaceAll('src="/', `src="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("src='/", `src='${RPM_SOURCE_ORIGIN}/`)
@@ -34,11 +33,18 @@ export const Route = createFileRoute('/api/rpm-proxy')({
           .replaceAll('srcset="/', `srcset="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("srcset='/", `srcset='${RPM_SOURCE_ORIGIN}/`)
 
-        // Fallback only for visibility. Do not touch transform/position/blur,
-        // because those are part of the original layout/animation behavior.
-        const visibilityFallback = `
+        // The original app reveals content through React after mount/scroll.
+        // Inside the proxy hydration is not guaranteed, so only the exact
+        // initial Reveal/Hero states are promoted to their original final state.
+        // Hover overlays that also use opacity-0 are intentionally untouched.
+        const animationFallback = `
 <style>
-  [class~="opacity-0"] { opacity: 1 !important; }
+  [class~="opacity-0"][class~="blur-[2px]"],
+  [class~="opacity-0"][class~="blur-[3px]"] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translateY(0) !important;
+  }
 </style>`
 
         const bridgeScript = `
@@ -57,6 +63,21 @@ export const Route = createFileRoute('/api/rpm-proxy')({
     }
   };
 
+  const syncHeaderState = () => {
+    const header = document.querySelector('header.fixed');
+    if (!(header instanceof HTMLElement)) return;
+
+    const scrolled = window.scrollY > 24;
+    header.style.borderBottom = scrolled
+      ? '1px solid var(--border)'
+      : '1px solid transparent';
+    header.style.backgroundColor = scrolled
+      ? 'color-mix(in oklch, var(--background) 90%, transparent)'
+      : 'transparent';
+    header.style.backdropFilter = scrolled ? 'blur(12px)' : '';
+    header.style.webkitBackdropFilter = scrolled ? 'blur(12px)' : '';
+  };
+
   document.addEventListener('click', (event) => {
     const target = event.target;
     const anchor = target instanceof Element ? target.closest('a[href]') : null;
@@ -67,10 +88,14 @@ export const Route = createFileRoute('/api/rpm-proxy')({
       event.stopImmediatePropagation();
     }
   }, true);
+
+  window.addEventListener('scroll', syncHeaderState, { passive: true });
+  window.addEventListener('load', syncHeaderState, { once: true });
+  requestAnimationFrame(syncHeaderState);
 })();
 </script>`
 
-        const headInjection = `<base href="${RPM_SOURCE_URL}">${visibilityFallback}${bridgeScript}`
+        const headInjection = `<base href="${RPM_SOURCE_URL}">${animationFallback}${bridgeScript}`
 
         if (html.includes('<head>')) {
           html = html.replace('<head>', `<head>${headInjection}`)
