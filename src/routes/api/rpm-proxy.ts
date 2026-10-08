@@ -23,8 +23,6 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
         let html = await upstream.text()
 
-        // Keep root-relative assets on the original RPM Summit origin.
-        // This avoids loading the Summit bundle/images from leonardofroese.com.br.
         html = html
           .replaceAll('src="/', `src="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("src='/", `src='${RPM_SOURCE_ORIGIN}/`)
@@ -33,10 +31,6 @@ export const Route = createFileRoute('/api/rpm-proxy')({
           .replaceAll('srcset="/', `srcset="${RPM_SOURCE_ORIGIN}/`)
           .replaceAll("srcset='/", `srcset='${RPM_SOURCE_ORIGIN}/`)
 
-        // The original app reveals content through React after mount/scroll.
-        // Inside the proxy hydration is not guaranteed, so only the exact
-        // initial Reveal/Hero states are promoted to their original final state.
-        // Hover overlays that also use opacity-0 are intentionally untouched.
         const animationFallback = `
 <style>
   [class~="opacity-0"][class~="blur-[2px]"],
@@ -51,6 +45,11 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 <script>
 (() => {
   const checkoutHost = 'pay.kiwify.com.br';
+  const testimonialVideos = {
+    'depoimento 01': 's5Xw05eyuOM',
+    'depoimento 02': 'nGj5NN4XvyM',
+    'depoimento 03': 'odkL-rQqsC8'
+  };
 
   const openCheckout = (href) => {
     try {
@@ -61,6 +60,21 @@ export const Route = createFileRoute('/api/rpm-proxy')({
     } catch {
       return false;
     }
+  };
+
+  const openTestimonial = (target) => {
+    const button = target instanceof Element
+      ? target.closest('button[aria-label^="Reproduzir"], button[aria-label^="reproduzir"]')
+      : null;
+    if (!(button instanceof HTMLElement)) return false;
+
+    const label = (button.getAttribute('aria-label') || '').toLowerCase();
+    const entry = Object.entries(testimonialVideos).find(([name]) => label.includes(name));
+    if (!entry) return false;
+
+    const videoUrl = 'https://www.youtube.com/watch?v=' + entry[1];
+    window.open(videoUrl, '_blank', 'noopener,noreferrer');
+    return true;
   };
 
   const syncHeaderState = () => {
@@ -80,6 +94,13 @@ export const Route = createFileRoute('/api/rpm-proxy')({
 
   document.addEventListener('click', (event) => {
     const target = event.target;
+
+    if (openTestimonial(target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+
     const anchor = target instanceof Element ? target.closest('a[href]') : null;
     if (!anchor) return;
 
