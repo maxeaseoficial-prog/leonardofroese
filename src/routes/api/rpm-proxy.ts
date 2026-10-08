@@ -91,6 +91,28 @@ export const Route = createFileRoute('/api/rpm-proxy')({
     return true;
   };
 
+  const syncGuideMetricsSpacing = () => {
+    const expected = ['19 anos', '+450 empresas', '10 estados', '+r$ 100 milhões'];
+    const metricValues = Array.from(document.querySelectorAll('p')).filter((node) => {
+      const text = (node.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      return expected.includes(text);
+    });
+
+    if (metricValues.length !== 4) return;
+
+    const metricWrappers = metricValues
+      .map((node) => node.parentElement)
+      .filter((node) => node instanceof HTMLElement);
+
+    if (metricWrappers.length !== 4) return;
+
+    const container = metricWrappers[0].parentElement;
+    if (!(container instanceof HTMLElement)) return;
+    if (!metricWrappers.every((wrapper) => wrapper.parentElement === container)) return;
+
+    container.style.paddingBottom = '3.5rem';
+  };
+
   const syncHeaderState = () => {
     const header = document.querySelector('header.fixed');
     if (!(header instanceof HTMLElement)) return;
@@ -124,9 +146,16 @@ export const Route = createFileRoute('/api/rpm-proxy')({
     }
   }, true);
 
+  const syncPage = () => {
+    syncHeaderState();
+    syncGuideMetricsSpacing();
+  };
+
   window.addEventListener('scroll', syncHeaderState, { passive: true });
-  window.addEventListener('load', syncHeaderState, { once: true });
-  requestAnimationFrame(syncHeaderState);
+  window.addEventListener('load', syncPage, { once: true });
+  requestAnimationFrame(syncPage);
+  setTimeout(syncGuideMetricsSpacing, 250);
+  setTimeout(syncGuideMetricsSpacing, 900);
 })();
 </script>`
 
