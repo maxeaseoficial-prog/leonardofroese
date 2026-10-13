@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as RpmRouteImport } from './routes/rpm'
+import { Route as ApiRpmProxyRouteImport } from './routes/api/rpm-proxy'
 import { Route as Lucro2xObrigadoRouteImport } from './routes/lucro2x/obrigado'
 import { Route as RaioXIndexRouteImport } from './routes/raio-x/index'
 import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
@@ -32,6 +34,16 @@ const IndexRoute = IndexRouteImport.update({
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RpmRoute = RpmRouteImport.update({
+  id: '/rpm',
+  path: '/rpm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRpmProxyRoute = ApiRpmProxyRouteImport.update({
+  id: '/api/rpm-proxy',
+  path: '/api/rpm-proxy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Lucro2xObrigadoRoute = Lucro2xObrigadoRouteImport.update({
@@ -99,6 +111,8 @@ const ApiPublicSitemapXmlRoute = ApiPublicSitemapXmlRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/rpm': typeof RpmRoute
+  '/api/rpm-proxy': typeof ApiRpmProxyRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -115,6 +129,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/rpm': typeof RpmRoute
+  '/api/rpm-proxy': typeof ApiRpmProxyRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -132,6 +148,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/obrigado': typeof ObrigadoRoute
+  '/rpm': typeof RpmRoute
+  '/api/rpm-proxy': typeof ApiRpmProxyRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -150,6 +168,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/obrigado'
+    | '/rpm'
+    | '/api/rpm-proxy'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/obrigado'
+    | '/rpm'
+    | '/api/rpm-proxy'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -182,6 +204,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/obrigado'
+    | '/rpm'
+    | '/api/rpm-proxy'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -199,6 +223,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  RpmRoute: typeof RpmRoute
+  ApiRpmProxyRoute: typeof ApiRpmProxyRoute
   Lucro2xObrigadoRoute: typeof Lucro2xObrigadoRoute
   RaioXDadosRoute: typeof RaioXDadosRoute
   RaioXPerguntasRoute: typeof RaioXPerguntasRoute
@@ -227,6 +253,20 @@ declare module '@tanstack/react-router' {
       path: '/obrigado'
       fullPath: '/obrigado'
       preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rpm': {
+      id: '/rpm'
+      path: '/rpm'
+      fullPath: '/rpm'
+      preLoaderRoute: typeof RpmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rpm-proxy': {
+      id: '/api/rpm-proxy'
+      path: '/api/rpm-proxy'
+      fullPath: '/api/rpm-proxy'
+      preLoaderRoute: typeof ApiRpmProxyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lucro2x/obrigado': {
@@ -319,6 +359,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ObrigadoRoute: ObrigadoRoute,
+  RpmRoute: RpmRoute,
+  ApiRpmProxyRoute: ApiRpmProxyRoute,
   Lucro2xObrigadoRoute: Lucro2xObrigadoRoute,
   RaioXDadosRoute: RaioXDadosRoute,
   RaioXPerguntasRoute: RaioXPerguntasRoute,
