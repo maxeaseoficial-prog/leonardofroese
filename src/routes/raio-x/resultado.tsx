@@ -9,6 +9,7 @@ import {
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
 import { checkoutUrl } from "@/features/lucro-2x/live-content";
+import leonardoPhoto from "@/assets/leonardo-DSC01026.jpg.asset.json";
 
 export const Route = createFileRoute("/raio-x/resultado")({
   head: () => funnelHead,
@@ -132,7 +133,7 @@ function Result() {
 
         <section className="result-card result-section result-host" style={{ padding: 0 }}>
           <div className="result-host-photo">
-            <img src="/images/hero-leonardo-final.webp" alt="Leonardo Froese" />
+            <img src={leonardoPhoto.url} alt="Leonardo Froese" />
           </div>
 
           <div className="result-host-content">
