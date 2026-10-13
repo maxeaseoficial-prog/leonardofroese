@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BarChart3, CalendarDays, FileText, Search, Star, Target, Video } from "lucide-react";
+import { BarChart3, FileText, Search, Star, Target, Video } from "lucide-react";
 import { calculateDiagnostic, pillars, type PillarId } from "@/features/lucro-2x/diagnostic-config";
 import {
   buildCheckoutUrl,
@@ -11,7 +11,6 @@ import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
 import { checkoutUrl } from "@/features/lucro-2x/live-content";
 import leonardoPhoto from "@/assets/leonardo-DSC01026.jpg.asset.json";
-import leonardoLucroPhoto from "@/assets/leonardo-DSC00683.jpg.asset.json";
 
 export const Route = createFileRoute("/raio-x/resultado")({
   head: () => funnelHead,
@@ -177,53 +176,11 @@ function Result() {
           <div className="lucro2x-grid">
             <div className="lucro2x-cover-card" aria-label="Cáliber Lucro 2x">
               <img
-                className="lucro2x-cover-photo"
-                src={leonardoLucroPhoto.url}
-                alt="Leonardo Froese — Cáliber Lucro 2x"
+                src="/images/lucro-2x-cover-hq.webp?v=20261013-2228"
+                alt="Cáliber Lucro 2x — Diagnóstico e Plano de Estruturação Empresarial"
                 loading="eager"
                 decoding="async"
               />
-              <div className="lucro2x-cover-effects" aria-hidden="true" />
-
-              <div className="lucro2x-cover-sidecopy" aria-hidden="true">
-                <span>EMPRESAS</span>
-                <span>MAIS FORTES</span>
-                <span>RESULTADOS</span>
-                <span>MAIS REAIS</span>
-              </div>
-
-              <div className="lucro2x-cover-topcopy">
-                <span>ESTRATÉGIA</span>
-                <span>PROCESSOS</span>
-                <span>LUCRO REAL</span>
-              </div>
-
-              <div className="lucro2x-cover-maincopy">
-                <div className="lucro2x-cover-brand">
-                  <span>CÁLIBER</span>
-                  <strong>LUCRO 2X</strong>
-                </div>
-                <p>Diagnóstico e Plano de Estruturação Empresarial</p>
-                <small>com <b>LEONARDO FROESE</b></small>
-
-                <div className="lucro2x-cover-date">
-                  <CalendarDays size={23} strokeWidth={1.8} />
-                  <div>
-                    <strong>27/11/2026</strong>
-                    <span>20h • Horário de Cuiabá - MT</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lucro2x-cover-graph" aria-hidden="true">
-                <span /><span /><span /><span /><span /><span />
-              </div>
-
-              <div className="lucro2x-cover-bottom">
-                <span>Diagnóstico estratégico</span>
-                <span>Processos que funcionam</span>
-                <span>Lucro com sistema</span>
-              </div>
             </div>
 
             <div className="lucro2x-content">
