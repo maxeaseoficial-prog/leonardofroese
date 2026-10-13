@@ -175,30 +175,15 @@ function Result() {
         <section className="result-section lucro2x-section" aria-labelledby="lucro2x-title">
           <div className="lucro2x-grid">
             <div className="lucro2x-cover-card" aria-label="Cáliber Lucro 2x">
-              <img src={leonardoPhoto.url} alt="Leonardo Froese - Cáliber Lucro 2x" />
-              <div className="lucro2x-cover-overlay" />
-              <div className="lucro2x-cover-copy">
-                <div className="lucro2x-cover-micro">Estratégia • Processos • Lucro real</div>
-                <div className="lucro2x-cover-title">
-                  <span>CÁLIBER</span>
-                  <strong>LUCRO 2X</strong>
-                </div>
-                <p>Diagnóstico e Plano de Estruturação Empresarial</p>
-                <small>com Leonardo Froese</small>
-              </div>
-              <div className="lucro2x-cover-bottom">
-                <span>Diagnóstico estratégico</span>
-                <span>Processos que funcionam</span>
-                <span>Lucro com sistema</span>
-              </div>
+              <img
+                src="/images/lucro-2x-cover.webp"
+                alt="Cáliber Lucro 2x — Diagnóstico e Plano de Estruturação Empresarial"
+                loading="eager"
+                decoding="async"
+              />
             </div>
 
             <div className="lucro2x-content">
-              <div className="lucro2x-price-kicker">
-                <span />
-                LIVE PAGA • R$ 97
-              </div>
-
               <h2 id="lucro2x-title" className="funnel-serif">
                 O que é o <em>Lucro 2x?</em>
               </h2>
