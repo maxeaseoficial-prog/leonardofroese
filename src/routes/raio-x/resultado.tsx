@@ -11,6 +11,7 @@ import { funnelHead } from "@/features/lucro-2x/funnel-head";
 import { FunnelShell } from "@/features/lucro-2x/funnel-ui";
 import { checkoutUrl } from "@/features/lucro-2x/live-content";
 import leonardoPhoto from "@/assets/leonardo-DSC01026.jpg.asset.json";
+import lucro2xPoster from "@/assets/lucro-2x-poster.png.asset.json";
 
 export const Route = createFileRoute("/raio-x/resultado")({
   head: () => funnelHead,
@@ -176,7 +177,7 @@ function Result() {
           <div className="lucro2x-grid">
             <div className="lucro2x-cover-card" aria-label="Cáliber Lucro 2x">
               <img
-                src="/images/lucro-2x-cover.webp"
+                src={lucro2xPoster.url}
                 alt="Cáliber Lucro 2x — Diagnóstico e Plano de Estruturação Empresarial"
                 loading="eager"
                 decoding="async"
