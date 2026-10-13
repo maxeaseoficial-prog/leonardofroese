@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { BarChart3, FileText, Search, Star, Target, Video } from "lucide-react";
 import { calculateDiagnostic, pillars, type PillarId } from "@/features/lucro-2x/diagnostic-config";
 import {
   buildCheckoutUrl,
@@ -169,8 +170,99 @@ function Result() {
             </div>
           </div>
 
+        </section>
+
+        <section className="result-section lucro2x-section" aria-labelledby="lucro2x-title">
+          <div className="lucro2x-grid">
+            <div className="lucro2x-cover-card" aria-label="Cáliber Lucro 2x">
+              <img src={leonardoPhoto.url} alt="Leonardo Froese - Cáliber Lucro 2x" />
+              <div className="lucro2x-cover-overlay" />
+              <div className="lucro2x-cover-copy">
+                <div className="lucro2x-cover-micro">Estratégia • Processos • Lucro real</div>
+                <div className="lucro2x-cover-title">
+                  <span>CÁLIBER</span>
+                  <strong>LUCRO 2X</strong>
+                </div>
+                <p>Diagnóstico e Plano de Estruturação Empresarial</p>
+                <small>com Leonardo Froese</small>
+              </div>
+              <div className="lucro2x-cover-bottom">
+                <span>Diagnóstico estratégico</span>
+                <span>Processos que funcionam</span>
+                <span>Lucro com sistema</span>
+              </div>
+            </div>
+
+            <div className="lucro2x-content">
+              <div className="lucro2x-price-kicker">
+                <span />
+                LIVE PAGA • R$ 97
+              </div>
+
+              <h2 id="lucro2x-title" className="funnel-serif">
+                O que é o <em>Lucro 2x?</em>
+              </h2>
+
+              <h3>Lucre mais. Sem precisar vender mais.</h3>
+              <p className="lucro2x-lead">
+                Descubra onde o lucro da sua empresa está vazando e saia com um plano prático para
+                começar a corrigir.
+              </p>
+
+              <div className="lucro2x-feature-grid">
+                <article className="lucro2x-feature">
+                  <div className="lucro2x-feature-icon"><Video size={22} strokeWidth={1.8} /></div>
+                  <div>
+                    <strong>Live ao vivo de 2 horas</strong>
+                    <p>Um encontro intenso, direto ao ponto, para diagnosticar os principais drenos de lucro da sua empresa.</p>
+                  </div>
+                </article>
+
+                <article className="lucro2x-feature">
+                  <div className="lucro2x-feature-icon"><Search size={22} strokeWidth={1.8} /></div>
+                  <div>
+                    <strong>Diagnóstico dos vazamentos</strong>
+                    <p>Entenda onde o dinheiro está sumindo, o que está travando a operação e quais problemas mais drenam resultado.</p>
+                  </div>
+                </article>
+
+                <article className="lucro2x-feature">
+                  <div className="lucro2x-feature-icon"><FileText size={22} strokeWidth={1.8} /></div>
+                  <div>
+                    <strong>Material de apoio</strong>
+                    <p>Acompanhe a live com apoio prático para organizar ideias, anotar prioridades e estruturar decisões.</p>
+                  </div>
+                </article>
+
+                <article className="lucro2x-feature">
+                  <div className="lucro2x-feature-icon"><BarChart3 size={22} strokeWidth={1.8} /></div>
+                  <div>
+                    <strong>Plano prático para aplicar</strong>
+                    <p>Saia da live com clareza sobre o que corrigir primeiro e com os próximos passos para começar a agir.</p>
+                  </div>
+                </article>
+
+                <article className="lucro2x-feature lucro2x-feature--wide">
+                  <div className="lucro2x-feature-icon"><Target size={22} strokeWidth={1.8} /></div>
+                  <div>
+                    <strong>Sem precisar vender mais</strong>
+                    <p>O foco é melhorar lucro, estrutura e execução antes de depender apenas de mais vendas.</p>
+                  </div>
+                </article>
+              </div>
+
+              <div className="lucro2x-highlight">
+                <div className="lucro2x-highlight-main">
+                  <Star size={19} fill="currentColor" />
+                  <strong>Ao final, você sai com um plano prático.</strong>
+                </div>
+                <p>Ideal para empresários que faturam, mas sentem que o lucro não aparece.</p>
+              </div>
+            </div>
+          </div>
+
           <a
-            className="funnel-primary result-cta live-result-cta"
+            className="funnel-primary result-cta live-result-cta lucro2x-main-cta"
             href={liveCheckout}
             target="_blank"
             rel="noopener noreferrer"
