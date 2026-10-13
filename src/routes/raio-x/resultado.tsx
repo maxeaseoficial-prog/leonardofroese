@@ -176,7 +176,7 @@ function Result() {
           <div className="lucro2x-grid">
             <div className="lucro2x-cover-card" aria-label="Cáliber Lucro 2x">
               <img
-                src="/images/lucro-2x-cover.webp"
+                src="/images/lucro-2x-cover.webp?v=20261013-1742"
                 alt="Cáliber Lucro 2x — Diagnóstico e Plano de Estruturação Empresarial"
                 loading="eager"
                 decoding="async"
