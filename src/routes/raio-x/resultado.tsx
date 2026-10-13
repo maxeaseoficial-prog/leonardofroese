@@ -193,7 +193,7 @@ function Result() {
           <div className="testimonial-video-grid">
             {testimonialVideos.map((video) => (
               <article
-                className={`testimonial-video-card testimonial-video-card--${video.format}`}
+                className="testimonial-video-card"
                 key={video.embedUrl}
               >
                 <div className="testimonial-video-top">
@@ -212,6 +212,15 @@ function Result() {
               </article>
             ))}
           </div>
+
+          <a
+            className="funnel-primary result-cta live-result-cta testimonial-live-cta"
+            href={liveCheckout}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Quero minha vaga na live
+          </a>
         </section>
       </article>
     </FunnelShell>
