@@ -196,6 +196,10 @@ function Result() {
                 className={`testimonial-video-card testimonial-video-card--${video.format}`}
                 key={video.embedUrl}
               >
+                <div className="testimonial-video-top">
+                  <span className="testimonial-video-badge">{video.title}</span>
+                  <span className="testimonial-video-dot" aria-hidden="true" />
+                </div>
                 <div className="testimonial-video-frame">
                   <iframe
                     src={video.embedUrl}
