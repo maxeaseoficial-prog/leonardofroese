@@ -1243,32 +1243,242 @@
 .lucro2x-cover-card {
   position: relative;
   width: 100%;
+  aspect-ratio: 4 / 5;
   align-self: start;
   overflow: hidden;
-  border: 1px solid rgba(216, 180, 92, 0.5);
+  border: 1px solid rgba(216, 180, 92, 0.58);
   border-radius: 18px;
-  background: #0b0b0d;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(216,180,92,.15), transparent 32%),
+    linear-gradient(145deg, #181309 0%, #09090b 46%, #050506 100%);
   box-shadow:
-    0 28px 70px rgba(0, 0, 0, 0.38),
-    0 0 42px rgba(216, 180, 92, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 28px 70px rgba(0, 0, 0, 0.42),
+    0 0 44px rgba(216, 180, 92, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+.lucro2x-cover-card::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(5,5,6,.04) 0%, rgba(5,5,6,.04) 38%, rgba(5,5,6,.40) 61%, rgba(5,5,6,.94) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.02) 0%, rgba(0,0,0,.06) 58%, rgba(0,0,0,.72) 100%);
 }
 .lucro2x-cover-card::after {
   content: "";
   position: absolute;
+  z-index: 5;
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    inset 0 -70px 90px rgba(0,0,0,.16);
 }
-.lucro2x-cover-card img {
-  width: 100%;
-  height: auto;
+.lucro2x-cover-photo {
+  position: absolute;
+  z-index: 0;
+  left: -3%;
+  bottom: -1%;
+  width: 68%;
+  height: 95%;
+  object-fit: cover;
+  object-position: 51% center;
   display: block;
-  object-fit: contain;
-  object-position: center top;
+  filter: saturate(.9) contrast(1.04) brightness(.86);
   image-rendering: auto;
 }
+.lucro2x-cover-effects {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 16%, rgba(216,180,92,.78) 16.2%, rgba(216,180,92,.08) 16.7%, transparent 17%),
+    linear-gradient(90deg, transparent 29%, rgba(216,180,92,.46) 29.15%, transparent 29.45%),
+    radial-gradient(ellipse at 10% 12%, transparent 0 18%, rgba(216,180,92,.16) 18.3% 18.7%, transparent 19% 100%);
+  mix-blend-mode: screen;
+  opacity: .72;
+}
+.lucro2x-cover-sidecopy,
+.lucro2x-cover-topcopy {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 7.5px;
+  line-height: 1.35;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(245,243,238,.58);
+}
+.lucro2x-cover-sidecopy {
+  left: 18px;
+  top: 18%;
+}
+.lucro2x-cover-topcopy {
+  right: 23px;
+  top: 25px;
+  align-items: flex-end;
+}
+.lucro2x-cover-topcopy::after,
+.lucro2x-cover-sidecopy::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  margin-top: 7px;
+  background: var(--gold);
+}
+.lucro2x-cover-maincopy {
+  position: absolute;
+  z-index: 4;
+  top: 19%;
+  right: 22px;
+  width: 52%;
+  text-align: right;
+}
+.lucro2x-cover-brand span,
+.lucro2x-cover-brand strong {
+  display: block;
+  font-family: Inter, Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: -.055em;
+  line-height: .88;
+  white-space: nowrap;
+}
+.lucro2x-cover-brand span {
+  color: #f5f5f4;
+  font-size: clamp(29px, 3.9vw, 49px);
+}
+.lucro2x-cover-brand strong {
+  margin-top: 8px;
+  color: #e3b64a;
+  font-size: clamp(27px, 3.7vw, 47px);
+  text-shadow: 0 7px 24px rgba(216,180,92,.16);
+}
+.lucro2x-cover-maincopy > p {
+  margin: 18px 0 0 auto;
+  max-width: 20ch;
+  color: rgba(255,255,255,.9);
+  font-size: 13px;
+  line-height: 1.34;
+}
+.lucro2x-cover-maincopy > small {
+  display: block;
+  margin-top: 18px;
+  color: rgba(245,243,238,.84);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 10px;
+}
+.lucro2x-cover-maincopy > small b {
+  margin-left: 7px;
+  color: var(--gold);
+  font-family: "IBM Plex Mono", monospace;
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .18em;
+}
+.lucro2x-cover-date {
+  margin: 24px 0 0 auto;
+  width: min(100%, 235px);
+  display: grid;
+  grid-template-columns: 35px minmax(0,1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid rgba(216,180,92,.58);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(25,21,13,.88), rgba(8,8,9,.92));
+  color: #e6bd5c;
+  box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  text-align: left;
+}
+.lucro2x-cover-date svg {
+  justify-self: center;
+}
+.lucro2x-cover-date div {
+  padding-left: 10px;
+  border-left: 1px solid rgba(216,180,92,.35);
+}
+.lucro2x-cover-date strong {
+  display: block;
+  color: #f0cc75;
+  font-size: 18px;
+  line-height: 1.1;
+}
+.lucro2x-cover-date span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(245,243,238,.88);
+  font-size: 8.5px;
+  line-height: 1.2;
+}
+.lucro2x-cover-graph {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 15%;
+  width: 46%;
+  height: 25%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 7px;
+  padding-right: 18px;
+  opacity: .5;
+}
+.lucro2x-cover-graph::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 5%;
+  top: 36%;
+  height: 2px;
+  transform: rotate(-22deg);
+  transform-origin: right center;
+  background: linear-gradient(90deg, transparent, rgba(216,180,92,.6), #f3c967);
+  box-shadow: 0 0 12px rgba(216,180,92,.32);
+}
+.lucro2x-cover-graph span {
+  width: 12%;
+  border: 1px solid rgba(216,180,92,.16);
+  border-bottom: 0;
+  background: linear-gradient(180deg, rgba(216,180,92,.17), rgba(216,180,92,.03));
+}
+.lucro2x-cover-graph span:nth-child(1) { height: 23%; }
+.lucro2x-cover-graph span:nth-child(2) { height: 31%; }
+.lucro2x-cover-graph span:nth-child(3) { height: 42%; }
+.lucro2x-cover-graph span:nth-child(4) { height: 56%; }
+.lucro2x-cover-graph span:nth-child(5) { height: 72%; }
+.lucro2x-cover-graph span:nth-child(6) { height: 92%; }
+.lucro2x-cover-bottom {
+  position: absolute;
+  z-index: 4;
+  left: 24px;
+  right: 24px;
+  bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(216,180,92,.22);
+}
+.lucro2x-cover-bottom span {
+  color: rgba(245,243,238,.74);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 7.5px;
+  line-height: 1.4;
+  letter-spacing: .08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .lucro2x-content {
   display: flex;
   flex-direction: column;
@@ -1378,6 +1588,67 @@
   }
   .lucro2x-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .lucro2x-cover-photo {
+    left: -10%;
+    width: 76%;
+    height: 96%;
+  }
+  .lucro2x-cover-maincopy {
+    top: 18%;
+    right: 16px;
+    width: 54%;
+  }
+  .lucro2x-cover-brand span {
+    font-size: 31px;
+  }
+  .lucro2x-cover-brand strong {
+    font-size: 29px;
+  }
+  .lucro2x-cover-maincopy > p {
+    margin-top: 13px;
+    font-size: 10px;
+  }
+  .lucro2x-cover-maincopy > small {
+    margin-top: 12px;
+    font-size: 8px;
+  }
+  .lucro2x-cover-maincopy > small b {
+    font-size: 7px;
+  }
+  .lucro2x-cover-date {
+    margin-top: 16px;
+    width: 200px;
+    grid-template-columns: 29px minmax(0,1fr);
+    gap: 7px;
+    padding: 9px 10px;
+  }
+  .lucro2x-cover-date strong {
+    font-size: 15px;
+  }
+  .lucro2x-cover-date span {
+    font-size: 7px;
+  }
+  .lucro2x-cover-sidecopy {
+    left: 12px;
+    font-size: 6px;
+  }
+  .lucro2x-cover-topcopy {
+    right: 14px;
+    top: 16px;
+    font-size: 6px;
+  }
+  .lucro2x-cover-bottom {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    gap: 5px;
+  }
+  .lucro2x-cover-bottom span {
+    font-size: 6px;
   }
 }
 
