@@ -134,11 +134,53 @@ function Result() {
 
         <section className="result-divider result-live-cta">
           <div className="funnel-kicker">Próximo passo</div>
-          <h2 className="funnel-serif">Você já enxergou o vazamento. Agora é hora de agir.</h2>
-          <p className="result-copy">
-            Na Live Lucro 2x, você aprofunda o diagnóstico, identifica os principais drenos de lucro
-            da sua empresa, recebe o material de apoio e sai com um plano prático para aplicar.
+          <h2 className="funnel-serif">Do diagnóstico à ação.</h2>
+          <p className="result-copy result-step-intro">
+            Você já identificou onde o lucro pode estar escapando. Agora o caminho é transformar
+            esse diagnóstico em execução.
           </p>
+
+          <div className="result-stepper" aria-label="Próximos passos">
+            <div className="result-step result-step--done">
+              <div className="result-step-circle" aria-hidden="true">✓</div>
+              <div className="result-step-content">
+                <span className="result-step-status">Concluído</span>
+                <strong>Enxergar o vazamento</strong>
+                <p>O Raio-X mostrou seus principais gargalos.</p>
+              </div>
+            </div>
+
+            <div className="result-step-connector" aria-hidden="true">
+              <span />
+              <b>→</b>
+              <span />
+            </div>
+
+            <div className="result-step result-step--active">
+              <div className="result-step-circle" aria-hidden="true">2</div>
+              <div className="result-step-content">
+                <span className="result-step-status">Agora</span>
+                <strong>Hora de agir</strong>
+                <p>Escolher prioridades e corrigir o que está drenando resultado.</p>
+              </div>
+            </div>
+
+            <div className="result-step-connector" aria-hidden="true">
+              <span />
+              <b>→</b>
+              <span />
+            </div>
+
+            <div className="result-step result-step--next">
+              <div className="result-step-circle" aria-hidden="true">3</div>
+              <div className="result-step-content">
+                <span className="result-step-status">Próximo passo</span>
+                <strong>Live Lucro 2x</strong>
+                <p>Diagnóstico aprofundado, material e um plano prático para aplicar.</p>
+              </div>
+            </div>
+          </div>
+
           <a
             className="funnel-primary result-cta live-result-cta"
             href={liveCheckout}
