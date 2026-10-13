@@ -16,6 +16,24 @@ export const Route = createFileRoute("/raio-x/resultado")({
   component: Result,
 });
 
+const testimonialVideos = [
+  {
+    title: "Depoimento 01",
+    embedUrl: "https://www.youtube-nocookie.com/embed/nGj5NN4XvyM?rel=0&playsinline=1",
+    format: "landscape",
+  },
+  {
+    title: "Depoimento 02",
+    embedUrl: "https://www.youtube-nocookie.com/embed/odkL-rQqsC8?rel=0&playsinline=1",
+    format: "short",
+  },
+  {
+    title: "Depoimento 03",
+    embedUrl: "https://www.youtube-nocookie.com/embed/s5Xw05eyuOM?rel=0&playsinline=1",
+    format: "short",
+  },
+] as const;
+
 function Result() {
   const navigate = useNavigate();
   const [session, setSession] = useState<DiagnosticSession | null>(null);
@@ -158,6 +176,37 @@ function Result() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="result-section result-testimonials" aria-labelledby="testimonial-title">
+          <div className="result-testimonials-head">
+            <div className="funnel-kicker">Depoimentos</div>
+            <h2 id="testimonial-title" className="funnel-serif">
+              Resultados contados por quem viveu na prática.
+            </h2>
+            <p className="result-copy">
+              Assista aos depoimentos sem sair desta página.
+            </p>
+          </div>
+
+          <div className="testimonial-video-grid">
+            {testimonialVideos.map((video) => (
+              <article
+                className={`testimonial-video-card testimonial-video-card--${video.format}`}
+                key={video.embedUrl}
+              >
+                <div className="testimonial-video-frame">
+                  <iframe
+                    src={video.embedUrl}
+                    title={video.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </article>
+            ))}
           </div>
         </section>
       </article>
