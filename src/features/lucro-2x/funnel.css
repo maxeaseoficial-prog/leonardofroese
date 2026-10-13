@@ -1031,6 +1031,7 @@
   grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.22fr);
   overflow: hidden;
   align-items: stretch;
+  margin-top: 78px;
 }
 .result-host-photo {
   min-height: 100%;
@@ -1065,6 +1066,7 @@
 @media (max-width: 640px) {
   .result-host {
     grid-template-columns: 1fr;
+    margin-top: 56px;
   }
   .result-host-photo img {
     min-height: 0;
@@ -1363,7 +1365,7 @@
 }
 .lucro2x-main-cta {
   width: min(100%, 720px);
-  margin-top: 30px;
+  margin-top: 44px;
   min-height: 64px;
   font-size: 18px;
 }
@@ -1397,5 +1399,8 @@
     padding: 12px 0 0;
     border-left: 0;
     border-top: 1px solid rgba(216,180,92,.22);
+  }
+  .lucro2x-main-cta {
+    margin-top: 34px;
   }
 }
