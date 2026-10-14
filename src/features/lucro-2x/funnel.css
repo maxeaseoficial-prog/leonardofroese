@@ -1273,6 +1273,21 @@
 .lucro2x-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  align-items: stretch;
+}
+/* Impede que o texto introdutório seja comprimido em uma coluna estreita. */
+.lucro2x-content > .lucro2x-lead {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 58ch;
+  min-width: 0;
+  align-self: stretch;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 .lucro2x-content h2 {
   margin: 14px 0 0;
