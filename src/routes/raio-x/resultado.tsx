@@ -190,10 +190,10 @@ function Result() {
               </h2>
 
               <h3>Lucre mais. Sem precisar vender mais.</h3>
-              <p className="lucro2x-lead">
+              <div className="lucro2x-lead" role="paragraph" style={{ display: "block", width: "100%", maxWidth: "none", minWidth: 0, flex: "none", whiteSpace: "normal", overflowWrap: "normal" }}>
                 Descubra onde o lucro da sua empresa está vazando e saia com um plano prático para
                 começar a corrigir.
-              </p>
+              </div>
 
               <div className="lucro2x-feature-grid">
                 <article className="lucro2x-feature">
