@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { buildCheckoutUrl, loadDiagnostic } from "./diagnostic-session";
 import "./funnel.css";
+import "./result-copy-overrides.css";
 
 export function FunnelShell({ children }: { children: ReactNode }) {
   return <main className="lucro-funnel">{children}</main>;
