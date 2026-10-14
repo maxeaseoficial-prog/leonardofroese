@@ -1522,3 +1522,71 @@
   .result-shell > .result-host .result-host-photo,
   .result-shell > .result-host .result-host-photo img { min-height: 510px; }
 }
+
+
+/* VSL entre a jornada "Próximo passo" e a apresentação Lucro 2x. */
+.result-shell > .result-vsl-section {
+  box-sizing: border-box;
+  width: min(1080px, calc(100vw - 48px));
+  max-width: none;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 74px 0 0;
+}
+.result-vsl-heading { text-align: center; margin: 0 auto 28px; max-width: 730px; }
+.result-vsl-heading h2 {
+  margin: 14px 0 13px;
+  font-size: clamp(38px, 4.6vw, 64px);
+  line-height: 1.03;
+  font-weight: 400;
+}
+.result-vsl-heading h2 em { font-style: normal; color: #e3b951; }
+.result-vsl-heading p { color: rgba(245,243,238,.73); line-height: 1.6; font-size: clamp(14px,1.6vw,18px); margin: 0; }
+.result-vsl-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(225,184,78,.48);
+  border-radius: 19px;
+  background: #09090b;
+  box-shadow: 0 30px 76px rgba(0,0,0,.46), 0 0 50px rgba(225,184,78,.07);
+}
+.result-vsl-frame video { display: block; width: 100%; height: 100%; object-fit: contain; background: #08080a; }
+.result-vsl-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(0,0,0,.24), rgba(0,0,0,.72)), url("/live-lucro-2x-vsl-cover.webp") center / cover no-repeat, #09090b;
+}
+.result-vsl-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 22px;
+  color: #f7f3ed;
+}
+.result-vsl-play-icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgba(244,207,123,.8);
+  border-radius: 50%;
+  color: #f4cf7b;
+  background: rgba(0,0,0,.58);
+  font-size: 25px;
+  padding-left: 4px;
+}
+.result-vsl-placeholder-content strong { font-size: clamp(15px,1.9vw,23px); }
+.result-vsl-placeholder-content > span:last-child { color: rgba(247,243,237,.78); font-size: clamp(12px,1.2vw,15px); }
+@media (max-width: 640px) {
+  .result-shell > .result-vsl-section { width: 100%; left: auto; transform: none; margin-top: 54px; }
+  .result-vsl-frame { border-radius: 12px; }
+  .result-vsl-play-icon { width: 52px; height: 52px; font-size: 19px; }
+  .result-vsl-placeholder-content { gap: 8px; }
+}
