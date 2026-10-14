@@ -6,4 +6,5 @@
 - [ ] Internalizar e validar as 20 logos de Parceiros & Clientes na Home e no resultado da Live
 - [x] Substituir a imagem da seção "O que é o Lucro 2x?" pelo pôster enviado, em alta qualidade
 - [x] Substituir o pôster da seção "O que é o Lucro 2x?" pela arte Live Lucro 2X Estratégia e Crescimento
+- [x] Atualizar a arte da seção "O que é o Lucro 2x?" pela nova versão enviada (data 12/11), validando desktop e mobile
 - [x] Corrigir o typecheck do errorComponent da raiz após a atualização do TanStack Router
