@@ -135,3 +135,64 @@
   .post-purchase-copy { padding: 29px 19px 34px; }
 }
 @media (prefers-reduced-motion: reduce) { .post-purchase-whatsapp { transition: none; } }
+
+/* Confirmação mais visível e celebração na abertura da página. */
+.post-purchase-eyebrow {
+  align-self: flex-start;
+  padding: 12px 17px;
+  gap: 12px;
+  color: #51ec9c;
+  background: rgba(29, 185, 98, .12);
+  border: 1px solid rgba(65, 227, 137, .4);
+  border-radius: 999px;
+  font-size: clamp(14px, 1.4vw, 18px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: .075em;
+  box-shadow: 0 0 27px rgba(38, 200, 121, .11);
+}
+.post-purchase-eyebrow svg { color: #51ec9c; flex: none; }
+.post-purchase-page { position: relative; isolation: isolate; }
+.post-purchase-confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+}
+.post-purchase-confetti-piece {
+  position: absolute;
+  top: -22px;
+  display: block;
+  width: 9px;
+  height: 16px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: post-purchase-confetti-fall linear both;
+}
+.post-purchase-confetti-piece:nth-child(3n) { width: 7px; height: 11px; border-radius: 50%; }
+.post-purchase-confetti-piece:nth-child(4n) { width: 12px; height: 7px; }
+@keyframes post-purchase-confetti-fall {
+  0% { transform: translate3d(0, -20px, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  83% { opacity: 1; }
+  100% { transform: translate3d(var(--confetti-drift, 70px), 110vh, 0) rotate(740deg); opacity: 0; }
+}
+/* O pulso não bloqueia o clique nem desloca o texto. */
+.post-purchase-whatsapp {
+  position: relative;
+  animation: post-purchase-cta-pulse 2s ease-in-out infinite;
+}
+@keyframes post-purchase-cta-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 9px 24px rgba(20, 181, 91, .22), 0 0 0 0 rgba(38, 200, 121, .36); }
+  50% { transform: scale(1.027); box-shadow: 0 14px 38px rgba(20, 181, 91, .3), 0 0 0 12px rgba(38, 200, 121, 0); }
+}
+.post-purchase-whatsapp:hover { animation-play-state: paused; transform: translateY(-2px); }
+.post-purchase-whatsapp:focus-visible { animation-play-state: paused; }
+@media (max-width: 420px) {
+  .post-purchase-eyebrow { font-size: 13px; padding: 10px 12px; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .post-purchase-confetti { display: none; }
+  .post-purchase-whatsapp { animation: none; }
+}
