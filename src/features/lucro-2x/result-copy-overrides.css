@@ -1,0 +1,96 @@
+/* Ajustes de progressão: o Raio-X já entregou o diagnóstico. A Live Lucro 2X entra como próxima etapa. */
+
+.lucro2x-section .lucro2x-lead {
+  font-size: 0;
+  line-height: 0;
+}
+
+.lucro2x-section .lucro2x-lead::after {
+  content: "Transforme o resultado do seu Raio-X em prioridades claras e um plano prático para começar a corrigir os vazamentos.";
+  display: block;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(245, 243, 238, 0.72);
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(1) p {
+  font-size: 0;
+  line-height: 0;
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(1) p::after {
+  content: "Um encontro intenso, direto ao ponto, para transformar o resultado do seu Raio-X em decisões práticas.";
+  display: block;
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(245, 243, 238, 0.62);
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) .lucro2x-feature-icon svg {
+  display: none;
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) .lucro2x-feature-icon::before {
+  content: "✓";
+  color: #e1b84e;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) strong {
+  font-size: 0;
+  line-height: 0;
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) strong::after {
+  content: "Priorização dos gargalos";
+  display: block;
+  font-size: 14px;
+  line-height: 1.3;
+  color: rgba(245, 243, 238, 0.96);
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) p {
+  font-size: 0;
+  line-height: 0;
+}
+
+.lucro2x-section .lucro2x-feature-grid > .lucro2x-feature:nth-child(2) p::after {
+  content: "Você já sabe onde estão os vazamentos. Agora vamos identificar qual deles mais impacta o seu lucro e o que precisa ser corrigido primeiro.";
+  display: block;
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(245, 243, 238, 0.62);
+}
+
+.result-progress-step--next p {
+  font-size: 0;
+  line-height: 0;
+}
+
+.result-progress-step--next p::after {
+  content: "Material, prioridades e plano prático.";
+  display: block;
+  margin-top: 7px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: rgba(245, 243, 238, 0.52);
+}
+
+@media (max-width: 640px) {
+  .lucro2x-section .lucro2x-lead::after {
+    font-size: 14px;
+  }
+
+  .result-progress-step--next p::after {
+    max-width: 112px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 3px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+}
