@@ -18,6 +18,10 @@ export const Route = createFileRoute("/raio-x/resultado")({
   component: Result,
 });
 
+// Após enviar public/videos/vsl-lucro2x.mp4, altere para true.
+const vslPublished = false;
+const vslVideoUrl = "/videos/vsl-lucro2x.mp4";
+
 const testimonialVideos = [
   {
     title: "Depoimento 01",
@@ -171,6 +175,36 @@ function Result() {
             </div>
           </div>
 
+        </section>
+
+        <section className="result-vsl-section" aria-labelledby="result-vsl-title">
+          <div className="result-vsl-heading">
+            <span className="funnel-kicker">Uma mensagem de Leonardo Froese</span>
+            <h2 id="result-vsl-title" className="funnel-serif">O próximo passo começa <em>aqui.</em></h2>
+            <p>Entenda como transformar o diagnóstico em decisões práticas para sua empresa.</p>
+          </div>
+          <div className="result-vsl-frame">
+            {vslPublished ? (
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                poster="/live-lucro-2x-vsl-cover.webp"
+                aria-label="Apresentação da Live Lucro 2x com Leonardo Froese"
+              >
+                <source src={vslVideoUrl} type="video/mp4" />
+                Seu navegador não suporta a reprodução deste vídeo.
+              </video>
+            ) : (
+              <div className="result-vsl-placeholder" aria-label="Vídeo de apresentação em preparação">
+                <div className="result-vsl-placeholder-content">
+                  <span className="result-vsl-play-icon" aria-hidden="true">▶</span>
+                  <strong>Em breve: uma mensagem para você.</strong>
+                  <span>A apresentação do Leonardo estará disponível aqui.</span>
+                </div>
+              </div>
+            )}
+          </div>
         </section>
 
         <section className="result-section lucro2x-section" aria-labelledby="lucro2x-title">
