@@ -11,7 +11,7 @@ const whatsappGroupUrl = "https://chat.whatsapp.com/J6GsZDEt0uJACWQu8qGcZC";
 export const Route = createFileRoute("/lucro2x/obrigado")({
   head: () => ({
     meta: [
-      { title: "Inscrição confirmada | Live Lucro 2x" },
+      { title: "Lucro 2x" },
       { name: "description", content: "Parabéns pela sua decisão! Entre no grupo oficial da Live Lucro 2x para receber todas as informações." },
       { name: "robots", content: "noindex, nofollow" },
       { name: "googlebot", content: "noindex, nofollow" },
