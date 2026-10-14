@@ -1,10 +1,11 @@
 export const funnelHead = {
   meta: [
-    { title: "Cáliber Lucro 2x | Leonardo Froese" },
-    { name: "description", content: "Raio-x empresarial Cáliber Lucro 2x." },
+    { title: "Lucro 2x" },
+    { name: "description", content: "Raio-X empresarial da Live Lucro 2x." },
     { name: "theme-color", content: "#08080a" },
   ],
   links: [
+    { rel: "icon", href: "/lucro2x-favicon.svg", type: "image/svg+xml" },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     { rel: "preconnect", href: "https://fonts.gstatic.com" },
     {
