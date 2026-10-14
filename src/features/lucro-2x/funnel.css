@@ -1228,6 +1228,51 @@
 
 
 /* Seção: O que é o Lucro 2x */
+/* O resultado geral usa uma coluna de 760px. Esta seção precisa sair dessa
+   largura SEM deixar o conteúdo da grid encolher. */
+.result-shell > .lucro2x-section {
+  box-sizing: border-box;
+  width: min(1180px, calc(100vw - 48px));
+  max-width: none;
+  position: relative;
+  left: 50%;
+  margin-left: 0;
+  transform: translateX(-50%);
+}
+.result-shell > .lucro2x-section .lucro2x-grid {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr);
+}
+.result-shell > .lucro2x-section .lucro2x-content {
+  min-width: 0;
+  width: 100%;
+}
+.result-shell > .lucro2x-section .lucro2x-lead {
+  width: 100%;
+  max-width: 58ch;
+  flex: 0 0 auto;
+  align-self: stretch;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+@media (max-width: 900px) {
+  .result-shell > .lucro2x-section {
+    width: min(760px, calc(100vw - 36px));
+  }
+  .result-shell > .lucro2x-section .lucro2x-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .result-shell > .lucro2x-section {
+    width: 100%;
+    left: auto;
+    margin-left: 0;
+    transform: none;
+  }
+}
+
 .lucro2x-section {
   width: min(1180px, calc(100vw - 48px));
   margin-left: 50%;
