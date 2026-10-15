@@ -29,13 +29,13 @@ function Opening() {
         </div>
         <Link
           to="/raiox/perguntas"
-          className="funnel-primary"
+          className="funnel-primary funnel-primary-gentle-pulse"
           style={{ maxWidth: 340, marginTop: 28 }}
         >
           Começar meu raio-x
         </Link>
         <p className="funnel-cred">
-          Diagnóstico construído por Leonardo Froese, da Cáliber Gestão Empresarial. 17 anos, mais
+          Diagnóstico construído por Leonardo Froese, da Cáliber Gestão Empresarial. 19 anos, mais
           de 450 empresas implantadas em 10 estados e mais de R$ 100 milhões em lucro gerado para
           clientes.
         </p>
