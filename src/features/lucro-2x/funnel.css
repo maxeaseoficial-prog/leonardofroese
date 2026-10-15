@@ -1590,3 +1590,19 @@
   .result-vsl-play-icon { width: 52px; height: 52px; font-size: 19px; }
   .result-vsl-placeholder-content { gap: 8px; }
 }
+
+/* Pulso sutil exclusivo dos botões iniciais das duas rotas do Raio-X. */
+.funnel-primary-gentle-pulse {
+  transform-origin: center;
+  animation: raio-x-gentle-pulse 2.9s ease-in-out infinite;
+}
+@keyframes raio-x-gentle-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(211,170,79,.12); }
+  50% { transform: scale(1.018); box-shadow: 0 10px 29px rgba(211,170,79,.28); }
+}
+.funnel-primary-gentle-pulse:hover,
+.funnel-primary-gentle-pulse:focus-visible,
+.funnel-primary-gentle-pulse:active { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .funnel-primary-gentle-pulse { animation: none; }
+}
