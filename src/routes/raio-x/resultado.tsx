@@ -353,14 +353,20 @@ function ProtectedVimeoVsl() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [playing, setPlaying] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== "https://player.vimeo.com") return;
       if (event.source !== frameRef.current?.contentWindow) return;
-      let data: { event?: string; method?: string } | null = null;
+      let data: { event?: string; method?: string; data?: { percent?: number; seconds?: number; duration?: number } } | null = null;
       try { data = typeof event.data === "string" ? JSON.parse(event.data) : event.data; }
       catch { return; }
+      if (data?.event === "timeupdate" || data?.event === "progress") {
+        const percent = data.data?.percent ?? (data.data?.duration ? (data.data.seconds ?? 0) / data.data.duration : 0);
+        if (Number.isFinite(percent)) setProgress(Math.min(1, Math.max(0, percent)));
+      }
+      if (data?.event === "ended") setProgress(1);
       if (data?.event === "play" || data?.event === "playing") {
         setPlaying(true);
         setStarting(false);
@@ -381,11 +387,12 @@ function ProtectedVimeoVsl() {
   };
 
   return (
+    <div className="result-vsl-player-wrap">
     <div className="result-vsl-frame result-vsl-locked">
       <iframe
         ref={frameRef}
         onLoad={() => {
-          for (const name of ["play", "playing", "pause", "ended"]) {
+          for (const name of ["play", "playing", "pause", "ended", "timeupdate"]) {
             frameRef.current?.contentWindow?.postMessage({ method: "addEventListener", value: name }, "https://player.vimeo.com");
           }
         }}
@@ -409,6 +416,10 @@ function ProtectedVimeoVsl() {
           <span className="sr-only">{starting ? "Iniciando vídeo" : "Reproduzir vídeo"}</span>
         </button>
       )}
+    </div>
+    <div className="result-vsl-progress-track" role="progressbar" aria-label="Progresso da apresentação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+      <div className="result-vsl-progress-fill" style={{ width: `${Math.pow(progress, 0.52) * 100}%` }} />
+    </div>
     </div>
   );
 }
