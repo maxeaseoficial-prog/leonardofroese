@@ -1616,3 +1616,40 @@
   height: 100%;
   border: 0;
 }
+
+/* VSL com botão único e bloqueio de hover/click no player Vimeo. */
+.result-vsl-locked .result-vsl-embed {
+  pointer-events: none;
+}
+.result-vsl-interaction-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  pointer-events: auto;
+}
+.result-vsl-custom-play {
+  position: absolute;
+  z-index: 3;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: clamp(66px, 9vw, 92px);
+  height: clamp(66px, 9vw, 92px);
+  padding: 0;
+  border: 2px solid rgba(255,255,255,.85);
+  border-radius: 50%;
+  background: #e32636;
+  color: #fff;
+  font-size: clamp(23px, 3vw, 34px);
+  box-shadow: 0 9px 34px rgba(0,0,0,.55), 0 0 24px rgba(227,38,54,.35);
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.result-vsl-custom-play span[aria-hidden="true"] { padding-left: 5px; }
+.result-vsl-custom-play:hover { background: #ff3445; transform: translate(-50%, -50%) scale(1.06); }
+.result-vsl-custom-play:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+@media (prefers-reduced-motion: reduce) {
+  .result-vsl-custom-play { transition: none; }
+}
