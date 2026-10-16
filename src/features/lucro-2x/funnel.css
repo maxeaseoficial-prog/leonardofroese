@@ -1675,3 +1675,15 @@
 @media (prefers-reduced-motion: reduce) {
   .result-vsl-progress-fill { transition: none; }
 }
+
+/* CTA centralizado diretamente abaixo da VSL. */
+.result-shell > .result-vsl-section .result-vsl-cta {
+  display: flex;
+  width: min(100%, 460px);
+  min-height: 62px;
+  margin: 28px auto 0;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+}
