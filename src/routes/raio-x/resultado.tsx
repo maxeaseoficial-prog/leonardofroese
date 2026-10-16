@@ -180,6 +180,14 @@ function Result() {
             <p>Entenda como transformar o diagnóstico em decisões práticas para sua empresa.</p>
           </div>
           <ProtectedVimeoVsl />
+          <a
+            className="funnel-primary live-result-cta result-vsl-cta"
+            href={liveCheckout}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Quero minha vaga na live
+          </a>
         </section>
 
         <section className="result-section lucro2x-section" aria-labelledby="lucro2x-title">
