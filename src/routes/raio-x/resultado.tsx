@@ -424,9 +424,9 @@ function ProtectedVimeoVsl() {
           <span className="sr-only">{starting ? "Iniciando vídeo" : "Reproduzir vídeo"}</span>
         </button>
       )}
-    </div>
-    <div className="result-vsl-progress-track" role="progressbar" aria-label="Progresso da apresentação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-      <div className="result-vsl-progress-fill" style={{ width: `${Math.pow(progress, 0.52) * 100}%` }} />
+      <div className="result-vsl-progress-track" role="progressbar" aria-label="Progresso da apresentação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+        <div className="result-vsl-progress-fill" style={{ width: `${Math.pow(progress, 0.52) * 100}%` }} />
+      </div>
     </div>
     </div>
   );
