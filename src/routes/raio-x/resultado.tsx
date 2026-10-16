@@ -413,6 +413,7 @@ function ProtectedVimeoVsl() {
         tabIndex={-1}
       />
       <div className="result-vsl-interaction-shield" aria-hidden="true" />
+      {!playing && <div className="result-vsl-start-overlay" aria-hidden="true" />}
       {!playing && (
         <button
           type="button"
@@ -420,7 +421,7 @@ function ProtectedVimeoVsl() {
           onClick={play}
           aria-label="Reproduzir vídeo de Leonardo Froese"
         >
-          <span aria-hidden="true">▶</span>
+          <svg className="result-vsl-play-symbol" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 10.5C16 8.7 18 7.6 19.6 8.6L39 21.5c1.8 1.1 1.8 3.9 0 5L19.6 39.4C18 40.4 16 39.3 16 37.5Z" fill="currentColor" /></svg>
           <span className="sr-only">{starting ? "Iniciando vídeo" : "Reproduzir vídeo"}</span>
         </button>
       )}
