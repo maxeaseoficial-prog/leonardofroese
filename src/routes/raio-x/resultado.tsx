@@ -384,6 +384,11 @@ function ProtectedVimeoVsl() {
     <div className="result-vsl-frame result-vsl-locked">
       <iframe
         ref={frameRef}
+        onLoad={() => {
+          for (const name of ["play", "playing", "pause", "ended"]) {
+            frameRef.current?.contentWindow?.postMessage({ method: "addEventListener", value: name }, "https://player.vimeo.com");
+          }
+        }}
         src="https://player.vimeo.com/video/1236353859?title=0&byline=0&portrait=0&badge=0&dnt=1&autopause=0&controls=0"
         title="Apresentação da Live Lucro 2X com Leonardo Froese"
         allow="autoplay; fullscreen; picture-in-picture"
