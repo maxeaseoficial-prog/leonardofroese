@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BarChart3, FileText, Search, Star, Target, Video } from "lucide-react";
 import { calculateDiagnostic, pillars, type PillarId } from "@/features/lucro-2x/diagnostic-config";
@@ -179,17 +179,7 @@ function Result() {
             <h2 id="result-vsl-title" className="funnel-serif">O próximo passo começa <em>aqui.</em></h2>
             <p>Entenda como transformar o diagnóstico em decisões práticas para sua empresa.</p>
           </div>
-          <div className="result-vsl-frame">
-            <iframe
-              src="https://player.vimeo.com/video/1236353859?title=0&byline=0&portrait=0&dnt=1"
-              title="Apresentação da Live Lucro 2X com Leonardo Froese"
-              allow="autoplay; fullscreen; picture-in-picture"
-              referrerPolicy="strict-origin-when-cross-origin"
-              loading="lazy"
-              allowFullScreen
-              className="result-vsl-embed"
-            />
-          </div>
+          <ProtectedVimeoVsl />
         </section>
 
         <section className="result-section lucro2x-section" aria-labelledby="lucro2x-title">
@@ -351,5 +341,69 @@ function Result() {
         </section>
       </article>
     </FunnelShell>
+  );
+}
+
+/**
+ * A camada de proteção bloqueia mouse e toque no iframe e oferece
+ * uma ação explícita de play. Vimeo ainda pode exibir elementos
+ * gráficos próprios no vídeo conforme o plano do proprietário.
+ */
+function ProtectedVimeoVsl() {
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [starting, setStarting] = useState(false);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== "https://player.vimeo.com") return;
+      if (event.source !== frameRef.current?.contentWindow) return;
+      let data: { event?: string; method?: string } | null = null;
+      try { data = typeof event.data === "string" ? JSON.parse(event.data) : event.data; }
+      catch { return; }
+      if (data?.event === "play" || data?.event === "playing") {
+        setPlaying(true);
+        setStarting(false);
+      }
+      if (data?.event === "pause" || data?.event === "ended") {
+        setPlaying(false);
+        setStarting(false);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  const play = () => {
+    setStarting(true);
+    // PostMessage é o protocolo usado pelo Vimeo Player SDK.
+    frameRef.current?.contentWindow?.postMessage({ method: "play" }, "https://player.vimeo.com");
+  };
+
+  return (
+    <div className="result-vsl-frame result-vsl-locked">
+      <iframe
+        ref={frameRef}
+        src="https://player.vimeo.com/video/1236353859?title=0&byline=0&portrait=0&badge=0&dnt=1&autopause=0&controls=0"
+        title="Apresentação da Live Lucro 2X com Leonardo Froese"
+        allow="autoplay; fullscreen; picture-in-picture"
+        referrerPolicy="strict-origin-when-cross-origin"
+        loading="lazy"
+        className="result-vsl-embed"
+        tabIndex={-1}
+      />
+      <div className="result-vsl-interaction-shield" aria-hidden="true" />
+      {!playing && (
+        <button
+          type="button"
+          className="result-vsl-custom-play"
+          onClick={play}
+          aria-label="Reproduzir vídeo de Leonardo Froese"
+        >
+          <span aria-hidden="true">▶</span>
+          <span className="sr-only">{starting ? "Iniciando vídeo" : "Reproduzir vídeo"}</span>
+        </button>
+      )}
+    </div>
   );
 }
