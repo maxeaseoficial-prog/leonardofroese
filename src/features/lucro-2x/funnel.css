@@ -1717,3 +1717,27 @@
     height: 10px;
   }
 }
+
+/* Capa escura e botão de play inspirado no ícone circular de referência. */
+.result-vsl-start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 62% 65% at 50% 48%, rgba(0,0,0,.68), rgba(0,0,0,.4) 65%, rgba(0,0,0,.25) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.43));
+}
+.result-vsl-frame .result-vsl-custom-play {
+  z-index: 5;
+  width: clamp(78px, 9vw, 106px);
+  height: clamp(78px, 9vw, 106px);
+  border: 3px solid #fff;
+  background: linear-gradient(145deg, #ff3547 0%, #dc142a 80%);
+  box-shadow: 0 14px 44px rgba(0,0,0,.62), 0 0 0 7px rgba(0,0,0,.13), 0 0 35px rgba(227,38,54,.18);
+}
+.result-vsl-frame .result-vsl-custom-play:hover { background: linear-gradient(145deg,#ff5260,#e81b32); }
+.result-vsl-play-symbol { width: 47%; height: 47%; display: block; margin-left: 4px; }
+@media (max-width: 640px) {
+  .result-vsl-frame .result-vsl-custom-play { width: 75px; height: 75px; border-width: 2px; }
+}
