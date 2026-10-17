@@ -61,10 +61,9 @@ function WeeklyLiveConfirmation() {
           </div>
           <div className="post-purchase-copy">
             <span className="post-purchase-eyebrow"><Check size={22} strokeWidth={3} /> GARANTA SUA INSCRIÇÃO GRATUITA</span>
-            <h1 id="post-purchase-title" className="post-purchase-title">Sua próxima conversa sobre gestão <em>já tem data.</em></h1>
-            <p className="post-purchase-subtitle">
-              Participe da <strong>live gratuita no Instagram, dia 22/10, às 20h (horário de Cuiabá).</strong> Vamos conversar sobre gestão empresarial, lucro e como identificar oportunidades de melhoria na sua empresa.
-            </p>
+            <h1 id="post-purchase-title" className="post-purchase-title weekly-live-title">Participe da <em>live gratuita no Instagram</em>, dia 22/10, às 20h (horário de Cuiabá).</h1>
+            <p className="post-purchase-subtitle weekly-live-subtitle">Sua próxima conversa sobre gestão <strong>já tem data.</strong></p>
+            <p className="weekly-live-support">Vamos conversar sobre gestão empresarial, lucro e como identificar oportunidades de melhoria na sua empresa.</p>
             <div className="post-purchase-next">
               <div className="post-purchase-step"><span>01</span><div><strong>Sua inscrição é feita pelo grupo gratuito do WhatsApp</strong><p>Para garantir sua inscrição, basta entrar no grupo. Você receberá o acesso, os lembretes e todas as orientações para acompanhar a live.</p></div></div>
               <a className="post-purchase-whatsapp" href={whatsappGroupUrl} target="_blank" rel="noopener noreferrer">
