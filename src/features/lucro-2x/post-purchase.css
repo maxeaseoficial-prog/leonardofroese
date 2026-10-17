@@ -196,3 +196,27 @@
   .post-purchase-confetti { display: none; }
   .post-purchase-whatsapp { animation: none; }
 }
+
+/* Hierarquia exclusiva da live semanal: informação do evento primeiro. */
+.weekly-live-title {
+  font-size: clamp(33px, 3.45vw, 51px);
+  line-height: 1.12;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.weekly-live-subtitle {
+  margin-top: 22px;
+  font-size: clamp(16px, 1.65vw, 20px);
+  line-height: 1.45;
+  color: rgba(247,243,237,.85);
+}
+.weekly-live-subtitle strong { color: #e8c16a; }
+.weekly-live-support {
+  margin: 12px 0 0;
+  color: rgba(247,243,237,.69);
+  font-size: 15px;
+  line-height: 1.65;
+}
+@media (max-width: 800px) {
+  .weekly-live-title { max-width: none; font-size: clamp(32px, 7.7vw, 45px); }
+}
