@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight, Check, MessageCircle } from "lucide-react";
 import { funnelHead } from "@/features/lucro-2x/funnel-head";
@@ -23,36 +22,12 @@ export const Route = createFileRoute("/live/semanal")({
 });
 
 function WeeklyLiveConfirmation() {
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (media.matches) return;
-    setShowConfetti(true);
-    const timeout = window.setTimeout(() => setShowConfetti(false), 4500);
-    return () => window.clearTimeout(timeout);
+  return () => window.clearTimeout(timeout);
   }, []);
 
   return (
     <FunnelShell>
       <main className="post-purchase-page">
-        {showConfetti && (
-          <div className="post-purchase-confetti" aria-hidden="true">
-            {Array.from({ length: 68 }, (_, index) => (
-              <span
-                key={index}
-                className="post-purchase-confetti-piece"
-                style={{
-                  left: `${(index * 61.8) % 100}%`,
-                  animationDelay: `${(index % 19) * 0.09}s`,
-                  animationDuration: `${2.9 + (index % 9) * 0.19}s`,
-                  ["--confetti-drift" as string]: `${(index % 2 ? 1 : -1) * (25 + index % 95)}px`,
-                  backgroundColor: ["#e8c16a", "#ffd976", "#24d178", "#ffffff", "#b68b3c"][index % 5],
-                }}
-              />
-            ))}
-          </div>
-        )}
         <section className="post-purchase-hero" aria-labelledby="post-purchase-title">
           <div className="post-purchase-photo">
             <img src={leonardoPhoto.url} alt="Leonardo Froese, apresentador da live semanal gratuita" />
