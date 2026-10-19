@@ -66,8 +66,7 @@ function WeeklyLiveConfirmation() {
             </div>
 
             <h1 id="weekly-live-heading" className="weekly-live-heading">
-              <span>Live <em>gratuita</em></span>
-              <span>no Instagram</span>
+              <span className="weekly-live-mainline">Live <em>gratuita</em> no Instagram</span>
               <span className="weekly-live-date">22/10 às 20h</span>
             </h1>
 

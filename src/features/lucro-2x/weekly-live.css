@@ -110,7 +110,10 @@
   background: #e6ba5f;
 }
 
-.weekly-live-content { min-width: 0; }
+.weekly-live-content {
+  min-width: 0;
+  container-type: inline-size;
+}
 
 .weekly-live-kicker {
   display: flex;
@@ -147,6 +150,11 @@
 .weekly-live-heading > span {
   display: block;
   white-space: nowrap;
+}
+
+/* Linha única para "Live gratuita no Instagram" em qualquer largura. */
+.weekly-live-heading .weekly-live-mainline {
+  font-size: clamp(27px, 9.6cqw, 76px);
 }
 
 .weekly-live-heading em,
