@@ -7,6 +7,11 @@ import "@/features/lucro-2x/weekly-live.css";
 
 const whatsappGroupUrl = "https://chat.whatsapp.com/Dm1ZdJTYfqfBKK67izctSA";
 
+// Fire the standard Meta Contact event only when the WhatsApp button is clicked.
+function trackWhatsAppContact() {
+  (window as Window & { fbq?: (...args: string[]) => void }).fbq?.("track", "Contact");
+}
+
 export const Route = createFileRoute("/live/semanal")({
   head: () => ({
     meta: [
@@ -93,6 +98,7 @@ function WeeklyLiveConfirmation() {
             <a
               className="weekly-live-whatsapp"
               href={whatsappGroupUrl}
+              onClick={trackWhatsAppContact}
               target="_blank"
               rel="noopener noreferrer"
             >
