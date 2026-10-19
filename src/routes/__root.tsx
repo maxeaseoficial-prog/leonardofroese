@@ -6,12 +6,31 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+// Global Meta Pixel snippet, executed on the initial document load.
+const metaPixelScript = "!function(f,b,e,v,n,t,s)\n{if(f.fbq)return;n=f.fbq=function(){n.callMethod?\nn.callMethod.apply(n,arguments):n.queue.push(arguments)};\nif(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';\nn.queue=[];t=b.createElement(e);t.async=!0;\nt.src=v;s=b.getElementsByTagName(e)[0];\ns.parentNode.insertBefore(t,s)}(window, document,'script',\n'https://connect.facebook.net/en_US/fbevents.js');\nfbq('init', '1816414942832059');\nfbq('track', 'PageView');";
+
+// Client-side route changes do not reload the document, so track them separately.
+// Skip the first render because the snippet above already fires its PageView.
+function MetaPixelNavigationTracker() {
+  const locationHref = useRouterState({ select: (state) => state.location.href });
+  const previousHref = useRef(locationHref);
+
+  useEffect(() => {
+    if (previousHref.current === locationHref) return;
+    previousHref.current = locationHref;
+    (window as Window & { fbq?: (...args: string[]) => void }).fbq?.("track", "PageView");
+  }, [locationHref]);
+
+  return null;
+}
 
 function NotFoundComponent() {
   return (
@@ -114,8 +133,18 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: metaPixelScript }} />
       </head>
       <body>
+        <noscript>
+          <img
+            height={1}
+            width={1}
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=1816414942832059&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
         {children}
         <Scripts />
       </body>
@@ -128,6 +157,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MetaPixelNavigationTracker />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
