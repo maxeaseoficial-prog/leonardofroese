@@ -22,9 +22,6 @@ export const Route = createFileRoute("/live/semanal")({
 });
 
 function WeeklyLiveConfirmation() {
-  return () => window.clearTimeout(timeout);
-  }, []);
-
   return (
     <FunnelShell>
       <main className="post-purchase-page">
