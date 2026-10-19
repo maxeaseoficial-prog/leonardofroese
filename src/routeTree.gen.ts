@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as RpmRouteImport } from './routes/rpm'
 import { Route as ApiRpmProxyRouteImport } from './routes/api/rpm-proxy'
+import { Route as LiveSemanalRouteImport } from './routes/live/semanal'
 import { Route as Lucro2xObrigadoRouteImport } from './routes/lucro2x/obrigado'
 import { Route as RaioXIndexRouteImport } from './routes/raio-x/index'
 import { Route as RaioXDadosRouteImport } from './routes/raio-x/dados'
@@ -44,6 +45,11 @@ const RpmRoute = RpmRouteImport.update({
 const ApiRpmProxyRoute = ApiRpmProxyRouteImport.update({
   id: '/api/rpm-proxy',
   path: '/api/rpm-proxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveSemanalRoute = LiveSemanalRouteImport.update({
+  id: '/live/semanal',
+  path: '/live/semanal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Lucro2xObrigadoRoute = Lucro2xObrigadoRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/rpm': typeof RpmRoute
   '/api/rpm-proxy': typeof ApiRpmProxyRoute
+  '/live/semanal': typeof LiveSemanalRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/rpm': typeof RpmRoute
   '/api/rpm-proxy': typeof ApiRpmProxyRoute
+  '/live/semanal': typeof LiveSemanalRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/rpm': typeof RpmRoute
   '/api/rpm-proxy': typeof ApiRpmProxyRoute
+  '/live/semanal': typeof LiveSemanalRoute
   '/lucro2x/obrigado': typeof Lucro2xObrigadoRoute
   '/raio-x/dados': typeof RaioXDadosRoute
   '/raio-x/perguntas': typeof RaioXPerguntasRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/rpm'
     | '/api/rpm-proxy'
+    | '/live/semanal'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/rpm'
     | '/api/rpm-proxy'
+    | '/live/semanal'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/rpm'
     | '/api/rpm-proxy'
+    | '/live/semanal'
     | '/lucro2x/obrigado'
     | '/raio-x/dados'
     | '/raio-x/perguntas'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   RpmRoute: typeof RpmRoute
   ApiRpmProxyRoute: typeof ApiRpmProxyRoute
+  LiveSemanalRoute: typeof LiveSemanalRoute
   Lucro2xObrigadoRoute: typeof Lucro2xObrigadoRoute
   RaioXDadosRoute: typeof RaioXDadosRoute
   RaioXPerguntasRoute: typeof RaioXPerguntasRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/api/rpm-proxy'
       fullPath: '/api/rpm-proxy'
       preLoaderRoute: typeof ApiRpmProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/semanal': {
+      id: '/live/semanal'
+      path: '/live/semanal'
+      fullPath: '/live/semanal'
+      preLoaderRoute: typeof LiveSemanalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lucro2x/obrigado': {
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   RpmRoute: RpmRoute,
   ApiRpmProxyRoute: ApiRpmProxyRoute,
+  LiveSemanalRoute: LiveSemanalRoute,
   Lucro2xObrigadoRoute: Lucro2xObrigadoRoute,
   RaioXDadosRoute: RaioXDadosRoute,
   RaioXPerguntasRoute: RaioXPerguntasRoute,
